@@ -1,6 +1,6 @@
 DEV:
-  target_workspace_name: devops-dev
-  target_workspace_id: 7afc490e-115f-472c-a205-17dc6a5bee52
+  target_workspace_name: Test_Data_Engineering_Dev_WS
+  target_workspace_id: 8a9d03e8-88fd-4bf1-a560-ead9e4fbfb10
   repo_directory: fabric_items
   items_in_scope:
     - Notebook
@@ -23,8 +23,8 @@ DEV:
     - Dataflow
 
 QA:
-  target_workspace_name: devops-test
-  target_workspace_id: 2ae91835-ea46-482c-8656-14362495e197
+  target_workspace_name: Test_Data_Engineering_Test_WS
+  target_workspace_id: 85c71e9f-810b-4c89-8336-9cf2ce54d2b3
   repo_directory: fabric_items
   items_in_scope:
     - Notebook
@@ -47,8 +47,8 @@ QA:
     - Dataflow
 
 PROD:
-  target_workspace_name: devops-prod
-  target_workspace_id: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+  target_workspace_name: Test_Data_Engineering_Prod_WS
+  target_workspace_id: f3b65e72-a785-434c-9900-56c49e92dff8
   repo_directory: fabric_items
   items_in_scope:
     - Notebook
