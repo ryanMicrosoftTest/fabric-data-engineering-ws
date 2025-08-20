@@ -93,7 +93,7 @@ stages:
         echo "Target Environment: $(targetEnvironment)"
         echo "Working Directory: $(Build.SourcesDirectory)"
         ls -a
-        python ./.cicd/authenticate_spn.py $(targetEnvironment)
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment)
       condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
       workingDirectory: $(Build.SourcesDirectory)/current-repo/
       env:
