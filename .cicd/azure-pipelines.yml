@@ -77,7 +77,7 @@ stages:
 
     - script: |
         python -m pip install --upgrade pip
-        pip install -r .cicd/requirements.txt
+        pip install -r $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt
       displayName: 'Install dependencies'
 
     # Example of using files from the external repository
