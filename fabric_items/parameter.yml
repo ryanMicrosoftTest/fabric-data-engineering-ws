@@ -1,0 +1,54 @@
+key_value_replace:
+    - find_key: $.variables[?(@.name=="workspace_id")].value
+      replace_value:
+        DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
+        QA: 2ae91835-ea46-482c-8656-14362495e197
+        PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+      item_type: "VariableLibrary"
+      item_name: "vars"
+    - find_key: $.variables[?(@.name=="item_id")].value
+      replace_value:
+        DEV: 6a63ffcd-fca4-4a4a-be88-96fe8a4b12cc
+        QA: 15f986b3-fffd-41ff-b1fd-dfbf9b445b06
+        PROD: f4568a62-8591-4f16-a138-aa0f19e1c923
+      item_type: "VariableLibrary"
+      item_name: "vars"
+    - find_key: $.variables[?(@.name=="kv_uri")].value
+      replace_value:
+        DEV: https://kvfabricprodeus2rh.vault.azure.net/
+        QA: https://kvfabricprodeus2rh.vault.azure.net/
+        PROD: https://kvfabricprodeus2rh.vault.azure.net/
+      item_type: "VariableLibrary"
+      item_name: "vars"
+    - find_key: $.variables[?(@.name=="tenant_id")].value
+      replace_value:
+        DEV: tenantID
+        QA: tenantID
+        PROD: tenantID
+      item_type: "VariableLibrary"
+      item_name: "vars"
+    - find_key: $.variables[?(@.name=="client_id_secret")].value
+      replace_value:
+        DEV: spn-client-id
+        QA: spn-client-id
+        PROD: spn-client-id
+      item_type: "VariableLibrary"
+      item_name: "vars"
+    - find_key: $.variables[?(@.name=="client_secret_name")].value
+      replace_value:
+        DEV: spn-secret
+        QA: spn-secret
+        PROD: spn-secret
+      item_type: "VariableLibrary"
+      item_name: "vars"
+
+
+# spark_pool:
+#     # CapacityPool_Large
+#     "72c68dbc-0775-4d59-909d-a47896f4573b":
+#         type: "Capacity"
+#         name: "CapacityPool_Large"
+#     # CapacityPool_Medium
+#     "e7b8f1c4-4a6e-4b8b-9b2e-8f1e5d6a9c3d":
+#         type: "Workspace"
+#         name: "WorkspacePool_Medium"
