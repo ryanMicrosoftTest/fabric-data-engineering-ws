@@ -12,7 +12,7 @@ resources:
   repositories:
   - repository: fabric-cicd-demo
     type: github
-    endpoint: github  # This should be your GitHub service connection name
+    endpoint: RyanMicrosoftContosoUniversity  # This should be your GitHub service connection name
     name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
     ref: main  # or specify a different branch/tag
 
