@@ -107,7 +107,7 @@ stages:
         echo "Target Environment: $(targetEnvironment)"
         echo "Working Directory: $(Build.SourcesDirectory)"
         ls -a
-        la -a fabric_items
+        ls -a fabric_items
         python ./.cicd/authenticate_spn.py $(targetEnvironment)
       condition: eq(variables['targetEnvironment'], 'PROD')
       workingDirectory: $(Build.SourcesDirectory)/current-repo/
