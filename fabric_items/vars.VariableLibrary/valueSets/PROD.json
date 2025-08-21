@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
+  "name": "PROD",
+  "variableOverrides": [
+    {
+      "name": "workspace_id",
+      "value": "a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1"
+    },
+    {
+      "name": "item_id",
+      "value": "f4568a62-8591-4f16-a138-aa0f19e1c923"
+    },
+    {
+      "name": "metadata_lh_abfs_table_path",
+      "value": "abfss://a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1@onelake.dfs.fabric.microsoft.com/ee7622f1-c0a9-432d-a779-52631901add9/Tables"
+    }
+  ]
+}

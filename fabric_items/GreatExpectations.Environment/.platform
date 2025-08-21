@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Environment",
+    "displayName": "GreatExpectations",
+    "description": "Environment"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c1dc6287-c939-af4b-4422-a3d435832384"
+  }
+}

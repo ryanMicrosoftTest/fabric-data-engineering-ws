@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "KQLDatabase",
+    "displayName": "NycTaxiDB",
+    "description": "NycTaxiDB"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "26b94bc7-855e-aa61-4ee4-cfafa24b2afc"
+  }
+}

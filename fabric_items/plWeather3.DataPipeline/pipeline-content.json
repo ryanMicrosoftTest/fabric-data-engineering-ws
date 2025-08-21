@@ -1,0 +1,173 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings",
+              "skipLineCount": 0
+            },
+            "storeSettings": {
+              "type": "HttpReadSettings",
+              "requestMethod": "GET"
+            },
+            "datasetSettings": {
+              "type": "DelimitedText",
+              "typeProperties": {
+                "location": {
+                  "type": "HttpServerLocation"
+                },
+                "columnDelimiter": ",",
+                "rowDelimiter": "\n",
+                "quoteChar": "\"",
+                "escapeChar": "\\",
+                "firstRowAsHeader": true
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "38eda74a-a432-469d-9774-56fd43f50a2c"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "OverwriteSchema",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "table": "weather"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "lab_lh",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "6c2e94de-e571-9701-47b9-e2dbd338a208",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "Date/Time",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "DateTime",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Temp_C",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "TempC",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Dew Point Temp_C",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "DewPointTempC",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Rel Hum_%",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "RelHumidity",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Wind Speed_km/h",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "WindSpeed_km/h",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Visibility_km",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "Visibility_km",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Press_kPa",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "Press_kPa",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Weather",
+                  "type": "String",
+                  "physicalType": "String"
+                },
+                "sink": {
+                  "name": "Weather",
+                  "physicalType": "string"
+                }
+              }
+            ],
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy_4s3",
+        "dependsOn": []
+      }
+    ]
+  }
+}

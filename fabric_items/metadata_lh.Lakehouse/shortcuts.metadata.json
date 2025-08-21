@@ -1,0 +1,14 @@
+[
+  {
+    "name": "healthdata",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "1f126619-984e-4ab2-b5fa-42d5680242f7",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/healthdata"
+      }
+    }
+  }
+]

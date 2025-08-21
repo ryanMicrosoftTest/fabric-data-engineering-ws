@@ -1,0 +1,38 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "adc9606c-b788-8042-4dbd-3f08feee9766",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "metadata_lh_abfs_table_path": {
+              "value": {
+                "value": "@pipeline().libraryVariables.metadata_lh_abfs_table_path",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "create_metadata_lh_tables",
+        "dependsOn": []
+      }
+    ],
+    "libraryVariables": {
+      "metadata_lh_abfs_table_path": {
+        "type": "String",
+        "variableName": "metadata_lh_abfs_table_path",
+        "libraryName": "vars"
+      }
+    }
+  }
+}

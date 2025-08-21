@@ -1,0 +1,207 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource"
+          },
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "table": "shortcut_table"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "metadata_lh",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "e3fedc51-94ca-4ed7-86b7-9cc4e928401a",
+                  "workspaceId": "3f5b5f79-2192-4a03-a760-4d9ed9366cfc",
+                  "rootFolder": "Tables"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup Shortcut Table",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Lookup Shortcut Table').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "2a4c0467-ad4c-a11f-4674-4ad42a77e843",
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "parameters": {
+                  "shortcut_name": {
+                    "value": {
+                      "value": "@item().name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "shortcut_location": {
+                    "value": {
+                      "value": "@item().shortcut_location",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "target_type": {
+                    "value": {
+                      "value": "@item().target_type",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "target_connection_id": {
+                    "value": {
+                      "value": "@item().target_connection_id",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "target_location": {
+                    "value": {
+                      "value": "@item().target_location",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "target_subpath": {
+                    "value": {
+                      "value": "@item().target_subpath",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "data_type": {
+                    "value": {
+                      "value": "@item().data_type",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "kv_uri": {
+                    "value": {
+                      "value": "@pipeline().libraryVariables.kv_uri",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "tenant_id_secret": {
+                    "value": {
+                      "value": "@pipeline().libraryVariables.tenant_id_secret",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "client_id_secret": {
+                    "value": {
+                      "value": "@pipeline().libraryVariables.client_id_secret",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "client_secret_name": {
+                    "value": {
+                      "value": "@pipeline().libraryVariables.client_secret_name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "workspace_id": {
+                    "value": {
+                      "value": "@item().workspace_id",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "lakehouse_id": {
+                    "value": {
+                      "value": "@item().lakehouse_id",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Create Shortcut",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "ForEach record in Shortcut Table",
+        "description": "Create a shortcut for each row/record in shortcut_table",
+        "dependsOn": [
+          {
+            "activity": "Lookup Shortcut Table",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "libraryVariables": {
+      "workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "vars"
+      },
+      "item_id": {
+        "type": "String",
+        "variableName": "item_id",
+        "libraryName": "vars"
+      },
+      "kv_uri": {
+        "type": "String",
+        "variableName": "kv_uri",
+        "libraryName": "vars"
+      },
+      "tenant_id_secret": {
+        "type": "String",
+        "variableName": "tenant_id_secret",
+        "libraryName": "vars"
+      },
+      "client_id_secret": {
+        "type": "String",
+        "variableName": "client_id_secret",
+        "libraryName": "vars"
+      },
+      "client_secret_name": {
+        "type": "String",
+        "variableName": "client_secret_name",
+        "libraryName": "vars"
+      }
+    }
+  }
+}

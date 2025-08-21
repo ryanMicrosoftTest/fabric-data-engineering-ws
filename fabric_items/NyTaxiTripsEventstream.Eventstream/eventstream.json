@@ -1,0 +1,47 @@
+{
+  "sources": [
+    {
+      "id": "e9e86260-8a01-4493-9c8f-7df9b337baa1",
+      "name": "YellowTaxi",
+      "type": "SampleData",
+      "properties": {
+        "type": "YellowTaxi"
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "7abb45b4-46aa-4b15-8795-bf1622fc4b6f",
+      "name": "nyctaxidatabase",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "DirectIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "26b94bc7-855e-aa61-4ee4-cfafa24b2afc",
+        "tableName": "nyctaxitrips",
+        "connectionName": "NyTaxiTripsEventstream_NycTaxiDB-ny",
+        "mappingRuleName": "nyctaxitrips_mapping"
+      },
+      "inputNodes": [
+        {
+          "name": "NyTaxiTripsEventstream-stream"
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "id": "4c2469f6-ece0-4722-9a1b-62f7e2998ddf",
+      "name": "NyTaxiTripsEventstream-stream",
+      "type": "DefaultStream",
+      "properties": {},
+      "inputNodes": [
+        {
+          "name": "YellowTaxi"
+        }
+      ]
+    }
+  ],
+  "operators": [],
+  "compatibilityLevel": "1.1"
+}
