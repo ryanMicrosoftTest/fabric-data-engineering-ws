@@ -29,8 +29,13 @@
 -- META   }
 -- META }
 
+-- MARKDOWN ********************
+
+-- # Notebook to Create Masked Data View and Roles
+
 -- CELL ********************
 
+-- Show all schemas
 SELECT *
 FROM sys.schemas
 
@@ -43,20 +48,7 @@ FROM sys.schemas
 
 -- CELL ********************
 
-SELECT TOP (100) [id],
-			[first_name],
-			[social_security_number]
-FROM [health_silver_lh].[sec].[vw_employee]
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
+-- Create sec schema if not exists to apply views to
 IF NOT EXISTS (
     SELECT 1
     FROM sys.schemas
@@ -75,6 +67,7 @@ EXEC('CREATE SCHEMA sec')
 
 -- CELL ********************
 
+-- Create function to apply masking for social security numbers
 CREATE OR ALTER FUNCTION sec.fn_mask_ssn(@ssn NVARCHAR(11))
 RETURNS NVARCHAR(11)
 AS
@@ -108,194 +101,6 @@ INNER JOIN
 student
 ON
 employee.social_security_number = student.social_security_number
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
--- create a view and apply the conditional masking to the view (note this cannot be done on the table itself because DDM only supports static masking functions and doesn't allow conditional expressions or joins)
-
-
-CREATE VIEW sec.vw_employee AS
-SELECT employee.id,
-       employee.first_name,
-       CASE 
-       WHEN EXISTS (SELECT 1 FROM student 
-                            WHERE student.id = employee.id)
-        THEN sec.fn_mask_ssn(employee.social_security_number)
-        ELSE employee.social_security_number
-    END AS social_security_number
-FROM employee;
-
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-SELECT *
-FROM sec.vw_employee
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-CREATE OR ALTER FUNCTION sec.fn_mask_ssn(@ssn NVARCHAR(64))
-RETURNS NVARCHAR(11)
-AS
-BEGIN
-    IF @ssn IS NULL 
-        RETURN NULL;
-
-    DECLARE @digits NVARCHAR(64) = LTRIM(RTRIM(@ssn));
-    -- strip common separators
-    SET @digits = REPLACE(REPLACE(REPLACE(REPLACE(@digits, '-', ''), ' ', ''), '.', ''), CHAR(160), '');
-
-    -- require exactly 9 digits; anything else -> fully redacted
-    IF LEN(@digits) <> 9 OR @digits LIKE '%[^0-9]%'
-        RETURN N'***-**-****';
-
-    RETURN CONCAT(N'XXXX-XX-', RIGHT(@digits, 4));
-END;
-
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-IF OBJECT_ID(N'sec.fn_mask_ssn', N'FN') IS NOT NULL
-    DROP FUNCTION sec.fn_mask_ssn
-    
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-CREATE FUNCTION sec.fn_mask_ssn(@ssn NVARCHAR(64))
-RETURNS NVARCHAR(11)
-WITH INLINE = ON
-AS
-BEGIN
-    -- Normalize the input to just digits (rstrip spaces, dashes, dots, NBSP)
-    DECLARE @d NVARCHAR(64) = REPLACE(REPLACE(REPLACE(REPLACE(@ssn, '-', ''), ' ', ''), '.', ''), CHAR(160), '');
-
-    -- Single Return: required for inlining eligability in Fabric 
-    RETURN CASE
-        WHEN @ssn IS NULL THEN NULL
-        WHEN LEN(@d) <> 9 OR @d LIKE '%[^0-9]%' THEN N'***-**-****'
-        ELSE CONCAT(N'XXX-XX-', RIGHT(@d, 4))
-    END;
-END;
-GO
-
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
--- Conditional Masking View -> Mask only for Students
-CREATE OR ALTER VIEW sec.vw_employee AS
-SELECT employee.id,
-       employee.first_name,
-       CASE 
-       WHEN EXISTS (SELECT 1 FROM student 
-                            WHERE student.id = employee.id)
-        THEN sec.fn_mask_ssn(employee.social_security_number)
-        ELSE employee.social_security_number
-    END AS social_security_number
-FROM employee;
-
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-SELECT TOP (100) [id],
-			[first_name],
-			[social_security_number]
-FROM [health_silver_lh].[sec].[vw_employee]
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-UPDATE STATISTICS sec.vw_employee
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-SELECT name AS ViewName
-FROM sys.views
-WHERE schema_id = SCHEMA_ID('sec');
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-SELECT social_security_number
-FROM employee
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
-SELECT *
-FROM employee
 
 -- METADATA ********************
 
@@ -377,16 +182,6 @@ DENY SELECT ON OBJECT::dbo.student TO maskedReaders;
 -- CELL ********************
 
 ALTER ROLE maskedReaders ADD MEMBER [adf_user_2@MngEnvMCAP372892.onmicrosoft.com]
-
--- METADATA ********************
-
--- META {
--- META   "language": "sql",
--- META   "language_group": "sqldatawarehouse"
--- META }
-
--- CELL ********************
-
 
 -- METADATA ********************
 
