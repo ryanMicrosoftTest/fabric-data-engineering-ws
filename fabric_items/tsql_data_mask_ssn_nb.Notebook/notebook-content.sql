@@ -282,15 +282,101 @@ WHERE schema_id = SCHEMA_ID('sec');
 
 -- CELL ********************
 
+SELECT social_security_number
+FROM employee
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+SELECT *
+FROM employee
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
 SELECT employee.id,
        employee.first_name,
        CASE 
        WHEN EXISTS (SELECT 1 FROM student 
-                            WHERE student.id = employee.id)
-        THEN sec.fn_mask_ssn(employee.social_security_number)
+                            WHERE student.social_security_number = employee.social_security_number)
+        THEN CONCAT('XXX-XX-', RIGHT(employee.social_security_number, 4)
+        )
         ELSE employee.social_security_number
     END AS social_security_number
 FROM employee;
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+-- Masked group
+CREATE OR ALTER VIEW sec.vw_employee_masked AS
+    SELECT employee.id,
+       employee.first_name,
+       CASE 
+       WHEN EXISTS (SELECT 1 FROM student 
+                            WHERE student.social_security_number = employee.social_security_number)
+        THEN CONCAT('XXX-XX-', RIGHT(employee.social_security_number, 4)
+        )
+        ELSE employee.social_security_number
+    END AS social_security_number
+FROM employee;
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+SELECT *
+FROM sec.vw_employee_masked
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+-- Create role for users to 
+CREATE ROLE maskedReaders;
+
+GRANT SELECT ON OBJECT::sec.vw_employee_masked TO maskedReaders;
+DENY SELECT ON OBJECT::dbo.employee TO maskedReaders;
+DENY SELECT ON OBJECT::dbo.student TO maskedReaders;
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+ALTER ROLE maskedReaders ADD MEMBER [adf_user_2@MngEnvMCAP372892.onmicrosoft.com]
 
 -- METADATA ********************
 
