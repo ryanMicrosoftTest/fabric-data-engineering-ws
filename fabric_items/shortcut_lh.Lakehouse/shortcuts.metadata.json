@@ -1,0 +1,50 @@
+[
+  {
+    "name": "airline_delta",
+    "path": "/Tables",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "1f126619-984e-4ab2-b5fa-42d5680242f7",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/outbound/airline_delta"
+      }
+    }
+  },
+  {
+    "name": "airline_delta",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "1f126619-984e-4ab2-b5fa-42d5680242f7",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/outbound/airline_delta"
+      }
+    }
+  },
+  {
+    "name": "airline_1",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "1f126619-984e-4ab2-b5fa-42d5680242f7",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/outbound/airline"
+      }
+    }
+  },
+  {
+    "name": "airline",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "1f126619-984e-4ab2-b5fa-42d5680242f7",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/outbound/airline"
+      }
+    }
+  }
+]

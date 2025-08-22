@@ -1,0 +1,47 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/variables/1.0.0/schema.json",
+  "variables": [
+    {
+      "name": "workspace_id",
+      "note": "",
+      "type": "String",
+      "value": "7afc490e-115f-472c-a205-17dc6a5bee52"
+    },
+    {
+      "name": "item_id",
+      "note": "",
+      "type": "String",
+      "value": "6a63ffcd-fca4-4a4a-be88-96fe8a4b12cc"
+    },
+    {
+      "name": "kv_uri",
+      "note": "",
+      "type": "String",
+      "value": "https://kvfabricprodeus2rh.vault.azure.net/"
+    },
+    {
+      "name": "tenant_id_secret",
+      "note": "",
+      "type": "String",
+      "value": "tenantID"
+    },
+    {
+      "name": "client_id_secret",
+      "note": "",
+      "type": "String",
+      "value": "spn-client-id"
+    },
+    {
+      "name": "client_secret_name",
+      "note": "",
+      "type": "String",
+      "value": "spn-secret"
+    },
+    {
+      "name": "metadata_lh_abfs_table_path",
+      "note": "",
+      "type": "String",
+      "value": "abfss://7afc490e-115f-472c-a205-17dc6a5bee52@onelake.dfs.fabric.microsoft.com/88b6e0df-1f87-4131-9179-5b2c9719106e/Tables"
+    }
+  ]
+}

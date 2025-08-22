@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Copy Data to Dimension City and Fact Sale"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "79c2d4d1-6416-8c08-4b75-2ded1485987b"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Eventhouse",
+    "displayName": "NycTaxiDB",
+    "description": "NycTaxiDB"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b6b6400e-5c0c-91b5-456f-50f0c4c86c8a"
+  }
+}

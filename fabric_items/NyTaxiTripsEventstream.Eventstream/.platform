@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Eventstream",
+    "displayName": "NyTaxiTripsEventstream"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f3d17511-d83a-ab8b-4015-02a3b2912a15"
+  }
+}

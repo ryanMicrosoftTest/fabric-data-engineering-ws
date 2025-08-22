@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
+  "name": "DEV",
+  "variableOverrides": [
+    {
+      "name": "item_id",
+      "value": "6a63ffcd-fca4-4a4a-be88-96fe8a4b12cc"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {},
+  "name": "wwi_df_gen2",
+  "queryGroups": [],
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "DefaultDestination": {
+      "queryId": "9cf0f5dc-b08d-4a55-a9a6-85580d84d3d0",
+      "queryName": "DefaultDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "dimension_customer": {
+      "queryId": "ccabf227-d285-484a-adbe-b7360b0db37b",
+      "queryName": "dimension_customer",
+      "loadEnabled": false
+    },
+    "dimension_customer_DataDestination": {
+      "queryId": "9b3cf296-f594-4437-a2c0-2a034007944f",
+      "queryName": "dimension_customer_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "https://mngenvmcap372892-my.sharepoint.com/personal/admin_mngenvmcap372892_onmicrosoft_com/",
+      "kind": "Web",
+      "connectionId": "{\"ClusterId\":\"47c4c7d1-c57a-466b-a854-b60cc308f6cf\",\"DatasourceId\":\"1868a684-93dd-4ed7-ab90-bb7e0457075f\"}"
+    },
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"47c4c7d1-c57a-466b-a854-b60cc308f6cf\",\"DatasourceId\":\"332326e5-6ccb-473b-b4cf-6751de648cda\"}"
+    }
+  ]
+}

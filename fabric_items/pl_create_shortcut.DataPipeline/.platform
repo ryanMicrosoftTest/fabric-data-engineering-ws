@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "pl_create_shortcut"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d0e39cd5-21b6-936e-4018-4f3627c03e8e"
+  }
+}

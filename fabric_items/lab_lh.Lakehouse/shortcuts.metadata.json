@@ -1,0 +1,14 @@
+[
+  {
+    "name": "parquet",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "610fbe61-2e0f-408d-8072-c076842327d8",
+        "location": "https://publicdatasetssa.dfs.core.windows.net",
+        "subpath": "/fabricdatafactorylab/parquet"
+      }
+    }
+  }
+]
