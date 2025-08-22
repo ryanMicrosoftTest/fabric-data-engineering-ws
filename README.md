@@ -113,6 +113,10 @@ A better option is to create a view with this logic applied and then create diff
 
 The below is an example of such a use case.  Below there are students who may also be employees (such as if they are graduate or undergraduate students working as research assistants to help fund their studies).  In the case that the employee is also a student, their social security number must be masked so that only the last 4 digits can be seen.  
 
+# Related Artifacts in this repo
+Masking on Spark Data itself -> fabric_items/data_masking_spark_files_nb.Notebook
+Masking on SQL Endpoint and Roles -> fabric_items/tsql_data_mask_ssn_nb.Notebook
+
 - Architecture Diagram
 ![Architecture Diagram](docs/conditional_masking_architecture.png)
 
