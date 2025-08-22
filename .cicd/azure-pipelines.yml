@@ -108,7 +108,7 @@ stages:
         echo "Working Directory: $(Build.SourcesDirectory)"
         ls -a
         ls -a fabric_items
-        python ./.cicd/authenticate_spn.py $(targetEnvironment)
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
       condition: eq(variables['targetEnvironment'], 'PROD')
       workingDirectory: $(Build.SourcesDirectory)/current-repo/
       env:
