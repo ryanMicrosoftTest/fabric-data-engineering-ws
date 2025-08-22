@@ -99,3 +99,25 @@ Tips
 - Ensure parameter.yml exists at fabric_items/parameter.yml and contains the required keys.
 - Confirm item_type_in_scope contains the item types you expect to deploy.
 - Verify workspace ID/name values are correct and the service connection has required permissions.
+
+
+## Additional Solutions
+- Please explore additional solutions below
+
+## Conditional Masking
+Imagine a scenario where you want to apply masking on columns when a specific condition occurs, however you don't want the mask applied on every record in the column, only if they meet a specific condition.  This is conditional masking.  This is a scenario where you can't apply Dynamic Data Masking (at the time of this writing) because this must take place on either the entirety of a column, not a subset of the column that meets a certain condition.  This is too complex for functions to apply at runtime to a view as well, so there are limited options.
+
+One option is to apply this directly to the data itself.  However this means if you want to have separate views for different users, you have to duplicate the data (one with the column masked, the other without the masking).  This may be fine if it's done on a dimension table, or some other table type where the number of records are small, but in general should be avoided.
+
+A better option is to create a view with this logic applied and then create different roles, one for users that can see the data unmasked, another for users who can see the data masked.  It is important in this case to ensure that the users who are only supposed to see the masked data do not have access to the underlying table (as the masking is not applied there and these users would be able to see the data) nor access to the sql endpoint table where the mask is not applied.  This can be accomplished by not giving the users access to the underlying delta tables and only access to the sql endpoint.  Then, the role has to DENY GRANTs on the tables where the data is not masked.
+
+The below is an example of such a use case.  Below there are students who may also be employees (such as if they are graduate or undergraduate students working as research assistants to help fund their studies).  In the case that the employee is also a student, their social security number must be masked so that only the last 4 digits can be seen.  
+
+- Architecture Diagram
+![Architecture Diagram](docs/conditional_masking_architecture.png)
+
+
+
+
+
+
