@@ -14,7 +14,7 @@ resources:
     type: github
     endpoint: RyanMicrosoftContosoUniversity  # This should be your GitHub service connection name
     name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
-    ref: feature/refactor-split-code-fabric-items
+    ref: main
 
 pool:
   vmImage: 'ubuntu-latest'  
