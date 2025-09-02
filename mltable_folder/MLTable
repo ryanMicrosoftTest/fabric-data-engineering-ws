@@ -1,0 +1,9 @@
+$schema: https://azuremlschemas.azureedge.net/latest/MLTable.schema.json
+type: mltable
+
+paths:
+  - folder: azureml://subscriptions/910ebf13-1058-405d-b6cf-eda03e5288d1/resourcegroups/aml-rg/workspaces/aml-private-dev/datastores/health_adls_outbound_cxn/paths/employee/
+
+transformations:
+  - read_delta_lake:
+      version_as_of: 1
