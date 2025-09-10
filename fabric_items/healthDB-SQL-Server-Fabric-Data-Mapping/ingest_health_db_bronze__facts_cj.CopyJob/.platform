@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "CopyJob",
+    "displayName": "ingest_health_db_bronze__facts_cj"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "5725889d-1d9e-86d2-4b62-7bad62c80af7"
+  }
+}

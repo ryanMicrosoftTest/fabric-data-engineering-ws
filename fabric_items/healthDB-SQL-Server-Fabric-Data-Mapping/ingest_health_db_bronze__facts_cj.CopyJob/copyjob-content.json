@@ -1,0 +1,175 @@
+{
+  "properties": {
+    "jobMode": "CDC",
+    "fullLoadBehavior": "None",
+    "source": {
+      "type": "AzureSqlTable",
+      "connectionSettings": {
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "database": "healthDB"
+        },
+        "externalReferences": {
+          "connection": "abae0a69-1bff-4cf5-be93-22b1ba37e04e"
+        }
+      }
+    },
+    "destination": {
+      "type": "DelimitedText",
+      "connectionSettings": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "artifactId": "8004db6d-22e6-8b3e-43dc-75883eb953e1",
+          "rootFolder": "Files"
+        }
+      }
+    },
+    "policy": {
+      "timeout": "0.12:00:00"
+    }
+  },
+  "activities": [
+    {
+      "id": "be0003761cdcc",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "fact_sales"
+          },
+          "changeDataSettings": {
+            "readMethod": "SnapshotPlusIncremental",
+            "columns": [
+              {
+                "name": "sale_timestamp",
+                "type": "DateTimeOffset",
+                "physicalType": "datetimeoffset"
+              }
+            ]
+          }
+        },
+        "destination": {
+          "datasetSettings": {
+            "location": {
+              "type": "LakehouseLocation",
+              "fileName": "dbo.fact_sales",
+              "folderPath": "Ingest/healthDB"
+            },
+            "columnDelimiter": ",",
+            "escapeChar": "\\",
+            "firstRowAsHeader": true,
+            "quoteChar": "\""
+          },
+          "storeSettings": {},
+          "formatSettings": {
+            "fileExtension": ".txt"
+          }
+        },
+        "enableStaging": false,
+        "translator": {
+          "type": "TabularTranslator",
+          "mappings": [
+            {
+              "source": {
+                "name": "bigint_transaction_id",
+                "type": "Int64",
+                "physicalType": "bigint"
+              },
+              "destination": {
+                "name": "bigint_transaction_id",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "sale",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "sale",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "unit_price",
+                "type": "Decimal",
+                "physicalType": "smallmoney",
+                "scale": 4,
+                "precision": 10
+              },
+              "destination": {
+                "name": "unit_price",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "sale_date",
+                "type": "DateTime",
+                "physicalType": "datetime2",
+                "precision": 7
+              },
+              "destination": {
+                "name": "sale_date",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "sale_timestamp",
+                "type": "DateTimeOffset",
+                "physicalType": "datetimeoffset",
+                "precision": 7
+              },
+              "destination": {
+                "name": "sale_timestamp",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "store_id",
+                "type": "String",
+                "physicalType": "nchar",
+                "length": "10"
+              },
+              "destination": {
+                "name": "store_id",
+                "type": "String",
+                "physicalType": "String"
+              }
+            },
+            {
+              "source": {
+                "name": "product_id",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "product_id",
+                "type": "String",
+                "physicalType": "String"
+              }
+            }
+          ]
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    }
+  ]
+}
