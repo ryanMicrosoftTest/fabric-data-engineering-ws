@@ -1,0 +1,53 @@
+source:
+  path: 'abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/3eb953e1-7588-43dc-8b3e-22e68004db6d/Files/Ingest/healthDB/dbo.dim_product.parquet'
+  type: files
+  format: parquet
+  source_system: msft_sql_server
+  schema:
+    fields:
+      - name: product_id
+        type: integer
+      - name: product_name
+        type: nvarchar(100)
+      - name: restock_date
+        type: smalldatetime
+      - name: restock_priority_level
+        type: tinyint
+
+target:
+  path: 'abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/3eb953e1-7588-43dc-8b3e-22e68004db6d/Tables/dim_product'
+  type: table
+  format: delta
+  schema:
+    fields:
+      - name: product_id
+        type: integer
+      - name: product_name
+        type: nvarchar(100)
+      - name: restock_date
+        type: smalldatetime
+      - name: restock_priority_level
+        type: tinyint
+    schema_evolution:
+      enabled: true
+      mode: additive                          # allows new columns to be added to the schema without breaking existing data
+  partition_by:
+    - restock_date
+  primary_key:
+    - product_id
+  incremental:
+    mode: append
+    unique_key: product_id                    # potentially use this to use monotonically_increasing_id() to generate unique IDs
+    timestamp_column: restock_date            # specifies the column in the source data that contains the event time
+    watermark_column: restock_date            # defines the column used to compute teh watermark
+    watermark_offset: 1 day                   # sets a delay threshold.  Data is considered late if it arrives more than one day after the latest known watermark
+    watermark_format: 'yyyy-MM-dd HH:mm:ss'   # defines the format in the watermark column
+    watermark_timezone: 'UTC'                 # defines the timezone of the watermark column
+    watermark_strategy: 'latest'              # indicatees that the watermark should be dynamically updated to the latest timestamp seen in the data
+    
+    watermark_initial_value: '2024-01-01 00:00:00'    
+    watermark_initial_timezone: 'UTC'
+    watermark_initial_format: 'yyyy-MM-dd HH:mm:ss'
+    watermark_initial_strategy: 'fixed'
+    watermark_initial_offset: 0 days
+   

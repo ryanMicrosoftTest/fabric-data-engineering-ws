@@ -1,0 +1,108 @@
+Metadata-Version: 2.1
+Name: mltable
+Version: 1.3.0
+Summary: Contains MLTable loading and authoring apis for the mltable package.
+Home-page: https://docs.microsoft.com/python/api/overview/azure/ml/?view=azure-ml-py
+Author: Microsoft Corp
+License: Proprietary https://aka.ms/azureml-preview-sdk-license 
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.6,< 4.0
+Description-Content-Type: text/x-rst
+Requires-Dist: azureml-dataprep[parquet] (<4.11.0a,>=4.10.0a)
+Requires-Dist: pyyaml (<7.0.0,>=5.1.0)
+Requires-Dist: jsonschema (<5.0.0,>=4.0.0)
+Requires-Dist: msrest (>=0.6.18)
+Requires-Dist: azure-core (!=1.22.0,<2.0.0,>=1.8.0)
+Requires-Dist: azure-mgmt-core (<2.0.0,>=1.3.0)
+Requires-Dist: python-dateutil (<3.0.0,>=2.7.3)
+Requires-Dist: cryptography (!=1.9,!=2.0.*,!=2.1.*,!=2.2.*,<41)
+Requires-Dist: PyJWT (<3.0.0)
+Requires-Dist: pytz
+
+# mltable: machine learning table data toolkit 
+MLTable is a Python package that provides fast, flexible data loading functions designed to make accessing "tabular" data easy and intuitive. MLTable will help you to abstract the schema definition for tabular data so that it is easier to materialize the table into a Pandas dataframe. 
+MlTable can be leveraged upon delimited text files, parquet files, delta lake, json-lines files from a cloud object store or local disk. 
+
+## Main Features 
+
+Here are a few things that mltable does well: 
+
+- Flexible **sampling and filtering** functionality on large data 
+
+- Robust IO tools for loading data from  **flat** files (CSV and delimited), **parquet** files, **delta lake** and **json-lines files** 
+
+- Capturing and defining **schema** contained in flat files 
+
+- Fast materialization of data into Pandas DataFrame
+
+## Getting started 
+
+You can install MLTable package via pip.
+```bash
+pip install mltable
+``` 
+
+Please note MLTable package is pre-installed on AzureML compute instances. 
+
+## Documentation 
+
+The official documentation is hosted on [Create a mltable data asset.](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-data-assets?tabs=cli#create-a-mltable-data-asset) 
+
+MLTable artifact’s metadata file is called  MLTable which adheres to the [AzureML MLTable schema](https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-mltable). 
+
+# Release History
+
+## 1.3.0 (2023-04-07)
+
+### Features Added
+ - bugfix (user error mapping, mltable save/load roundtrip)
+
+## 1.2.0 (2023-02-22)
+
+### Features Added
+ - bugfix (mltable save/load, validation schema)
+
+## 1.1.0 (2023-01-26)
+
+### Features Added
+ - bugfix (fix schema, flake8 errors)
+ - improve logging and exception message
+
+## 1.0.0 (2022-12-05)
+
+### Features Added
+ - factory apis(from_delta_lake)
+ - Authhoring apis(convert_column_types,save, skip etc)
+
+## 0.1.0b4 (2022-10-05)
+
+### Features Added
+- Factory apis(from_paths, from_delimited_files, from_parquet_files, from_json_lines_files).
+- Authoring apis(keep_columns, drop_columns, take_random_sample, take etc).
+- Support mltable load from data asset uri
+
+## 0.1.0b3 (2022-06-30)
+
+## 0.1.0b2 (2022-05-23)
+
+## 0.1.0b1 (2022-05-17)
+
+### Features Added
+- Initial public preview release to load into pandas dataframe
+
+

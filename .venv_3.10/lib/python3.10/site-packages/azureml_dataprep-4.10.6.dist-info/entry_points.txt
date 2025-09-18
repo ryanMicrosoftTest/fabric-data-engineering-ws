@@ -1,0 +1,2 @@
+[console_scripts]
+azmldprep = azureml.dataprep.cli.azmldprep:main

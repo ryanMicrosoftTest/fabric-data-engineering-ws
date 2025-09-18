@@ -1,0 +1,1735 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.DataPrep</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.DataPrep.Common.Builders">
+            <summary>
+            A class used to create various intelligent transformation steps.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.Builders.#ctor(Microsoft.DataPrep.Common.DataFlow)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="dataFlow">parent dataflow object.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.Builders.GetFileFormatBuilder">
+            <summary>
+            Get a builder to detect file format automatically.
+            </summary>
+            <returns>File Format Builder.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.Builders.GetColumnTypesBuilder">
+            <summary>
+            Get a builder to automatically detect column types.
+            </summary>
+            <returns>Column Type Builder.</returns>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.FileFormatBuilder">
+             <summary>
+             Interactive object that can learn the file format and properties required to read a given file.
+            
+             Note: This Builder is generally used on a Dataflow which has had a 'get_files' step applied to it.After the path(s)
+                   to files have been resolved, the appropriate method of interpreting those files can be learned and modified
+                   using this Builder.
+             </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.FileFormatBuilder.FileFormat">
+            <summary>
+            indicate the detcted file format.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatBuilder.#ctor(Microsoft.DataPrep.Common.DataFlow)">
+            <summary>
+            Class constructor for file format builder.
+            </summary>
+            <param name="dataFlow">parent dataflow object.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatBuilder.ToDataFlowAsync(System.Boolean)">
+             <summary>
+             Uses learned information about the files in the initial Dataflow to construct a new Dataflow
+                 which has the correct reading/parsing steps to extract their data.
+            
+             </summary>
+             <param name="includePath">Whether to include a column containing the path from which the data was read.</param>
+             <returns>A new Dataflow with the appropriate parsing/reading steps applied based on the learned information.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatBuilder.LearnAsync">
+             <summary>
+             Learn the `file_format` of the files from the initial Dataflow.
+            
+             Note:
+                After calling this function the 'file_format' attribute on this Builder will be populated with
+                information about the file(s) in the initial Dataflow.This attribute includes file type as well
+                as some parameters to be used when parsing the file(s).
+             </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.ColumnTypesBuilder">
+            <summary>
+               Interactive object that can be used to infer column types and type conversion attributes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.ColumnTypesBuilder.ConversionCandidates">
+            <summary>
+            Current dictionary of conversion candidates, where key is column name and value is list of conversion candidates.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.ColumnTypesBuilder.#ctor(Microsoft.DataPrep.Common.DataFlow)">
+            <summary>
+            Constructor to create a column type builder.
+            </summary>
+            <param name="dataFlow">parent dataflow object.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.ColumnTypesBuilder.ToDataFlowAsync">
+             <summary>
+             Uses current state of this object to add 'set_column_types' step to the original Dataflow.
+            
+             Note:
+                This call will fail if there are any unresolved date format ambiguities remaining.
+             </summary>
+             <returns>The modified Dataflow.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.ColumnTypesBuilder.LearnAsync(System.Nullable{System.Boolean})">
+            <summary>
+               Performs a pull on the data and populates : ColumnTypesBuilder.ConversionCandidates with automatically inferred conversion candidates for each column.
+            </summary>
+            <param name="dayFirst">Argument that would force automatic date format ambiguity resolution for all columns.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.ColumnDefinitionInfo">
+            <summary>
+            Define column data type and related arguments.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.ColumnDefinitionInfo.#ctor(System.String,Microsoft.DPrep.Engine.FieldType,System.Object[])">
+            <summary>
+            Describes a column definition, such as column name, type and format.
+            </summary>
+            <param name="columnName">Column Name.</param>
+            <param name="type">Column Type, such as long.</param>
+            <param name="arguments">Column Format, such as "%m-%d-%Y" for Date type.</param>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.ColumnDefinitionInfo.ColumnName">
+            <summary>
+            Column Name.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.ColumnDefinitionInfo.Type">
+            <summary>
+            Column Type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.ColumnDefinitionInfo.Arguments">
+            <summary>
+            Column Format, such as "%m-%d-%Y" for Date type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.IntColumnDefinitionInfo">
+            <summary>
+            Define a integer type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.IntColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes an integer column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.LongColumnDefinitionInfo">
+            <summary>
+            Define a long type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.LongColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes a long column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.StringColumnDefinitionInfo">
+            <summary>
+            Define a string type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.StringColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes an string column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.BoolColumnDefinitionInfo">
+            <summary>
+            Define a boolean type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.BoolColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes an boolean column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DecimalColumnDefinitionInfo">
+            <summary>
+            Define a decimal type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DecimalColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes a decimal column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.NullColumnDefinitionInfo">
+            <summary>
+            Define a null value type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.NullColumnDefinitionInfo.#ctor(System.String)">
+            <summary>
+            Describes a null column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DateTimeColumnDefinitionInfo">
+            <summary>
+            Define a datetime type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DateTimeColumnDefinitionInfo.#ctor(System.String,System.String[])">
+            <summary>
+            Describes a DateTime column definition.
+            </summary>
+            <param name="columnName">Column Name.</param>
+            <param name="arguments">DateTime type formats.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.UnknownColumnDefinitionInfo">
+            <summary>
+            Define an unknown type column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.UnknownColumnDefinitionInfo.#ctor(System.String,System.Object[])">
+            <summary>
+            Describes a column with unknown data type.
+            </summary>
+            <param name="columnName">Column Name.</param>
+            <param name="arguments">unknown data arguments.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.ColumnProfile">
+            <summary>
+            A ColumnProfile collects summary statistics on a particular column of data produced by a Dataflow.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.ColumnProfile.#ctor(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            A ColumnProfile collects summary statistics on a particular column of data produced by a Dataflow.
+            </summary>
+            <param name="cache">summary statistics on a particular column in a dictionary format.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DataFlow">
+            <summary>
+            A Dataflow represents a series of lazily-evaluated, immutable operations on data.
+            It is only an execution plan. No data is loaded from the source until you get data from the Dataflow using one of Head, GetProfile or the write methods.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.#ctor(Microsoft.DPrep.Engine.IActivity)">
+            <summary>
+            Creates a new instance of the Dataflow.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToDataView">
+            <summary>
+            Perform the necessary execution on DataFlow object to get an IDataView result. The number of threads will be decided by the system.
+            </summary>
+            <returns>IDataView result.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToDataView(System.Nullable{System.Int32})">
+            <summary>
+            Perform the necessary execution on DataFlow object to get an IDataView result.
+            </summary>
+            <param name="parallelizationDegree">How many threads can be used by the resulting IDataView. If null, the number of threads will be decided by the system.</param>
+            <returns>IDataView result.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.GetRecords">
+            <summary>
+            Perform the necessary execution on DataFlow object to return IEnumerable of type Record.
+            </summary>
+            <returns>IEnumerable of type Record</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToDPrepJson">
+            <summary>
+            Serializes the current Dataflow into a JSON string.
+            </summary>
+            <returns>JSON string.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToV2YamlDataflow(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Serializes the current Dataflow into a v2 Yaml string.
+            </summary>
+            <returns>YAML string.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.SaveToDPrepFile(System.String)">
+            <summary>
+            Serializes the current Dataflow into a specified DPrep file in JSON format.
+            </summary>
+            <param name="dprepFilePath">Output DPrep file path.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.FromDPrepFile(System.String)">
+            <summary>
+            Perform the execution on DPrep file to get a DataFlow object.
+            </summary>
+            <param name="dprepFilePath">Input DPrep file path.</param>
+            <returns>DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.FromDPrepJSONString(System.String)">
+            <summary>
+            Perform the execution on DPrep JSON string to get a DataFlow object.
+            </summary>
+            <param name="dprepJSONString">Input DPrep JSON string.</param>
+            <returns>DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.GetProfile(System.Boolean,System.Int64)">
+            <summary>
+            Requests the data profile which collects summary statistics on the full data produced by the Dataflow.
+            A data profile can be very useful to understand the input data, identify anomalies and missing values,
+            and verify that data preparation operations produced the desired result.
+            </summary>
+            <param name="include_stype_counts">Whether to include checking if values look like some well known semantic types of information.
+            For Example, "email address". Turning this on will impact performance.</param>
+            <param name="number_of_histogram_bins">Number of bins in a histogram. If not specified will be set to 10.</param>
+            <returns>an OrderedDictionary object containing column ProfileResult.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddStep(Microsoft.DPrep.Engine.Blocks.BlockArguments)">
+            <summary>
+            Adds a Step to current DataFlow using provided arguments.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddSteps(System.Collections.Generic.IEnumerable{Microsoft.DPrep.Engine.Blocks.BlockArguments})">
+            <summary>
+            Adds a multiple Steps to current DataFlow using provided arguments.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DataFlow.Activity">
+            <summary>
+            An object contains under-constructing dataflow and associated support methods, such as methods to Add, or remove a step.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DataFlow.BlockArguments">
+            <summary>
+            A collection of arguments used to create steps in current DataFlow.null
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DataFlow.Builders">
+            <summary>
+            Builder classes could be used to create various Intelligent transformation steps.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DataFlow.SecretManager">
+            <summary>
+            Maintain a list of secrets which will be used during execution.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Reference(Microsoft.DPrep.Engine.ActivityReference)">
+            <summary>
+            Creates a reference to an existing activity object.
+            </summary>
+            <param name="reference">The reference activity.</param>
+            <return>A new Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ReadParquetDataset(Microsoft.DPrep.Engine.PropertiesSystem.DataSourcePropertyValue)">
+            <summary>
+            Creates a step to read parquet file.
+            </summary>
+            <param name="path">The path to the Parquet file.</param>
+            <return>A new Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.SelectPartitions(System.Collections.Generic.List{System.Int64})">
+            <summary>
+            Selects specific partitions from the data, dropping the rest.
+            </summary>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToCsvStreams(System.Char,System.String,System.String)">
+            <summary>
+            Creates streams with the data in delimited format.
+            </summary>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToParquetStreams(System.String,System.Int64)">
+            <summary>
+            Creates streams with the data in parquet format.
+            </summary>
+            <param name="error">String to use for error values.</param>
+            <param name="rowsPerGroup">Number of rows to use per row group.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToDataFrameDirectory(System.String,System.Int64)">
+            <summary>
+            Creates streams with the data in dataframe directory format.
+            </summary>
+            <param name="error">String to use for error values.</param>
+            <param name="rowsPerGroup">Number of rows to use per row group.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.NullCoalesce(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            For each record, selects the first non-null value from the columns specified and uses it as the value of a new column.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="newColumnId">The name of the new column.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ExtractErrorDetails(System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Extracts the error details from error values into a new column.
+            </summary>
+            <param name="column">The source column.</param>
+            <param name="errorValueColumn">Name of a column to hold the original value of the error.</param>
+            <param name="extractErrorCode">Whether to also extract the error code.</param>
+            <param name="errorCodeColumn">Name of a column to hold the error code.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DuplicateColumn(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Creates new columns that are duplicates of the specified source columns.
+            </summary>
+            <param name="columnPairs">Mapping of the columns to duplicate to their new names.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.SplitSType(System.String,Microsoft.DataPrep.Common.SType,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates new columns from an existing column, interpreting its values as a semantic type.
+            </summary>
+            <param name="column">The source column.</param>
+            <param name="stype">The semantic type used to interpret values in the column.</param>
+            <param name="stypeFields">Fields of the semantic type to use. If not provided, all fields will be used.</param>
+            <param name="newColumnNames">Names of the new columns. If not provided new columns will be named with the source column name plus the semantic type field name.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ReplaceNa(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.Boolean,System.Boolean,System.Boolean,System.String)">
+            <summary>
+            Replaces values in the specified columns with nulls. You can choose to use the default list, supply your own, or both.
+            </summary>
+            <param name="useDefaultNaList">Use the default list and replace 'null', 'NaN', 'NA', and 'N/A' with null.</param>
+            <param name="useEmptyStringAsNa">Replace empty strings with null.</param>
+            <param name="useNanAsNa">Replace NaNs with Null.</param>
+            <param name="customNaList">Provide a comma separated list of values to replace with null.</param>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ReplaceNa(System.String,System.Boolean,System.Boolean,System.Boolean,System.String)">
+            <summary>
+            Replaces values in the specified columns with nulls. You can choose to use the default list, supply your own, or both.
+            </summary>
+            <param name="useDefaultNaList">Use the default list and replace 'null', 'NaN', 'NA', and 'N/A' with null.</param>
+            <param name="useEmptyStringAsNa">Replace empty strings with null.</param>
+            <param name="useNanAsNa">Replace NaNs with Null.</param>
+            <param name="customNaList">Provide a comma separated list of values to replace with null.</param>
+            <param name="columnName">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ReplaceNa(System.String[],System.Boolean,System.Boolean,System.Boolean,System.String)">
+            <summary>
+            Replaces values in the specified columns with nulls. You can choose to use the default list, supply your own, or both.
+            </summary>
+            <param name="useDefaultNaList">Use the default list and replace 'null', 'NaN', 'NA', and 'N/A' with null.</param>
+            <param name="useEmptyStringAsNa">Replace empty strings with null.</param>
+            <param name="useNanAsNa">Replace NaNs with Null.</param>
+            <param name="customNaList">Provide a comma separated list of values to replace with null.</param>
+            <param name="columnNames">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.TrimString(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.Boolean,System.Boolean,Microsoft.DataPrep.Common.TrimType,System.String)">
+            <summary>
+            Trims string values in specific columns.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="trimLeft">Whether to trim from the beginning.</param>
+            <param name="trimRight">Whether to trim from the end.</param>
+            <param name="trimType">Whether to trim whitespace or custom characters.</param>
+            <param name="customCharacters">The characters to trim.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Round(System.String,System.Int64)">
+            <summary>
+            Rounds the values in the column specified to the desired number of decimal places.
+            </summary>
+            <param name="column">The source column.</param>
+            <param name="decimalPlaces">The number of decimal places.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Clip(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.Nullable{System.Double},System.Nullable{System.Double},System.Boolean)">
+            <summary>
+            Clips values so that all values are between the lower and upper boundaries.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="lower">All values lower than this value will be set to this value.</param>
+            <param name="upper">All values higher than this value will be set to this value.</param>
+            <param name="useValues">If true, values outside boundaries will be set to the boundary values. If false, those values will be set to null.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.StrReplace(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Replaces values in a string column that match a search string with the specified value.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="valueToFind">The value to find.</param>
+            <param name="replaceWith">The replacement value.</param>
+            <param name="matchEntireCellContents">Whether the value to find must match the entire value.</param>
+            <param name="useSpecialCharacters">If checked, you can use '#(tab)', '#(cr)', or '#(lf)' to represent special characters in the find or replace arguments.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DistinctRows">
+            <summary>
+            Filters out records that contain duplicate values in all columns, leaving only a single instance.
+            </summary>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DropNulls(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,Microsoft.DPrep.Engine.ColumnRelationship)">
+            <summary>
+            Drops rows where all or any of the selected columns are null.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="columnRelationship">Whether all or any of the selected columns must be null.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DropErrors(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,Microsoft.DPrep.Engine.ColumnRelationship)">
+            <summary>
+            Drops rows where all or any of the selected columns are an Error.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="columnRelationship">Whether all or any of the selected columns must be an Error.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Distinct(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Filters out records that contain duplicate values in the specified columns, leaving only a single instance.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Skip(System.Int64)">
+            <summary>
+            Skips the specified number of records.
+            </summary>
+            <param name="count">The number of records to skip.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Take(System.Int64)">
+            <summary>
+            Takes the specified count of records.
+            </summary>
+            <param name="count">The number of records to take.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.RenameColumns(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Renames the specified columns.
+            </summary>
+            <param name="columnPairs">The columns to rename and the desired new names.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DropColumns(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Drops the specified columns.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DropColumns(System.String)">
+            <summary>
+            Drops the specified columns.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.DropColumns(System.String[])">
+            <summary>
+            Drops the specified columns.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.PromoteHeaders">
+            <summary>
+            Sets the first record in the dataset as headers, replacing any existing ones.
+            </summary>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToNumber(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,Microsoft.DataPrep.Common.DecimalMark)">
+            <summary>
+            Converts the values in the specified columns to floating point numbers.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="decimalPoint">The symbol to use as the decimal mark.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToNumber(System.String,Microsoft.DataPrep.Common.DecimalMark)">
+            <summary>
+            Converts the values in the specified columns to floating point numbers.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <param name="decimalPoint">The symbol to use as the decimal mark.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToNumber(System.String[],Microsoft.DataPrep.Common.DecimalMark)">
+            <summary>
+            Converts the values in the specified columns to floating point numbers.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <param name="decimalPoint">The symbol to use as the decimal mark.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToBool(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},Microsoft.DataPrep.Common.MismatchAsOption)">
+            <summary>
+            Converts the values in the specified columns to booleans.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="trueValues">The values to treat as true.</param>
+            <param name="falseValues">The values to treat as false.</param>
+            <param name="mismatchAs">How to treat values that don't match the values in the true or false values lists.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToBool(System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},Microsoft.DataPrep.Common.MismatchAsOption)">
+            <summary>
+            Converts the values in the specified columns to booleans.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <param name="trueValues">The values to treat as true.</param>
+            <param name="falseValues">The values to treat as false.</param>
+            <param name="mismatchAs">How to treat values that don't match the values in the true or false values lists.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToBool(System.String[],System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},Microsoft.DataPrep.Common.MismatchAsOption)">
+            <summary>
+            Converts the values in the specified columns to booleans.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <param name="trueValues">The values to treat as true.</param>
+            <param name="falseValues">The values to treat as false.</param>
+            <param name="mismatchAs">How to treat values that don't match the values in the true or false values lists.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToString(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Converts the values in the specified columns to strings.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToString(System.String)">
+            <summary>
+            Converts the values in the specified columns to strings.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToString(System.String[])">
+            <summary>
+            Converts the values in the specified columns to strings.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToLong(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Converts the values in the specified columns to 64 bit integers.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToLong(System.String)">
+            <summary>
+            Converts the values in the specified columns to 64 bit integers.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ToLong(System.String[])">
+            <summary>
+            Converts the values in the specified columns to 64 bit integers.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ConvertUnixTimestampToDateTime(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.Boolean)">
+            <summary>
+            Converts the specified column to DateTime values by treating the existing value as a Unix timestamp.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <param name="useSeconds">Whether to use seconds as the resolution. Milliseconds are used if false.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ConvertUnixTimestampToDateTime(System.String,System.Boolean)">
+            <summary>
+            Converts the specified column to DateTime values by treating the existing value as a Unix timestamp.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <param name="useSeconds">Whether to use seconds as the resolution. Milliseconds are used if false.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ConvertUnixTimestampToDateTime(System.String[],System.Boolean)">
+            <summary>
+            Converts the specified column to DateTime values by treating the existing value as a Unix timestamp.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <param name="useSeconds">Whether to use seconds as the resolution. Milliseconds are used if false.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow._Summarize(System.Collections.Generic.List{Microsoft.DataPrep.Common.SummaryColumnsValue},System.Collections.Generic.List{System.String},System.Boolean,System.String)">
+            <summary>
+            Summarizes data by running aggregate functions over specific columns. The aggregate functions are independent and it is possible to
+               aggregate the same column multiple times. Unique names have to be provided for the resulting columns. The aggregations can be
+               grouped, in which case one record is returned per group; or ungrouped, in which case one record is returned for the whole dataset.
+               Additionally, the results of the aggregations can either replace the current dataset or augment it by appending the result columns.
+            </summary>
+            <param name="summaryColumns">Column summarization definition.</param>
+            <param name="groupByColumns">Columns to group by.</param>
+            <param name="joinBack">Whether to append subtotals or replace current data with them.</param>
+            <param name="joinBackColumnsPrefix">Prefix to use for subtotal columns when appending them to current data.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendColumns(System.Collections.Generic.List{Microsoft.DPrep.Engine.ActivityReference},System.Boolean)">
+            <summary>
+            Appends the columns from the referenced dataflows to the current one. Duplicate columns will result in failure.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <param name="parallelize">Whether to parallelize the operation. If true, the data for all inputs will be loaded into memory.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendRows(System.Collections.Generic.List{Microsoft.DPrep.Engine.ActivityReference})">
+            <summary>
+            Appends the records in the specified dataflows to the current one. If the schemas of the dataflows are distinct, this will result in
+               records with different schemas.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Sort(System.Collections.Generic.List{System.Tuple{System.String,System.Boolean}})">
+            <summary>
+            Sorts the dataset by the specified columns.
+            </summary>
+            <param name="sortOrder">The columns to sort by and whether to sort ascending or descending. True is treated as descending, false as ascending.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ZipPartitions(System.Collections.Generic.List{Microsoft.DPrep.Engine.ActivityReference})">
+            <summary>
+            Appends the columns from the referenced dataflows to the current one. This is different from AppendColumns in that it assumes all
+               dataflows being appended have the same number of partitions and same number of Records within each corresponding partition. If
+               these two conditions are not true the operation will fail.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.WriteStreams(System.String,Microsoft.DPrep.Engine.PropertiesSystem.OutputFilePropertyValue,System.String,System.String)">
+            <summary>
+            Writes the streams in the specified column to the destination path. By default, the name of the files written will be the resource
+               identifier of the streams. This behavior can be overriden by specifying a column which contains the names to use.
+            </summary>
+            <param name="streamsColumn">The column containing the streams to write.</param>
+            <param name="fileNamesColumn">A column containing the file names to use.</param>
+            <param name="basePath">The path under which the files should be written.</param>
+            <param name="prefixPath">The prefix path that needs to be removed from the target paths.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ParseJsonColumn(System.String)">
+            <summary>
+            Parses the values in the specified column as JSON objects and expands them into multiple columns.
+            </summary>
+            <param name="column">The source column.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ParseDelimited(System.Char,Microsoft.DataPrep.Common.PromoteHeadersMode,Microsoft.DPrep.Engine.FileEncoding,System.Boolean,System.Int64,Microsoft.DataPrep.Common.SkipMode,System.Nullable{System.Char})">
+            <summary>
+            Return a DataFlow object which can parse data with a specified delimiter.
+            </summary>
+            <param name="delimiter">The separator to use to split columns. Default is comma.</param>
+            <param name="header">How to determine column headers.</param>
+            <param name="encoding">The encoding of the files being read.</param>
+            <param name="quoting">Whether to handle new line characters within quotes. This option will impact performance.</param>
+            <param name="skipRows">How many rows to skip.</param>
+            <param name="skipMode">The mode in which rows are skipped.</param>
+            <param name="commentLineChar">Character used to indicate a line is a comment instead of data in the files being read.</param>
+            <returns> A new Dataflow with Parse Delimited Step added.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ReadPreppy">
+            <summary>
+            Return a DataFlow object which can read Preppy format files.
+            </summary>
+            <returns> A new Dataflow with Read Preppy Step added.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.GetFiles(System.String)">
+            <summary>
+            Expands the path specified by reading globs and files in folders and outputs one record per file found.
+            </summary>
+            <param name="path">The path or paths to expand.</param>
+            <returns>A new DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.GetFiles(Microsoft.DataPrep.Common.DatastoreValue)">
+            <summary>
+            Expands paths within AzureML Datastores, returning a record per file found.
+            </summary>
+            <param name="datastore">The Datastore from which to load files.</param>
+            <returns>A new Dataflow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.GetFiles(System.Collections.Generic.IEnumerable{Microsoft.DataPrep.Common.DatastoreValue})">
+            <summary>
+            Expands paths within AzureML Datastores, returning a record per file found.
+            </summary>
+            <param name="datastores">The Datastore from which to load files.</param>
+            <returns>A new Dataflow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.SetColumnTypes(Microsoft.DataPrep.Common.ColumnDefinitionInfo[])">
+             <summary>
+             Converts values in specified columns to the corresponding data types.
+             </summary>
+             <remarks>
+             The values in the ColumnDefinitionInfo dictionary could be of several types:
+                 FieldType
+                 Tuple of : FieldType.DATE and List of format strings (single format string is also supported)
+            
+                 code-block::dotnet
+                 
+                 var dataflow = Reader.ReadCsv(path = "./some/path");
+                 dataflow = dataflow.set_column_types(
+                     {"MyNumericColumn": FieldType.DECIMAL,
+                      "MyBoolColumn": FieldType.BOOLEAN,
+                      "MyAutodetectDateColumn": FieldType.DATE,
+                      "MyDateColumnWithFormat": (FieldType.DATE, ['%m-%d-%Y']),
+                      "MyOtherDateColumn": DateTimeConverter(['%d-%m-%Y'])
+                      });
+                                                       
+            
+                 Note:
+                    If you choose to convert a column to FieldType.DATE and do not provide
+                       **format(s)** to use, DataPrep will attempt to infer a format to use by pulling on the data.
+                       If a format could be inferred from the data, it will be used to convert values in the corresponding
+                       column. However, if a format could not be inferred, this step will fail and you will need to either
+                       provide the format to use.
+             </remarks>
+             <param name="columnTypes">A dictionary where key is the column name and value is desured data type.</param>
+             <returns>The modified DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Summarize(System.Collections.Generic.List{Microsoft.DataPrep.Common.SummaryColumnsValue},System.Collections.Generic.List{System.String},System.Boolean,System.String)">
+             <summary>
+             Summarizes data by running aggregate functions over specific columns.
+             </summary>
+             <remarks>
+             The aggregate functions are independent and it is possible to aggregate the same column multiple times. 
+             Unique names have to be provided for the resulting columns. The aggregations can be grouped, in which case 
+             one record is returned per group; or ungrouped, in which case one record is returned for the whole dataset.
+             Additionally, the results of the aggregations can either replace the current dataset or augment it by 
+             appending the result columns.
+            </remarks>
+             <param name="summaryColumns">List of SummaryColumnsValue where each value defines column to summarize,
+             summary function to use and name of resulting column to add.</param>
+             <param name="groupByColumns">Columns to group by. </param>
+             <param name="joinBack">Whether to append subtotals or replace current data with them. </param>
+             <param name="joinBackColumnsPrefix">Prefix to use for subtotal columns when appending them to current data. </param>
+             <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.WriteDelimitedFile(System.String,System.Char,System.String,System.String)">
+            <summary>
+            Write out the data in the Dataflow in a delimited text format. The output is specified as a directory
+            which will contain multiple files, one per partition processed in the Dataflow.
+            </summary>
+            <param name="filePath">The path to a directory in which to store the output files.</param>
+            <param name="separator">The separator to use.</param>
+            <param name="na">String to use for null values.</param>
+            <param name="error">String to use for error values.</param>
+            <returns>The modified Dataflow. Every execution of the returned Dataflow will perform the write again.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.WritePreppy(System.String)">
+            <summary>
+            Write out the data in the Dataflow as Preppy files, a DataPrep serialization format.
+            The output is specified as a directory which will contain multiple files, one per partition processed in the Dataflow.
+            </summary>
+            <param name="filePath">The path to a directory in which to write the output files.</param>
+            <returns>The modified Dataflow. Every execution of the returned Dataflow will perform the write again.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.WritePreppy(Microsoft.DataPrep.Common.DatastoreValue)">
+            <summary>
+            Write out the data in the Dataflow as Preppy files, a DataPrep serialization format, to a location in an Azure Machine 
+            Learning datastore. The output is specified as a directory which will contain multiple files, one per partition 
+            processed in the Dataflow.
+            </summary>
+            <param name="datastore">The path to a directory in a Datastore in which to write the output files.</param>
+            <returns>The modified Dataflow. Every execution of the returned Dataflow will perform the write again.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.Join(Microsoft.DataPrep.Common.DataFlow,System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.String}},Microsoft.DataPrep.Common.JoinType,System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates a new Dataflow that is a result of joining this Dataflow with the provided right_dataflow.
+            </summary>
+            <param name="rightDataFlow">Right Dataflow or DataflowReference to join with.</param>
+            <param name="joinKeyPairs">Key column pairs. List of tuples of columns names where each tuple forms a key pair to join on.
+                For instance: [(column_from_left_dataflow, column_from_right_dataflow)]</param>
+            <param name="joinType">Type of join to perform. Match is default.</param>
+            <param name="leftColumnPrefix">Prefix to use in result Dataflow for columns originating from left_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="rightColumnPrefix">Prefix to use in result Dataflow for columns originating from right_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="leftNonePrefixedColumns">List of column names from left_dataflow that should not be prefixed with left_column_prefix.
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <param name="rightNonePrefixedColumns">List of column names from right_dataflow that should not be prefixed with right_column_prefix.
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <returns>The new Dataflow.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.JoinAsync(Microsoft.DataPrep.Common.DataFlow,System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.String}},Microsoft.DataPrep.Common.JoinType,System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates a new Dataflow that is a result of joining this Dataflow with the provided right_dataflow.
+            </summary>
+            <param name="rightDataFlow">Right Dataflow to join with.</param>
+            <param name="joinKeyPairs">Key column pairs. List of columns names where each value forms a key pair to join on.
+                For instance: [(column_from_left_dataflow, column_from_right_dataflow)]</param>
+            <param name="joinType">Type of join to perform. Match is default.</param>
+            <param name="leftColumnPrefix">Prefix to use in result Dataflow for columns originating from left_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="rightColumnPrefix">Prefix to use in result Dataflow for columns originating from right_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="leftNonePrefixedColumns">List of column names from left_dataflow that should not be prefixed with left_column_prefix.
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <param name="rightNonePrefixedColumns">List of column names from right_dataflow that should not be prefixed with right_column_prefix.
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <returns>The new Dataflow.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.JoinAsync(Microsoft.DataPrep.Common.DataFlow,Microsoft.DataPrep.Common.DataFlow,System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.String}},Microsoft.DataPrep.Common.JoinType,System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates a new Dataflow that is a result of joining two provided Dataflows.
+            </summary>
+            <param name="leftDataFlow">Left Dataflow to join with.</param>
+            <param name="rightDataFlow">Right Dataflow to join with.</param>
+            <param name="joinKeyPairs">Key column pairs. List of columns names where each value forms a key pair to join on.
+                For instance: [(column_from_left_dataflow, column_from_right_dataflow)]</param>
+            <param name="joinType">Type of join to perform. Match is default.</param>
+            <param name="leftColumnPrefix">Prefix to use in result Dataflow for columns originating from left_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="rightColumnPrefix">Prefix to use in result Dataflow for columns originating from right_dataflow. Needed to avoid column name conflicts at runtime.</param>
+            <param name="leftNonPrefixedColumns">List of column names from left_dataflow that should not be prefixed with left_column_prefix. 
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <param name="rightNonPrefixedColumns">List of column names from right_dataflow that should not be prefixed with right_column_prefix.
+                Every other column appearing in the data at runtime will be prefixed.</param>
+            <returns>The new Dataflow.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendColumns(System.Collections.Generic.List{Microsoft.DataPrep.Common.DataFlow})">
+            <summary>
+            Appends the columns from the referenced dataflows to the current one. Duplicate columns will result in failure.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendColumnsAsync(System.Collections.Generic.List{Microsoft.DataPrep.Common.DataFlow})">
+            <summary>
+            Asynchronously appends the columns from the referenced dataflows to the current one. Duplicate columns will result in failure.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The asynchronous task to append columns.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendRows(System.Collections.Generic.List{Microsoft.DataPrep.Common.DataFlow})">
+            <summary>
+            Appends the records in the specified dataflows to the current one. If the schemas of the dataflows are distinct, this will result in
+               records with different schemas.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AppendRowsAsync(System.Collections.Generic.List{Microsoft.DataPrep.Common.DataFlow})">
+            <summary>
+            Asynchronously appends the records in the specified dataflows to the current one. If the schemas of the dataflows are distinct, this will result in
+               records with different schemas.
+            </summary>
+            <param name="dataflows">The dataflows to append.</param>
+            <return>The asynchronous task to append rows to a dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.KeepColumns(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Keeps the specified columns and drops all others.
+            </summary>
+            <param name="columns">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.KeepColumns(System.String)">
+            <summary>
+            Keeps the specified columns and drops all others.
+            </summary>
+            <param name="columnName">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.KeepColumns(System.String[])">
+            <summary>
+            Keeps the specified columns and drops all others.
+            </summary>
+            <param name="columnNames">The source columns.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ExpressionFilter(System.String)">
+            <summary>
+            Filter records based on the provided expression.
+            </summary>
+            <param name="expression">The expression to evaluate to filter the record in the dataflow.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.ExpressionFilter(Microsoft.DPrep.Lariat.DataModel.Expression)">
+            <summary>
+            Filter records based on the provided expression.
+            </summary>
+            <param name="expression">The expression to evaluate to filter the record in the dataflow.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddColumnsFromRecord(System.String,System.String,System.String)">
+            <summary>
+            Add new columns to the dataset based on the record generated by expression
+            </summary>
+            <param name="expression">The expression to evaluate to generate the values in the column.</param>
+            <param name="priorColumnName">The name of the column after which the new column should be added. The default is to add the new column as the last column.</param>
+            <param name="newColumnPrefix">string value to be prepend in the name of the new columns added to dataset. This might be needed to avoid column name conflicts.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddColumnsFromPartitionFormat(Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector,System.String,System.Boolean)">
+            <summary>
+            Add new columns to the dataset based on matching the partition format on 'Path' column.
+            </summary>
+            <param name="column">The name of the string type column to be matched against.</param>
+            <param name="partitionFormat">The partition format matching the target column to create columns.</param>
+            <param name="ignoreError">Indicate whether or not to fail the execution if there is any error.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddColumnFromExpression(System.String,System.String,Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Add a new column to the dataset based on the expression
+            </summary>
+            <param name="expression">The expression to evaluate to generate the values in the column.</param>
+            <param name="priorColumn">The selector of the column after which the new column should be added. The default is to add the new column as the last column.</param>
+            <param name="newColumnName">Name of the new column to be added. This might be needed to avoid column name conflicts.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataFlow.AddColumnFromExpression(Microsoft.DPrep.Lariat.DataModel.Expression,System.String,Microsoft.DPrep.Engine.PropertiesSystem.ColumnsSelector)">
+            <summary>
+            Add a new column to the dataset based on the expression
+            </summary>
+            <param name="expression">The expression to evaluate to generate the values in the column.</param>
+            <param name="priorColumn">The selector of the column after which the new column should be added. The default is to add the new column as the last column.</param>
+            <param name="newColumnName">Name of the new column to be added. This might be needed to avoid column name conflicts.</param>
+            <return>The modified Dataflow.</return>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.SummaryFunction">
+            <summary>
+            Enum SummaryFunction
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Min">
+            <summary>
+            Minimum value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Max">
+            <summary>
+            Maximum value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Mean">
+            <summary>
+            Mean value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Median">
+            <summary>
+            Median value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Var">
+            <summary>
+            Variance value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Sd">
+            <summary>
+            Standard deviance value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Count">
+            <summary>
+            Total count.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Sum">
+            <summary>
+            Sum of all value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Skewness">
+            <summary>
+            Skewness value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Kurtosis">
+            <summary>
+            Kurtosis value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.ToList">
+            <summary>
+            Aggregate values into a list.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.TopValues">
+            <summary>
+            Top values.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.BottomValues">
+            <summary>
+            Bottom values.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.Single">
+            <summary>
+            Single value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SummaryFunction.CommonPath">
+            <summary>
+            Common Path.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.MismatchAsOption">
+            <summary>
+            Enum MismatchAsOption
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.MismatchAsOption.AsTrue">
+            <summary>
+            Mismatch value as true.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.MismatchAsOption.AsFalse">
+            <summary>
+            Mismatch value as false.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.MismatchAsOption.AsError">
+            <summary>
+            Mismatch value as error.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.TrimType">
+            <summary>
+            Enum TrimType
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.TrimType.Whitespace">
+            <summary>
+            Trim white space.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.TrimType.Custom">
+            <summary>
+            Trim custom characters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DecimalMark">
+            <summary>
+            Enum DecimalMark
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.DecimalMark.Dot">
+            <summary>
+            Using dot as decimal mark.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.DecimalMark.Comma">
+            <summary>
+            Using comma as decimal mark.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.JoinType">
+            <summary>
+            Describes different possible types of join.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.None">
+            <summary>
+            None.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.Match">
+            <summary>
+            Only records with matching join keys will be returned.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.Inner">
+            <summary>
+            Only records with matching join keys will be returned.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.UnmatchLeft">
+            <summary>
+            Records from left data set that did not match with anything.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.LeftAnti">
+            <summary>
+            Records from left data set that did not match with anything.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.LeftOuter">
+            <summary>
+            All records from left data set and only matching records from the right data set.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.UnmatchRight">
+            <summary>
+            Records from right data set that did not match with anything.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.RightAnti">
+            <summary>
+            Records from right data set that did not match with anything.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.RightOuter">
+            <summary>
+            All records from right data set and only matching records from the right data set.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.FullAnti">
+            <summary>
+            Only unmatched records from left and right data sets.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.JoinType.Full">
+            <summary>
+            All records from both left and right data sets.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.SkipMode">
+            <summary>
+            Defines a strategy to skip rows when reading files
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SkipMode.None">
+            <summary>
+            Don't skip any rows.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SkipMode.Ungrouped">
+            <summary>
+            Skip rows from the first file only.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SkipMode.FirstFile">
+            <summary>
+            Skip rows from the first file only.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SkipMode.Grouped">
+            <summary>
+            Skip rows from every file.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SkipMode.AllFiles">
+            <summary>
+            Skip rows from every file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.PromoteHeadersMode">
+            <summary>
+            Defines strategy to promote headers when reading files
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.None">
+            <summary>
+            Do not promote headers. Use when file(s) has no headers.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.Ungrouped">
+            <summary>
+            Promote headers from the first file. All subsequent files are considered to be just data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.FirstFile">
+            <summary>
+            Promote headers from the first file. All subsequent files are considered to be just data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.Grouped">
+            <summary>
+            Promote headers from every file. Allows to read files with inconsistent schema.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.AllFiles">
+            <summary>
+            Promote headers from every file. Allows to read files with inconsistent schema.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.ConstantGrouped">
+            <summary>
+            Optimized option for the case when all the files have exactly same headers. In effect this will promote headers from the first file and skip a row for every other file.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.PromoteHeadersMode.SameAllFiles">
+            <summary>
+            Optimized option for the case when all the files have exactly same headers. In effect this will promote headers from the first file and skip a row for every other file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.SType">
+            <summary>
+            Defines suported semantic types
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.EmailAddress">
+            <summary>
+            Email address.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.GeographicCoordinate">
+            <summary>
+            Common representations of geographic coordinates.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.Ipv4Address">
+            <summary>
+            IPv4 address.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.Ipv6Address">
+            <summary>
+            IPv6 address.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.UsPhoneNumber">
+            <summary>
+            Common formats of US phone numbers.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.SType.ZipCode">
+            <summary>
+            Common formats of US ZIP code.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DatastoreValue">
+            <summary>
+            Properties uniquely identifying a datastore.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DatastoreValue.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Properties uniquely identifying a datastore.
+            </summary>
+            <param name="subscription">The subscription the workspace belongs to.</param>
+            <param name="resourceGroup">The resource group the workspace belongs to.</param>
+            <param name="workspaceName">The workspace the datastore belongs to.</param>
+            <param name="datastoreName">The datastore to read the data from.</param>
+            <param name="path">The path on the datastore.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DatastoreValue.ToDictionary">
+            <summary>
+            Convert DatastoreValue to a dictionary object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DatastoreValue.Subscription">
+            <summary>
+            The subscription the workspace belongs to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DatastoreValue.ResourceGroup">
+            <summary>
+            The resource group the workspace belongs to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DatastoreValue.WorkspaceName">
+            <summary>
+            The workspace the datastore belongs to.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DatastoreValue.DatastoreName">
+            <summary>
+            The datastore to read the data from.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DatastoreValue.Path">
+            <summary>
+            The path on the datastore.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.HistogramArgumentsValue">
+            <summary>
+            Additional arguments required for Histogram summary function.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.HistogramArgumentsValue.#ctor(System.Int64)">
+            <summary>
+            Additional arguments required for Histogram summary function.
+            </summary>
+            <param name="histogramBucketCount">Number of buckets to use.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.HistogramArgumentsValue.ToDictionary">
+            <summary>
+            Convert HistogramArgumentsValue to a dictionary object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.HistogramArgumentsValue.HistogramBucketCount">
+            <summary>
+            Number of buckets to use.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.KernelDensityArgumentsValue">
+            <summary>
+            Additional arguments required for KernelDensity summary function.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.KernelDensityArgumentsValue.#ctor(System.Int64,System.Double)">
+            <summary>
+            Additional arguments required for KernelDensity summary function.
+            </summary>
+            <param name="kernelDensityPointCount">Number of kernel density points to calculate.</param>
+            <param name="kernelDensityBandwidth">Kernel density bandwidth.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.KernelDensityArgumentsValue.ToDictionary">
+            <summary>
+            Convert KernelDensityArgumentsValue to a dictionary object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.KernelDensityArgumentsValue.KernelDensityPointCount">
+            <summary>
+            Number of kernel density points to calculate.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.KernelDensityArgumentsValue.KernelDensityBandwidth">
+            <summary>
+            Kernel density bandwidth.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.SummaryColumnsValue">
+            <summary>
+            Column summarization definition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.SummaryColumnsValue.#ctor(System.String,Microsoft.DataPrep.Common.SummaryFunction,System.String,Microsoft.DataPrep.Common.HistogramArgumentsValue,Microsoft.DataPrep.Common.KernelDensityArgumentsValue,System.Collections.Generic.List{System.Double})">
+            <summary>
+            Column summarization definition.
+            </summary>
+            <param name="columnId">Column to summarize.</param>
+            <param name="summaryFunction">Aggregation function to use.</param>
+            <param name="summaryColumnName">Name of the new column holding the aggregate values.</param>
+            <param name="histogramArguments">Additional arguments required for Histogram summary function.</param>
+            <param name="kernelDensityArguments">Additional arguments required for KernelDensity summary function.</param>
+            <param name="quantiles">Quantile boundary values required for Quantiles summary function.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.SummaryColumnsValue.ToDictionary">
+            <summary>
+            Convert SummaryColumnsValue to a dictionary object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.ColumnId">
+            <summary>
+            Column to summarize.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.SummaryFunction">
+            <summary>
+            Aggregation function to use.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.SummaryColumnName">
+            <summary>
+            Name of the new column holding the aggregate values.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.HistogramArguments">
+            <summary>
+            Additional arguments required for Histogram summary function.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.KernelDensityArguments">
+            <summary>
+            Additional arguments required for KernelDensity summary function.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryColumnsValue.Quantiles">
+            <summary>
+            Quantile boundary values required for Quantiles summary function.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.SummaryFunctionsValue">
+            <summary>
+            Summarization definition for each column.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.SummaryFunctionsValue.#ctor(Microsoft.DataPrep.Common.SummaryFunction,Microsoft.DataPrep.Common.HistogramArgumentsValue,Microsoft.DataPrep.Common.KernelDensityArgumentsValue,System.Collections.Generic.List{System.Double})">
+            <summary>
+            Summarization definition for each column.
+            </summary>
+            <param name="summaryFunction">Aggregation function to use.</param>
+            <param name="histogramArguments">Additional arguments required for Histogram summary function.</param>
+            <param name="kernelDensityArguments">Additional arguments required for KernelDensity summary function.</param>
+            <param name="quantiles">Quantile boundary values required for Quantiles summary function.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.SummaryFunctionsValue.ToDictionary">
+            <summary>
+            Convert SummaryFunctionsValue to a dictionary object.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryFunctionsValue.SummaryFunction">
+            <summary>
+            Aggregation function to use.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryFunctionsValue.HistogramArguments">
+            <summary>
+            Additional arguments required for Histogram summary function.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryFunctionsValue.KernelDensityArguments">
+            <summary>
+            Additional arguments required for KernelDensity summary function.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.SummaryFunctionsValue.Quantiles">
+            <summary>
+            Quantile boundary values required for Quantiles summary function.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DPrepSettings">
+            <summary>
+            Configuration for DPrep execution.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DPrepSettings.Instance">
+            <summary>
+            Get the DPrepSettings instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DPrepSettings.PythonPath">
+            <summary>
+            Path of a Python interpreter to use for Python execution.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DPrepSettings.SecretManager">
+            <summary>
+            Secret manager used in DPrep engine.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DPrepSettings.DatastoreResolver">
+            <summary>
+            Datastore resolver used in DPrep engine.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.DPrepSettings.ExecutorSettings">
+            <summary>
+            Executor settings used in DPrep engine and environment resolver.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.EngineBuilder">
+            <summary>
+            EngineBuilder to help construct engine for usage in SDK.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.EngineBuilder.Instance">
+            <summary>
+            Get the EngineBuilder instance.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.EngineBuilder.GetEngineInstance">
+            <summary>
+            Get singleton engine instance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.FileFormatType">
+            <summary>
+            Define file format type.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.Delimited">
+            <summary>
+            Define a delimited text file, such as CSV, TSV.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.FixedWidth">
+            <summary>
+            Define a fixed width file format.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.PlainText">
+            <summary>
+            Define a plaintext file without delimiter. 
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.Excel">
+            <summary>
+            Define an excel file.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.Parquet">
+            <summary>
+            Define a parquet file.
+            </summary>
+        </member>
+        <member name="F:Microsoft.DataPrep.Common.FileFormatType.JSON">
+            <summary>
+            Define a json file format.
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.FileFormatProperties">
+            <summary>
+            A class contains file format information, such as type and properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.FileFormatProperties.Type">
+            <summary>
+            File format type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatProperties.#ctor(Microsoft.DataPrep.Common.FileFormatType,System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            FileFormatProperties constructor. 
+            </summary>
+            <param name="type">file format type.</param>
+            <param name="properties">file format associated properties.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatProperties.Get``1(System.String)">
+            <summary>
+            Get a specific file format property by a given key name.
+            </summary>
+            <typeparam name="T">Required data type.</typeparam>
+            <param name="keyName">Property key name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.FileFormatProperties.Set(System.String,System.Object)">
+            <summary>
+            Set a file format property value for a key name.
+            </summary>
+            <param name="keyName">Property key name.</param>
+            <param name="value">Property value.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.CandidateConverter">
+            <summary>
+            Result of type inference returned by DataPrep to suggest a potential type conversion.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.CandidateConverter.DataType">
+            <summary>
+            Target Data Type Accessor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.CandidateConverter.#ctor(Microsoft.DPrep.Engine.FieldType)">
+            <summary>
+            Result of type inference returned by DataPrep to suggest a potential type conversion.
+            </summary>
+            <param name="type">Target type for the conversion. </param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.CandidateConverter.IsValid">
+            <summary>
+            Whether the object is valid or not. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.CandidateDateTimeConverter">
+            <summary>
+            Specialized result of type inference used by DataPrep to suggest DateTime conversion.
+            </summary>
+        </member>
+        <member name="P:Microsoft.DataPrep.Common.CandidateDateTimeConverter.AmbiguousFormats">
+            <summary>
+            Public Accessor for Ambiguous DateTime Formats.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.CandidateDateTimeConverter.#ctor(System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Collections.Generic.List{System.String}})">
+            <summary>
+            Specialized result of type inference used by DataPrep to suggest DateTime conversion.
+            Note:
+                   It can be in valid or invalid state. 
+                   Valid state means that, based on the scanned data, a list of unambiguous formats was detected and
+                   DateTimeConverter could be created from this candidate.
+                   Invalid state means that either sampled values seen during inference were inconclusive(like with `1/1/2018` it is unclear if day is before month) or conflicting.
+            </summary>
+            <param name="formats">Unambiguous date formats detected during type inference.</param>
+            <param name="ambiguousFormats">Ambiguous date formats detected during type inference.</param>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.CandidateDateTimeConverter.IsValid">
+            <summary>
+            Whether the object still contains ambiguous or not.  
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.CandidateDateTimeConverter.ResolveAmbiguity(System.Boolean)">
+            <summary>
+            Resolves date format ambiguity by keeping only one kind of formats.
+            </summary>
+            <param name="dayFirst">Controls which format to preserve. `True` will keep only formats where day comes before month.</param>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.DataStoreExtensions">
+            <summary>
+            Represent extension methods that can be called on DatastoreValue object
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.DataStoreExtensions.ToStreamInfo(Microsoft.DataPrep.Common.DatastoreValue,System.String)">
+            <summary>
+            Construct object of type StreamInfo from filePath and datastore.
+            </summary>
+            <param name="filepath">Input File path.</param>
+            <param name="datastore">DataStoreValue object.</param>
+            <returns>StreamInfo object.</returns>
+        </member>
+        <member name="T:Microsoft.DataPrep.Common.StreamInfoExtension">
+            <summary>
+            Represent extension methods that can be called on StreamInfo object
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Common.StreamInfoExtension.Open(Microsoft.DPrep.Lariat.DataModel.StreamInfo)">
+            <summary>
+             Perform the necessary execution on StreamInfo object to return stream of type System.IO.Stream
+            </summary>
+        </member>
+        <member name="T:Microsoft.DataPrep.Reader">
+            <summary>
+            A class containing multiple data source read methods.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.Reader.ReadCSV(System.String,System.Boolean)">
+            <summary>
+            Creates a new Dataflow with the operations required to read and parse CSV.
+            </summary>
+            <param name="path">The path to the file(s) or folder(s) that you want to load and parse.
+            For example, you can use path = "./data*" to read all files with name starting with "data".</param>
+            <param name="includePath">Whether or not to keep the Path column.</param>
+            <returns>A new DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Reader.ReadTSV(System.String)">
+            <summary>
+            Creates a new Dataflow with the operations required to read and parse TSV.
+            </summary>
+            <param name="path">The path to the file(s) or folder(s) that you want to load and parse. 
+            For example, you can use path = "./data*" to read all files with name starting with "data".</param>
+            <returns>a new DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Reader.ReadPreppy(System.String,System.Boolean)">
+            <summary>
+            Creates a new Dataflow with the operations required to enumerate and read Preppy files.
+            </summary>
+            <param name="path">The path to the folder(s) containing Preppy files that you want to enumerate and read.
+            For example, you can use path = "./data*" to read all files with name starting with "data".</param>
+            <param name="includePath">Whether or not to keep the Path column.</param>
+            <returns>A new DataFlow object.</returns>
+        </member>
+        <member name="M:Microsoft.DataPrep.Reader.AutoReadFile(System.String,System.Boolean)">
+            <summary>
+            Analyzes the file(s) at the specified path and returns a new Dataflow containing the operations required to
+            read and parse them. The type of the file and the arguments required to read it are inferred automatically.
+            If this method fails or produces results not as expected, you may consider using other read methods with file types specified.
+            </summary>
+            <param name="path">The path to the file(s) or folder(s) that you want to load and parse. You can use path = "./data*" to read 
+            all files with name starting with "data".</param>
+            <param name="includePath"> Whether to include a column containing the path from which the data was read. This is useful 
+            when you are reading multiple files, and might want to know which file a particular record is originated from, or to keep useful information in file path.</param>
+            <returns>a new DataFlow object.</returns>
+        </member>
+        <member name="T:Microsoft.DataPrep.PreppyWriter">
+            <summary>
+            A class containing methods to write data in preppy format.
+            </summary>
+        </member>
+        <member name="M:Microsoft.DataPrep.PreppyWriter.Write(System.Collections.Generic.IEnumerable{Microsoft.DPrep.Lariat.DataModel.Record},System.String)">
+            <summary>
+            Serializes IEnumerable of type Record to write it in preppy format.
+            </summary>
+            <param name="records">IEnumerable of type Record to be serialize.</param>
+            <param name="pathToFile">Output path of the serialized file.</param>
+        </member>
+    </members>
+</doc>
