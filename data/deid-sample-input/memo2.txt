@@ -1,0 +1,3 @@
+Patient: Maria Lopez
+DOB: 07/22/1975
+Summary: Reports severe migraine episodes twice weekly. MRI scan negative for abnormalities. Initiated propranolol 40 mg BID for prophylaxis. Advised to maintain headache diary.

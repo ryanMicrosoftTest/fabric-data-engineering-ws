@@ -1,0 +1,16 @@
+Memo 6 — Psychiatry (GAD & Sleep Hygiene)
+Date: 2025-09-05
+Hospital: Evergreen Behavioral Health
+Doctor: Dr. Leonard Wu, MD — License: MA-PSY-334455 — Email: l.wu@evergreenbh.example — Fax: (555) 0181-7755
+Patient: Emily Davis — Age: 27 — Profession: Graphic designer — Organization: WideWorld Importers
+Address: 200 Elm St, City: Cambridge, State: MA, Zip: 02139, CountryOrRegion: United States
+Phone: (555) 0170-4419 — Email: emily.davis@example.com — Username: emdavis_design
+MedicalRecord: MRN BH-33021 — HealthPlan: Contoso Behavioral ID CB-6611-9955 — Account: BHA-00931
+IDs: SocialSecurity: 760-11-2468; IDNum (Passport): USA L55667788; License (Driver): MA E-88442277
+Net/Portal: IPAddress: 192.0.2.88 — Url: https://behavioral.examplehealth.org/BH-33021
+Devices: Sleep tracker Device Ring SN SR-221-991; Phone Device Android SN A50-88231
+BioID: BioID FaceID template FID-2209 on patient device (not stored by clinic)
+Vehicle: Volkswagen Golf — VIN: WVWZZZ1KZ6W123456 — Plate: MA CALM-7
+LocationOther: Cambridge Common (mindfulness walks)
+Unknown: NoteKey Q-PRIME-006
+Assessment/Plan: Initiated sertraline 50 mg daily; CBT-I referral; reduce caffeine; safety plan reviewed.

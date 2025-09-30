@@ -1,0 +1,16 @@
+Memo 3 — Endocrinology (Type 1 Diabetes Titration)
+Date: 2025-09-10
+Hospital: Fabrikam Medical Center — Endocrinology
+Doctor: Dr. Priya Nandakumar, MD — License: MA-MED-778901 — Email: p.nandakumar@endocrine.example — Fax: (555) 0198-4411
+Patient: David Chen — Age: 35 — Profession: Software engineer — Organization: Tailwind Apps, LLC
+Address: 9 Beacon Hill Rd, City: Boston, State: MA, Zip: 02108, CountryOrRegion: United States
+Phone: (555) 0102-9090 — Email: d.chen@example.com — Username: dchen_dev
+MedicalRecord: MRN E-10029 — HealthPlan: Aetna Choice POS II ID AC-9911-5533 — Account: ACC-2200-0081
+IDs: SocialSecurity: 321-54-9876; IDNum (Passport): USA P44556677; License (Driver): MA D44556677
+Tech: Televisit IPAddress: 192.0.2.56 — Url: https://endo.examplehealth.org/chart/E-10029
+Devices: Device Dexcom G6 SN G6-552-118; Insulin pump Device Tandem t:slim S/N TS-771-993
+BioID: BioID voiceprint VP-3301 enrolled for pump support line
+Vehicle: Toyota Prius — VIN: JTDKB20U693511222 — Plate: MA ECO-992
+LocationOther: Charles River Esplanade (pre-meal run pattern)
+Unknown: CaseToken NX-77Q
+Assessment/Plan: A1c 8.2%. Adjusted basal rates; reviewed carb ratios. Hypoglycemia protocol reinforced.
