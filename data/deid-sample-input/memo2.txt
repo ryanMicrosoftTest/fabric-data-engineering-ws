@@ -1,3 +1,16 @@
-Patient: Maria Lopez
-DOB: 07/22/1975
-Summary: Reports severe migraine episodes twice weekly. MRI scan negative for abnormalities. Initiated propranolol 40 mg BID for prophylaxis. Advised to maintain headache diary.
+Memo 2 — Cardiology (Hypertension & Palpitations)
+Date: 2025-08-30
+Hospital: North Seaport Heart & Vascular Institute
+Doctor: Dr. Omar Reyes, DO — License: MA-DO-883210 — Email: o.reyes@nsheart.example — Fax: (555) 0166-7700
+Patient: Maria Lopez — Age: 50 — Profession: Accountant — Organization: Contoso Logistics, Inc.
+Address: 44 Seaport Blvd, City: Boston, State: MA, Zip: 02210, CountryOrRegion: United States
+Phone: (555) 0177-2210 — Email: maria.lopez@example.com — Username: maria.lopez78
+MedicalRecord: MRN C-554-8892 — HealthPlan: Fabrikam PPO ID FP-3344-2200 — Account: A-881102-77
+IDs: SocialSecurity: 987-65-4321; IDNum (Passport): USA Y98765432; License (Driver): MA L99887766
+Connectivity: IPAddress: 198.51.100.72 — Url: https://cardio.examplehealth.org/patients/C-554-8892
+Devices: Holter monitor Device HM-24 S/N 24H-5521; BP cuff Device BC-10 S/N BC10-0033
+BioID: Fingerprint template BioID FP-4411 registered for device pickup
+Vehicle: Subaru Outback — VIN: 4S4BSENC0H3322110 — Plate: MA 5FT-9Z2
+LocationOther: Logan Airport, Terminal B (reported palpitations while traveling)
+Unknown: NoteRef UQ-22A-ALPHA
+Assessment/Plan: Palpitations likely PACs; Holter placed. Increase lisinopril to 20 mg daily; lifestyle counseling. ER precautions reviewed.

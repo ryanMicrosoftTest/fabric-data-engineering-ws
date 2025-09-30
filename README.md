@@ -122,6 +122,21 @@ Masking on SQL Endpoint and Roles -> fabric_items/tsql_data_mask_ssn_nb.Notebook
 
 
 
+## Azure Health Deidentification Service
+Imagine a scenario where you have PHI data that needs to be either tagged, redacted, or surrogated.  The Azure Deidentification Service leverages a Microsoft managed machine learning classification model trained on health data to identify health elements in text files, and perform either tagging, redaction, or surrogation.  These files can be processed in real-time or via a job.  If the data is to be processed in a job, the data must be stored in a storage account in a text format (ideally .txt).  The job will point at this data and then write the processed data to a target container.  A comon practice for this is to have one container for the raw data, have a deidentification job point at this container, run the job, and then store the output in a deidentified container.  This way, only highly priveleged users can have access on the raw container while researchers and data scientists have access to the deidentified data.  In this repository, there is a notebook that shows many different ways of utilizing this service in Microsoft Fabric.  That notebook can be found here at this path: fabric_items/de-identification-service/deidenticiation-nb.Notebook/notebook-content.py
+![Deidentification-Notebook](fabric_items/de-identification-service/deidenticiation-nb.Notebook/notebook-content.py)
+
+
+- Architecture Diagram
+![Architecture Diagram](docs/deidentification-architecture.png)
+
+- Workflow Overview
+![Workflow Overview](docs/deidentification-workflow.png)
+
+
+
+
+
 
 
 
