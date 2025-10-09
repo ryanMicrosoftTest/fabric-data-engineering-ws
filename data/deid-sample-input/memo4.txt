@@ -1,0 +1,16 @@
+Memo 4 — Orthopedics (ACL Tear Rehab)
+Date: 2025-07-25
+Hospital: Seaside Orthopedic Hospital
+Doctor: Dr. Hannah Kim, MD — License: MA-ORTHO-662341 — Email: h.kim@seasideortho.example — Fax: (555) 0133-6442
+Patient: Robert Wilson — Age: 54 — Profession: Sales manager — Organization: Fabrikam Aerospace
+Address: 77 Atlantic Ave, City: Boston, State: MA, Zip: 02111, CountryOrRegion: United States
+Phone: (555) 0188-1122 — Email: robert.wilson@example.com — Username: r_wilson54
+MedicalRecord: MRN OR-22019 — HealthPlan: Contoso HealthPlus ID CHP-2201-77 — Account: BIL-77110022
+IDs: SocialSecurity: 246-80-1357; IDNum (Passport): USA N11223344; License (Driver): MA WIL-662034
+Network: IPAddress: 203.0.113.199 — Url: https://ortho.examplehealth.org/OR-22019
+Devices: Hinged knee brace Device KB-SN-99321; Home TENS Device TNS-11 SN T11-0099
+BioID: BioID retinal scan RS-7710 at imaging desk
+Vehicle: Ford F-150 — VIN: 1FTFW1EF1EKD12345 — Plate: MA TRK-441
+LocationOther: Fenway Park (injury occurred ascending stairs)
+Unknown: RefCode Z-PL-004
+Assessment/Plan: Partial ACL tear; PT 2x/week x 6 weeks, brace use reviewed; consider surgical consult if instability persists.

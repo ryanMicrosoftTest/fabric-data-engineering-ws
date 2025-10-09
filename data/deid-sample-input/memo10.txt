@@ -1,0 +1,16 @@
+Memo 10 — General Surgery (Appendectomy Post‑Op)
+Date: 2025-09-03
+Hospital: Bayview Surgical Center
+Doctor: Dr. Samuel O’Neill, MD — License: MA-SURG-443321 — Email: s.oneill@bayviewsurg.example — Fax: (555) 0195-6677
+Patient: Sophia Brown — Age: 24 — Profession: Barista — Organization: Woodgrove Coffee Roasters
+Address: 88 Pine St, City: Worcester, State: MA, Zip: 01608, CountryOrRegion: United States
+Phone: (555) 0122-7781 — Email: sophia.brown@example.com — Username: soph_b24
+MedicalRecord: MRN GS-22002 — HealthPlan: Woodgrove HMO ID WH-2200-5533 — Account: BV-ACC-22190
+IDs: SocialSecurity: 909-88-7766; IDNum (Passport): USA V22113344; License (Driver): MA SB-77665544
+Net/Portal: IPAddress: 203.0.113.12 — Url: https://surgery.examplehealth.org/GS-22002
+Devices: Wound vac Device WV-10 SN WV-10-441; Home thermometer Device HT-2 SN HT2-9920
+BioID: BioID fingerprint FP-7712 for medication locker access
+Vehicle: Honda Fit — VIN: JHMGD38458S123456 — Plate: MA MINI-05
+LocationOther: Elm Park (walking tolerated 20 minutes)
+Unknown: SURG-UNK-9B
+Assessment/Plan: Incisions clean/dry/intact; afebrile; continue oral antibiotics; avoid heavy lifting for 2 weeks; return precautions reviewed.

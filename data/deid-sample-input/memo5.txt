@@ -1,0 +1,16 @@
+Memo 5 — OB/GYN (Gestational Diabetes Management)
+Date: 2025-06-18
+Hospital: Harbor Women’s Health
+Doctor: Dr. Aisha Rahman, MD — License: MA-OB-559012 — Email: a.rahman@harborwh.example — Fax: (555) 0191-3355
+Patient: Sarah Thompson — Age: 37 — Profession: Project manager — Organization: Northwind Traders
+Address: 12 Seaglass Ct, City: Salem, State: MA, Zip: 01970, CountryOrRegion: United States
+Phone: (555) 0150-6600 — Email: sarah.thompson@example.com — Username: sarah_t37
+MedicalRecord: MRN OB-99102 — HealthPlan: BluePlus Maternity ID BPM-7788-4411 — Account: MAT-ACC-00192
+IDs: SocialSecurity: 555-66-7777; IDNum (Passport): USA R22334455; License (Driver): MA T-11220990
+Connectivity: IPAddress: 198.51.100.14 — Url: https://ob.examplehealth.org/OB-99102
+Devices: Glucose meter Device GM-Alpha SN GM-A-8842; CGM Device Libre 3 SN L3-552-20
+BioID: BioID fingerprint FP-8821 for lab kiosk
+Vehicle: Volvo XC60 — VIN: YV4A22PK5L1123456 — Plate: MA MOM-220
+LocationOther: Salem Willows Park (postprandial walks)
+Unknown: Tag UNK-OB-52
+Assessment/Plan: GDMA2; continue insulin, dietician referral, weekly NST at 32 weeks.

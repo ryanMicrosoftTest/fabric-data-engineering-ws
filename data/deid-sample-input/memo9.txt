@@ -1,0 +1,16 @@
+Memo 9 — Neurology (Migraine Prophylaxis)
+Date: 2025-08-05
+Hospital: Summit Neurology Group
+Doctor: Dr. Caroline Brooks, MD — License: MA-NEURO-991122 — Email: c.brooks@summitneuro.example — Fax: (555) 0144-8800
+Patient: Olivia Martinez — Age: 40 — Profession: Marketing director — Organization: Fourth Coffee
+Address: 300 Summit Way, City: Somerville, State: MA, Zip: 02143, CountryOrRegion: United States
+Phone: (555) 0130-4412 — Email: olivia.martinez@example.com — Username: oliva_mktg
+MedicalRecord: MRN N-112200 — HealthPlan: Alpine HSA ID AH-5533-9911 — Account: SUM-ACCT-5520
+IDs: SocialSecurity: 654-32-1098; IDNum (Passport): USA U33445566; License (Driver): MA MZ-11223344
+Connectivity: IPAddress: 192.0.2.190 — Url: https://neuro.examplehealth.org/N-112200
+Devices: Smart headache diary Device HD-1 SN HD1-7788; Nightguard Device NG-22 SN NG-2281
+BioID: BioID voiceprint VP-7741 used for telephone refills
+Vehicle: Tesla Model 3 — VIN: 5YJ3E1EA7JF012345 — Plate: MA NEURA-1
+LocationOther: Rose Kennedy Greenway (photosensitivity triggers noted)
+Unknown: MiscRef NEU-X1
+Assessment/Plan: Start propranolol 40 mg BID; riboflavin and magnesium supplements; follow-up in 6 weeks.

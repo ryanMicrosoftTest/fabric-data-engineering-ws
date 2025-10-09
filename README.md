@@ -113,8 +113,79 @@ A better option is to create a view with this logic applied and then create diff
 
 The below is an example of such a use case.  Below there are students who may also be employees (such as if they are graduate or undergraduate students working as research assistants to help fund their studies).  In the case that the employee is also a student, their social security number must be masked so that only the last 4 digits can be seen.  
 
+# Related Artifacts in this repo
+Masking on Spark Data itself -> fabric_items/data_masking_spark_files_nb.Notebook
+Masking on SQL Endpoint and Roles -> fabric_items/tsql_data_mask_ssn_nb.Notebook
+
 - Architecture Diagram
 ![Architecture Diagram](docs/conditional_masking_architecture.png)
+
+
+
+## Azure Health Deidentification Service
+Imagine a scenario where you have PHI data that needs to be either tagged, redacted, or surrogated.  The Azure Deidentification Service leverages a Microsoft managed machine learning classification model trained on health data to identify health elements in text files, and perform either tagging, redaction, or surrogation.  These files can be processed in real-time or via a job.  If the data is to be processed in a job, the data must be stored in a storage account in a text format (ideally .txt).  The job will point at this data and then write the processed data to a target container.  A comon practice for this is to have one container for the raw data, have a deidentification job point at this container, run the job, and then store the output in a deidentified container.  This way, only highly priveleged users can have access on the raw container while researchers and data scientists have access to the deidentified data.  In this repository, there is a notebook that shows many different ways of utilizing this service in Microsoft Fabric.  That notebook can be found here at this path: fabric_items/de-identification-service/deidenticiation-nb.Notebook/notebook-content.py
+![Deidentification-Notebook](fabric_items/de-identification-service/deidenticiation-nb.Notebook/notebook-content.py)
+
+
+- Architecture Diagram
+![Architecture Diagram](docs/deidentification-architecture.png)
+
+- Workflow Overview
+![Workflow Overview](docs/deidentification-workflow.png)
+
+
+## Enable SQL Audit Logs on Lakehouse SQL Analytics Endpoint
+
+## Enable SQL Audit Logs on Lakehouse SQL Analytics Endpoint
+
+Enabling SQL audit logs is currently only possible via API. Follow the steps below to configure this feature.
+
+### Prerequisites
+
+- The calling Service Principal (SPN) must have the required API permission:
+  ![Audit Permission](docs/sql_audit_images/audit_permission.png)
+
+
+
+
+- Example: Permission enabled on the SPN:
+  ![Audit Permission Two](docs/sql_audit_images/audit_permission_image_two.png)
+
+
+
+
+
+- The SPN must also have the Audit permission on the lakehouse object:
+  ![Endpoint Manage Permissions](docs/sql_audit_images/sql_endpoint_manage_permissions.png)
+
+
+
+
+
+- Example: Audit permission on the SPN group:
+  ![Endpoint Manage Permissions Detailed](docs/sql_audit_images/sql_ep_permissions_details.png)
+
+
+
+
+
+### Implementation Steps
+
+1. **Fetch SPN Secret at Runtime**
+
+   Replace the Key Vault information with your own:
+   ![Key Vault Fetch](docs/sql_audit_images/key_vault_call_code.png)
+
+
+
+
+
+2. **Patch SQL Endpoint**
+
+   Use client code to perform the patch. Replace variables with your workspace_id and lakehouse_id:
+   ![Client Code](docs/sql_audit_images/client_code.png)
+
+
 
 
 

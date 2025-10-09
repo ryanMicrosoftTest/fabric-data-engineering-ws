@@ -1,0 +1,16 @@
+Memo 8 — Pulmonology (Post-COVID Dyspnea)
+Date: 2025-09-01
+Hospital: Lakeside Pulmonary Clinic
+Doctor: Dr. Naomi Patel, MD — License: MA-PULM-778812 — Email: n.patel@lakesidepulm.example — Fax: (555) 0197-3300
+Patient: Michael Johnson — Age: 60 — Profession: Retired electrician — Organization: (former) City of Boston Utilities
+Address: 15 Cedar Ln, City: Quincy, State: MA, Zip: 02169, CountryOrRegion: United States
+Phone: (555) 0180-5500 — Email: michael.johnson@example.com — Username: mj_retired60
+MedicalRecord: MRN P-80911 — HealthPlan: Medicare Advantage ID MA-2299-6644 — Account: LS-AC-992211
+IDs: SocialSecurity: 101-22-3033; IDNum (Passport): USA T66778899; License (Driver): MA JN-44332211
+Connectivity: IPAddress: 198.51.100.205 — Url: https://pulm.examplehealth.org/P-80911
+Devices: Incentive spirometer Device IS-77 SN 77-IS-0042; Home oximeter Device OX-12 SN OX12-9022
+BioID: BioID iris code IC-5501 (research study enrollment)
+Vehicle: Ford Escape — VIN: 1FMCU0GD2HUE12345 — Plate: MA BREATHE
+LocationOther: Castle Island (dyspnea on exertion noted)
+Unknown: Token K-NULL-42
+Assessment/Plan: PFTs show mild restriction; pulmonary rehab recommended; continue inhaled budesonide-formoterol.

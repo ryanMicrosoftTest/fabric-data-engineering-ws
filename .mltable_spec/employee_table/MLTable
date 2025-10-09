@@ -1,0 +1,2 @@
+paths:
+  - pattern: abfss://output@healthsaadlsrheus.dfs.core.windows.net/employee/*.parquet

@@ -1,0 +1,16 @@
+Memo 7 — Gastroenterology (IBS Flare)
+Date: 2025-08-12
+Hospital: Riverbend Digestive Health Center
+Doctor: Dr. Elena García, MD — License: MA-GI-120045 — Email: e.garcia@riverbendgi.example — Fax: (555) 0175-9922
+Patient: James Anderson — Age: 32 — Profession: Warehouse supervisor — Organization: Adventure Works
+Address: 890 Riverside Dr, City: Lowell, State: MA, Zip: 01850, CountryOrRegion: United States
+Phone: (555) 0160-2288 — Email: james.anderson@example.com — Username: j.anderson32
+MedicalRecord: MRN GI-77720 — HealthPlan: HealthCo Silver ID HC-2211-7788 — Account: RB-ACCT-4477
+IDs: SocialSecurity: 432-10-9876; IDNum (Passport): USA S99887766; License (Driver): MA A55443322
+Network: IPAddress: 203.0.113.78 — Url: https://gi.examplehealth.org/GI-77720
+Devices: Home BP monitor Device BP-SN-10101; Smart scale Device SS-200 SN SS-200-771
+BioID: BioID palm vein template PV-9920 (building access)
+Vehicle: Chevy Malibu — VIN: 1G1ZB5ST0JF123456 — Plate: MA RB-2201
+LocationOther: Tsongas Center (symptoms worsened after event)
+Unknown: GI-UNK-H7
+Assessment/Plan: IBS-D flare; low-FODMAP diet guidance; trial rifaximin; stool studies ordered.
