@@ -151,9 +151,7 @@ lakehouse_resp.json()
 
 # CELL ********************
 
-workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
 sql_properties_id = lakehouse_resp.json()['properties']['sqlEndpointProperties']['id']
-
 
 resp = update_sql_audit_settings(workspace_id, sql_properties_id, token)
 
