@@ -8,7 +8,6 @@ DEV:
     - Report
     - SemanticModel
     - Lakehouse
-    - MirroredDatabase
     - VariableLibrary
     - CopyJob
     - Eventhouse
@@ -31,7 +30,6 @@ QA:
     - Report
     - SemanticModel
     - Lakehouse
-    - MirroredDatabase
     - VariableLibrary
     - CopyJob
     - Eventhouse
@@ -54,7 +52,6 @@ PROD:
     - Report
     - SemanticModel
     - Lakehouse
-    - MirroredDatabase
     - VariableLibrary
     - CopyJob
     - Eventhouse
