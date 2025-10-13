@@ -136,56 +136,71 @@ Imagine a scenario where you have PHI data that needs to be either tagged, redac
 
 ## Enable SQL Audit Logs on Lakehouse SQL Analytics Endpoint
 
-## Enable SQL Audit Logs on Lakehouse SQL Analytics Endpoint
-
 Enabling SQL audit logs is currently only possible via API. Follow the steps below to configure this feature.
 
 ### Prerequisites
 
 - The calling Service Principal (SPN) must have the required API permission:
-  ![Audit Permission](docs/sql_audit_images/audit_permission.png)
 
+&nbsp;  
+&nbsp;  
+![Audit Permission](docs/sql_audit_images/audit_permission.png)
 
-
+&nbsp;  
+&nbsp;  
 
 - Example: Permission enabled on the SPN:
-  ![Audit Permission Two](docs/sql_audit_images/audit_permission_image_two.png)
 
+&nbsp;  
+&nbsp;  
+![Audit Permission Two](docs/sql_audit_images/audit_permission_image_two.png)
 
-
-
+&nbsp;  
+&nbsp;  
 
 - The SPN must also have the Audit permission on the lakehouse object:
-  ![Endpoint Manage Permissions](docs/sql_audit_images/sql_endpoint_manage_permissions.png)
 
+&nbsp;  
+&nbsp;  
+![Endpoint Manage Permissions](docs/sql_audit_images/sql_endpoint_manage_permissions.png)
 
-
-
+&nbsp;  
+&nbsp;  
 
 - Example: Audit permission on the SPN group:
-  ![Endpoint Manage Permissions Detailed](docs/sql_audit_images/sql_ep_permissions_details.png)
 
+&nbsp;  
+&nbsp;  
+![Endpoint Manage Permissions Detailed](docs/sql_audit_images/sql_ep_permissions_details.png)
 
-
-
+&nbsp;  
+&nbsp;  
 
 ### Implementation Steps
 
 1. **Fetch SPN Secret at Runtime**
 
-   Replace the Key Vault information with your own:
-   ![Key Vault Fetch](docs/sql_audit_images/key_vault_call_code.png)
+  Replace the Key Vault information with your own:
 
+&nbsp;  
+&nbsp;  
+![Key Vault Fetch](docs/sql_audit_images/key_vault_call_code.png)
 
-
-
+&nbsp;  
+&nbsp;  
 
 2. **Patch SQL Endpoint**
 
-   Use client code to perform the patch. Replace variables with your workspace_id and lakehouse_id:
-   ![Client Code](docs/sql_audit_images/client_code.png)
+  Use client code to perform the patch. Replace variables with your workspace_id and lakehouse_id:
 
+&nbsp;  
+&nbsp;  
+![Client Code](docs/sql_audit_images/client_code.png)
 
+&nbsp;  
+&nbsp;  
+
+## Note:  Although this appears to be working from the response, the audit logs are actually not being captured.  This has been escalated to the product group and they are working on a fix in the coming weeks
 
 
 
