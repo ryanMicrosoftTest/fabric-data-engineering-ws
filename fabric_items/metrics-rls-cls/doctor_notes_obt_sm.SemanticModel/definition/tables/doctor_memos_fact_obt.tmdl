@@ -1,0 +1,37 @@
+table doctor_memos_fact_obt
+	lineageTag: 1af63ba0-1959-4c77-8747-6fa96c8ba1ca
+	sourceLineageTag: [dbo].[doctor_memos_fact_obt]
+
+	column doctor
+		dataType: string
+		lineageTag: 2a2d8976-a658-48a4-917f-4aad566bf9da
+		sourceLineageTag: doctor
+		summarizeBy: none
+		sourceColumn: doctor
+
+		annotation SummarizationSetBy = Automatic
+
+	column memo_content
+		dataType: string
+		lineageTag: e4b78360-7a2b-48ae-bf93-f46fd7da78be
+		sourceLineageTag: memo_content
+		summarizeBy: none
+		sourceColumn: memo_content
+
+		annotation SummarizationSetBy = Automatic
+
+	column upn
+		dataType: string
+		lineageTag: b4a67c1b-f90a-4024-84f2-15e7cb404758
+		sourceLineageTag: upn
+		summarizeBy: none
+		sourceColumn: upn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition doctor_memos_fact_obt = entity
+		mode: directLake
+		source
+			entityName: doctor_memos_fact_obt
+			expressionSource: 'DirectLake - deid_lh'
+

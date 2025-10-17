@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "doctor_memos_report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "bfa4eae5-1d40-b83f-482e-d09eac484f5a"
+  }
+}

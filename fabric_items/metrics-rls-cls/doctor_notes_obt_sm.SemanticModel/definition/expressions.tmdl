@@ -1,0 +1,11 @@
+expression 'DirectLake - deid_lh' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/a8cbda3d-903e-4154-97d9-9a91c95abb42/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: 585d9fdb-20e6-4825-9861-c3350f353eac
+
+	annotation PBI_IncludeFutureArtifacts = False
+
+	annotation PBI_RemovedChildren = [{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[deidentified_dr_notes]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[doctor_memos_fact]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[dim_doctor]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[doctor-notes-parquet]"}},"objectType":"Table"}]
+

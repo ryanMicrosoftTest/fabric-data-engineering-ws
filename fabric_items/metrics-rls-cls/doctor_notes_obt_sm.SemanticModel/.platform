@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "doctor_notes_obt_sm"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a71ba262-4bfc-bdc7-4359-dd793796faae"
+  }
+}
