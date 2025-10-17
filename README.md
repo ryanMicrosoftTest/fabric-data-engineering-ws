@@ -210,6 +210,7 @@ Use Case:  Mistakes happen to data, sometimes via corruption, sometimes via acci
 
 Solution:  Restore Points make it possible to roll your data warehouse back to an earlier state
 
+Note: There is a programmatic approach to this in the notebook located at [fabric_items/Data Warehouse Restore Points/restore_points_nb.Notebook/notebook-content.py](fabric_items/Data%20Warehouse%20Restore%20Points/restore_points_nb.Notebook/notebook-content.py) in this repo.
 
 What are Restore Points:
 - Recovery points of the warehouse created by copying only the metadata, while referencing the data files in OneLake
