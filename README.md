@@ -286,3 +286,60 @@ WHERE is_user_process = 1;
 After the restore point, I can see that the records with BuyingGroup Wingtip Toys have returned
 
 ![](docs/restore_points/restore_points_10.png)
+
+
+## OneLake Security
+
+### Problem Statement
+Organizations often need to secure sensitive tables across multiple consumption layers, but each tool historically required its own role model. Maintaining consistent definitions, filters, and memberships across the Lakehouse, SQL Analytics Endpoint, Semantic Model, and downstream Power BI reports is error-prone and time-consuming. Misalignment between layers can expose data unintentionally or block legitimate users, making fine-grained data security difficult to govern at scale.
+
+### Old Approach
+Before OneLake Security, teams defined and managed roles separately on every surface:
+- Create a role on the Lakehouse and keep its filters current.
+- Re-create the same role definition on the SQL Analytics Endpoint.
+- Duplicate the role yet again in the Semantic Model or Power BI dataset.
+Each step relied on manual parity checks, often belonging to different teams or pipelines. Any changes—like adding a department filter or onboarding a new user group—had to be coordinated and redeployed in every layer, increasing operational overhead and the chance of drift.
+
+- ![Old Approach](docs/onelake_security/old_approach.png)
+
+### OneLake Security Overview
+OneLake Security introduces a centralized access-control layer that sits directly on top of data stored in OneLake. Roles, filters, and user assignments are defined once on the Lakehouse tables, and OneLake automatically enforces those policies when the data is accessed via SQL analytics endpoints or semantic models. Because the security metadata travels with the data, downstream artifacts inherit the same protections without extra configuration. This unified model removes redundant role definitions, shortens deployment cycles, and keeps governance policies consistent from storage through consumption.
+
+### New Approach
+With OneLake Security enabled:
+1. Define data roles and row-level security predicates at the Lakehouse layer.
+2. Assign Azure AD security principals (users, groups, service principals) to those roles.
+3. Publish or refresh SQL analytics endpoints and semantic models—OneLake automatically applies the defined security filters.
+Power BI reports that use the semantic model no longer require duplicated role definitions; they honor the Lakehouse security as-is. The end result is a single source of truth for security, simplified maintenance, and higher confidence that sensitive data stays protected everywhere it is consumed.
+
+- ![New Approach](docs/onelake_security/new_approach.png)
+
+### Screenshots
+
+OneLake Security Roles defined on a Lakehouse
+![OneLake Security Lakehouse Roles](docs/onelake_security/onelake_security_lakehouse_roles.png)
+
+View of the OrthopedicRole shows that only one t able is exposed by the Role Definition
+![Orthopedics Role Definition Table](docs/onelake_security/orthopedics_role_def_1.png)
+
+Showing that the SQL definition for how the data is filtered for the Role
+![Orthopedics Role Definition RLS](docs/onelake_security/orthopedics_role_def_2.png)
+
+What the Role sees from the Lakehouse
+![Cardiology Lakehouse View](docs/onelake_security/cardiology_onelake_lakehouse_view.png)
+
+View of what an admin sees from the lakehouse.  Note the other tables seen as well and all rows
+![Admin Lakehouse View](docs/onelake_security/admin_view_lakehouse.png)
+
+Cardiology View of the SQL Analytics Endpoint
+![Cardiology View SQL Analytics Endpoint](docs/onelake_security/cardiology_view_sql_endpoint.png)
+
+View of what an admin sees in the SQL Analytics Endpoint
+![Admin SQL Analytics View](docs/onelake_security/view_sql_analytics_ep_admin.png)
+
+View of what can be seen by CardiologyRole for doctor_memos_report
+![Doctor Memos Report](docs/onelake_security/cardiology_sm_report_view.png)
+
+View of what admins see from doctor_memos_report
+![Admin View Report](docs/onelake_security/admin_sm_report_view.png)
+
