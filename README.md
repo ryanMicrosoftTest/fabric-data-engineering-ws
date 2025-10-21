@@ -204,6 +204,85 @@ Enabling SQL audit logs is currently only possible via API. Follow the steps bel
 
 
 
+## Fabric Data Warehouse Restore Points
+
+Use Case:  Mistakes happen to data, sometimes via corruption, sometimes via accidental drops
+
+Solution:  Restore Points make it possible to roll your data warehouse back to an earlier state
+
+Note: There is a programmatic approach to this in the notebook located at [fabric_items/Data Warehouse Restore Points/restore_points_nb.Notebook/notebook-content.py](fabric_items/Data%20Warehouse%20Restore%20Points/restore_points_nb.Notebook/notebook-content.py) in this repo.
+
+What are Restore Points:
+- Recovery points of the warehouse created by copying only the metadata, while referencing the data files in OneLake
+- The metadata is copied while the underlying data of the warehouse stored as parquet files aren't copied
+- These restore points can be used to recover the warehouse as of a prior point in time
+
+System-Created Restore Points:
+- These are created throughout the day and are available for thirty days.
+- System-generated restore points are created automatically every eight hours
+- A system created restore point might not be immediately available for a new warehouse
+- There can be up to 180 system generated restore points at any given point in time
+- System-created restore points can't be deleted
 
 
 
+User-defined restore points:
+- Enables the workspace admins to manually create restore points before and after large modifications made to the warehouse
+- This ensures that the restore points are logically consistent, providing data protection and quick recovery time in case of any workload interruptions or user errors
+- User-defined restore points are available for thirty calendar days and are automatically deleted on your behalf after the expiry of the retention period
+
+![](docs/restore_points/restore_points_1.png)
+
+```sql
+SELECT
+  BuyingGroup,
+  COUNT(*) AS total_records
+FROM dimension_customer
+GROUP BY
+  BuyingGroup;
+```
+
+
+![](docs/restore_points/restore_points_2.png)
+
+
+![](docs/restore_points/restore_points_3.png)
+
+
+![](docs/restore_points/restore_points_4.png)
+
+
+![](docs/restore_points/restore_points_5.png)
+
+Before running the restore, it may be helpful to see what active users are currently using the Data Warehouse, to inform them you are about to run a restore activity
+```
+-- See all currently active users
+SELECT
+    session_id,
+    login_name AS UserName,
+    host_name,
+    program_name,
+    status,
+    login_time,
+    last_request_start_time
+
+FROM sys.dm_exec_sessions
+WHERE is_user_process = 1;
+```
+
+
+![](docs/restore_points/restore_points_6.png)
+
+
+![](docs/restore_points/restore_points_7.png)
+
+
+![](docs/restore_points/restore_points_8.png)
+
+
+![](docs/restore_points/restore_points_9.png)
+
+
+After the restore point, I can see that the records with BuyingGroup Wingtip Toys have returned
+
+![](docs/restore_points/restore_points_10.png)
