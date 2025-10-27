@@ -1,0 +1,23 @@
+DEV:
+  target_workspace_name: data-backup-dev
+  target_workspace_id: c6477a7a-4704-4c20-a04d-7d81f3413ab0
+  repo_directory: fabric_items
+  items_in_scope:
+    - Lakehouse
+    - Warehouse
+
+QA:
+  target_workspace_name: data-backup-qa
+  target_workspace_id: 48b25824-5342-457d-8569-4c7f43f52a5e
+  repo_directory: fabric_items
+  items_in_scope:
+    - Lakehouse
+    - Warehouse
+
+PROD:
+  target_workspace_name: data-backup-prod
+  target_workspace_id: 62b32ddc-2f5a-4852-8ce8-f338c1063575
+  repo_directory: fabric_items
+  items_in_scope:
+    - Lakehouse
+    - Warehouse
