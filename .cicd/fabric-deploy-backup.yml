@@ -1,5 +1,8 @@
 # This will only be deployed manually
-
+trigger:
+  branches:
+    include:
+      - backup
   paths:
     include:
       - 'fabric_items/**'  
