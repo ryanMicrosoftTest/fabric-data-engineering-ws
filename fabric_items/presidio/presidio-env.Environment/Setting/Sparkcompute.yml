@@ -1,0 +1,16 @@
+enable_native_execution_engine: false
+instance_pool_id: 8b573cc2-e81c-415b-9cdb-b55d68426bd9
+driver_cores: 8
+driver_memory: 56g
+executor_cores: 8
+executor_memory: 56g
+dynamic_executor_allocation:
+  enabled: false
+  min_executors: 9
+  max_executors: 9
+spark_conf:
+  spark.fabric.pools.skipStarterPools: true
+  spark.synapse.diagnostic.emitters: spark-eh
+  spark.synapse.diagnostic.emitter.spark-eh.type: AzureEventHub
+  spark.synapse.diagnostic.emitter.spark-eh.categories: Log,EventLog,Metrics
+runtime_version: 1.3
