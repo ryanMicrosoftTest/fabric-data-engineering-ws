@@ -343,3 +343,50 @@ View of what can be seen by CardiologyRole for doctor_memos_report
 View of what admins see from doctor_memos_report
 ![Admin View Report](docs/onelake_security/admin_sm_report_view.png)
 
+### Presidio Deidentification Framework
+
+#### Presidio Overview
+Presidio is an open-source framework maintained by Microsoft to help organizations detect and anonymize Personally Identifiable Information (PII) across text and images. By integrating Presidio into data pipelines, teams can comply with privacy regulations while safeguarding sensitive records that flow through research, analytics, and operational workloads.
+
+#### What Problem Does Presidio Solve?
+Academic medical centers and research organizations routinely process clinical notes, patient records, and other datasets packed with PII. Presidio provides a customizable, production-grade toolkit for identifying and anonymizing that information before it is stored, shared, or analyzed. The result is stronger adherence to HIPAA, GDPR, and institutional privacy policies—without slowing down data-driven research.
+
+#### Key Features
+
+##### PII Detection Across Modalities
+- **Text:** Finds entities such as names, addresses, national IDs, credit cards, and custom domain-specific tokens.
+- **Images:** Uses optical character recognition (OCR) plus entity detection to redact sensitive content in screenshots, scans, or medical imagery.
+- **Structured/Semi-Structured Data:** Scans tabular or nested data sources and applies the same detection logic used for free-form text.
+
+##### Detection Techniques
+- **Regex:** Pattern-based detection for highly structured identifiers (for example, SSNs or MRNs).
+- **NER (Machine Learning):** Context-aware natural language processing models that catch entities even when the pattern is irregular.
+- **Checksum Validation:** Additional verification for identifiers like credit cards to reduce false positives.
+- **Context Words:** Confidence boosting via nearby words (for example, “patient” alongside a name).
+
+##### Anonymization Options
+- Replace, redact, mask, or encrypt detected entities out of the box.
+- Extend with custom anonymization operators to match project-specific policies.
+
+##### Customizability
+- Define bespoke recognizers for domain-specific entities (for example, study IDs or hospital units).
+- Control behavior with:
+  - **Allow lists:** Explicitly preserve approved terms such as canonical institution names.
+  - **Deny lists:** Force redaction even when detection confidence is lower than a threshold.
+
+##### Deployment Flexibility
+- Works in Python and PySpark workloads—including Microsoft Fabric notebooks and Spark jobs.
+- Ships as Docker images that scale in Kubernetes, Azure Container Apps, or Azure Machine Learning endpoints.
+- Integrates with big-data pipelines (Spark, Azure Data Factory, Synapse) and cloud storage to process large volumes of unstructured data.
+
+#### Modules
+- **Presidio Analyzer:** Detects PII entities in text using the techniques above.
+- **Presidio Anonymizer:** Applies the chosen anonymization operators to detection results.
+- **Presidio Image Redactor:** Handles OCR-based detection and redaction in images.
+- **Presidio Structured:** Targets structured and semi-structured sources (CSV, JSON, Parquet) with consistent detection/anonymization behavior.
+
+
+#### Artifacts in this repository for Presidio
+- Artifacts for Presidio are located here: fabric_items/presidio
+
+
