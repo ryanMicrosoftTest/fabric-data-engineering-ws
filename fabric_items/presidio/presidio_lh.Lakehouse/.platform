@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "presidio_lh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3f8427df-ffec-a038-48db-133b98142750"
+  }
+}
