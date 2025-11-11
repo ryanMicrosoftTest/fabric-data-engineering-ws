@@ -32,6 +32,7 @@ import notebookutils
 import pandas as pd
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
+import uuid
 
 
 # METADATA ********************
@@ -122,15 +123,15 @@ class DataAccessRole:
         """
         self.decisionRulesDefinition = decisionRules.definition
         self.membersDefinition = members.definition
-        self.definition = {
-            'value':[
-                {
+        role = {
                 'name': name,
                 'decisionRules': self.decisionRulesDefinition,
                 'members': self.membersDefinition
                 }
-            ]
-        }
+        if id:
+            role['id'] = id
+        self.definition = {'value': [role]}
+
 
 
 # other utilities
@@ -208,6 +209,22 @@ def create_lakehouse(workspace_id:str, display_name:str, description:str, api_to
 
     return response
 
+def get_lakehouse(workspace_id:str, lakehouse_id:str, api_token:str):
+    """
+    GET https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/lakehouses/{lakehouseId}
+
+    """
+    url = f'https://api.fabric.microsoft.com/v1/workspaces/{workspace_id}/lakehouses/{lakehouse_id}'
+
+    headers = {
+    "Authorization": f"Bearer {api_token}",
+    "Content-Type": "application/json"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response
+
 def create_update_data_access_role(workspace_id:str, item_id:str, data_access_role:DataAccessRole, api_token:str):
     """
     Create or update a data access role in OneLake
@@ -230,6 +247,39 @@ def create_update_data_access_role(workspace_id:str, item_id:str, data_access_ro
     response = requests.put(url, headers=headers, json=data_access_role.definition)
 
     return response
+
+def upsert_data_access_role(workspace_id:str, item_id:str, role:DataAccessRole, api_token:str):
+    """
+    """
+    base = f'https://api.fabric.microsoft.com/v1/workspaces/{workspace_id}/items/{item_id}/dataAccessRoles'
+    headers = {
+    "Authorization": f"Bearer {api_token}",
+    "Content-Type": "application/json"
+    }
+
+    # read existing
+    existing = requests.get(base, headers=headers).json().get('value', [])
+
+    new_role = role.definition['value'][0]
+    # if id not set, try match by name; else assign a new id
+
+    match = None
+    if 'id' in new_role:
+        match = next((r for r in existing if r.get('id')==new_role['id']), None)
+    if not match:
+        match = next((r for r in existing if r.get('name', '').lower()==new_role['name'].lower()), None)
+
+    if match:
+        # update in place
+        match.update({k:v for k,v in new_role.items() if k!='id' or new_role.get('id')})
+    else:
+        new_role.setdefault('id', str(uuid.uuid4()))
+        existing.append(new_role)
+    
+    # 2 write back full set
+    return requests.put(base, headers=headers, json={'value':existing})
+
+
 
 def get_lakehouse_permissions(workspace_id:str, item_id:str, api_token:str):
     """
@@ -306,6 +356,51 @@ lh_response.json()
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# MARKDOWN ********************
+
+# ### Compare the Lakehouses between the working Data Role and the not working one
+
+# CELL ********************
+
+deid_lh_id = '5090acaa-9246-4eb2-b9fc-93b8b6e7e60c'
+onelake_security_lh = 'af5a29cf-f732-4bac-8fa0-395f63345887'
+
+good_lh_details = get_lakehouse(workspace_id, lakehouse_id=deid_lh_id, api_token=token)
+bad_lh_details = get_lakehouse(workspace_id, lakehouse_id=onelake_security_lh, api_token=token)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+good_lh_details.json()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+bad_lh_details.json()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Create Table
 
 # CELL ********************
 
@@ -451,7 +546,7 @@ department_list = [
 ### create table in lakehouse
 
 doctor_table_data = []
-schema = ['doctor','memo_content', 'department']
+schema = ['department','doctor','memo_content',]
 
 for index in range(1,35):
     list_index = index - 1
@@ -463,6 +558,7 @@ for index in range(1,35):
 
 doctor_table_df = spark.createDataFrame(doctor_table_data, schema=schema)
 
+display(doctor_table_df)
     
 
 # METADATA ********************
@@ -502,6 +598,41 @@ except:
 ### create roles in the table
 
 # create DecisionRules
+# permissionRule = [
+#             {
+#               "attributeName": "Path",
+#               "attributeValueIncludedIn": [
+#                 "/Tables/doctor_table"
+#               ]
+#             },
+#             {
+#               "attributeName": "Action",
+#               "attributeValueIncludedIn": [
+#                 "Read"
+#               ]
+#             }
+#           ]
+# constraints = {
+#             "columns": [
+#               { #allowing all columns so CLS doesn't interfere
+#                 "tablePath": "/Tables/doctor_table",
+#                 "columnNames": [
+#                   "*"
+#                 ],
+#                 "columnEffect": "Permit",
+#                 "columnAction": [
+#                   "Read"
+#                 ]
+#               }
+#             ],
+#             "rows": [
+#               {
+#                 "tablePath": "/Tables/doctor_table",
+#                 "value": "SELECT * FROM doctor_table WHERE department = 'Cardiology'"
+#               }
+#             ]
+#           }
+
 permissionRule = [
             {
               "attributeName": "Path",
@@ -518,11 +649,10 @@ permissionRule = [
           ]
 constraints = {
             "columns": [
-              {
+              { 
                 "tablePath": "/Tables/doctor_table",
                 "columnNames": [
-                  "doctor",
-                  "department"
+                  "*"
                 ],
                 "columnEffect": "Permit",
                 "columnAction": [
@@ -533,7 +663,7 @@ constraints = {
             "rows": [
               {
                 "tablePath": "/Tables/doctor_table",
-                "value": "select * from doctor_table where department=\'Cardiology\'"
+                "value": "SELECT * FROM doctor_table"
               }
             ]
           }
@@ -551,6 +681,7 @@ dec_rule.definition
 
 # CELL ********************
 
+"""
 # create members WORKING
 fabricItemMembers = [
           {
@@ -564,6 +695,7 @@ fabricItemMembers = [
 members = Members(fabricItemMembers=fabricItemMembers)
 
 members.definition
+"""
 
 # METADATA ********************
 
@@ -609,7 +741,7 @@ members.definition
 
 # create data access role
 
-da_role = DataAccessRole(decisionRules=dec_rule, id='', members=members, name='cardiologyRole')
+da_role = DataAccessRole(decisionRules=dec_rule, id='', members=members, name='allowAll')
 
 da_role.definition
 
@@ -696,7 +828,7 @@ display(da_roles_list_good_access_lh_df[da_roles_list_good_access_lh_df['name']=
 
 # CELL ********************
 
-da_roles_list_good_access_lh.json()['value'][6]
+# da_roles_list_good_access_lh.json()['value'][6]
 
 # METADATA ********************
 
@@ -707,7 +839,7 @@ da_roles_list_good_access_lh.json()['value'][6]
 
 # CELL ********************
 
-da_roles_list_no_access_lh.json()['value'][0]
+# da_roles_list_no_access_lh.json()['value'][0]
 
 # METADATA ********************
 
@@ -787,6 +919,931 @@ display(bad_access_df)
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# MARKDOWN ********************
+
+# ### Decision Rules for Role on working Lakehouse
+
+# CELL ********************
+
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              { 
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Cardiology'"
+              }
+            ]
+          }
+
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+### New Members schema with entra
+
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": "a8cbda3d-903e-4154-97d9-9a91c95abb42/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c"
+          }
+        ]
+
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "662b14b6-a936-46b0-bde0-9f4d759dc46e",
+    "objectType": "User"
+  }
+]
+
+
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+
+members.definition
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='cardiologyRole')
+
+upsert_resp = upsert_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', role=da_role, api_token=token)
+
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+upsert_resp
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+upsert_resp.content
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Neurology Role
+
+# CELL ********************
+
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              { 
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Neurology'"
+              }
+            ]
+          }
+
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+
+
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='NeurologyRole')
+
+upsert_resp = upsert_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', role=da_role, api_token=token)
+
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+
+
+print(upsert_resp)
+print(upsert_resp.content)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Dermatology Role
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Gastroenterology Role
+
+# CELL ********************
+
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              { 
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Gastroenterology'"
+              }
+            ]
+          }
+
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+# add members dr_muir@MngEnvMCAP372892.onmicrosoft.com | 6338eaf2-5a87-4eb3-b23b-ea30d04de02a
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": "a8cbda3d-903e-4154-97d9-9a91c95abb42/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c"
+          }
+        ]
+
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "6338eaf2-5a87-4eb3-b23b-ea30d04de02a",
+    "objectType": "User"
+  }
+]
+
+
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+
+members.definition
+
+
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='GastroenterologyRole')
+
+upsert_resp = upsert_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', role=da_role, api_token=token)
+
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+
+
+print(upsert_resp)
+print(upsert_resp.content)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Orthopedics Role
+
+# CELL ********************
+
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              { 
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Orthopedics'"
+              }
+            ]
+          }
+
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+# add members purview-admin@MngEnvMCAP372892.onmicrosoft.com | b00395d7-230b-41bb-8bbc-d668979bd8f6
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": "a8cbda3d-903e-4154-97d9-9a91c95abb42/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c"
+          }
+        ]
+
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "b00395d7-230b-41bb-8bbc-d668979bd8f6",
+    "objectType": "User"
+  }
+]
+
+
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+
+members.definition
+
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='OrthopedicsRole')
+
+upsert_resp = upsert_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', role=da_role, api_token=token)
+
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+
+
+print(upsert_resp)
+print(upsert_resp.content)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Start Fresh
+# New Lakehouse
+
+# CELL ********************
+
+# create lakehouse
+# get oauth token
+
+token = get_api_token_via_akv(kv_uri, client_id_secret, tenant_id_secret, client_secret_name)
+
+
+# create lakehouse
+lh_response = create_lakehouse(workspace_id, display_name='new_onelake_test_lh', description='lakehouse to test onelake security V2', api_token=token)
+
+
+lh_response.json()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+try:
+    doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{lh_response.json()["workspaceId"]}@onelake.dfs.fabric.microsoft.com/{lh_response.json()["id"]}/Tables/doctor_table')
+
+except:
+    print('ERROR')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### OneLake Security must be MANUALLY enabled on the created lakehouse
+
+# CELL ********************
+
+# add all roles to it
+
+### Neuro Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Neurology'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/{lh_response.json()['id']}"
+          }
+        ]
+
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "662b14b6-a936-46b0-bde0-9f4d759dc46e",
+    "objectType": "User"
+  }
+]
+
+
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+
+members.definition
+ 
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='NeurologyRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id=lh_response.json()['id'], role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+
+
+### Gastro Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Gastroenterology'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+ 
+# add members dr_muir@MngEnvMCAP372892.onmicrosoft.com | 6338eaf2-5a87-4eb3-b23b-ea30d04de02a
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/{lh_response.json()['id']}"
+          }
+        ]
+ 
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "6338eaf2-5a87-4eb3-b23b-ea30d04de02a",
+    "objectType": "User"
+  }
+]
+ 
+ 
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+ 
+members.definition
+ 
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='GastroenterologyRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id=lh_response.json()['id'], role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+### Ortho Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_memos_fact_obt"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_memos_fact_obt",
+                "value": "SELECT * FROM doctor_memos_fact_obt WHERE department = 'Orthopedics'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+ 
+# add members purview-admin@MngEnvMCAP372892.onmicrosoft.com | b00395d7-230b-41bb-8bbc-d668979bd8f6
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/{lh_response.json()['id']}"
+          }
+        ]
+ 
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "b00395d7-230b-41bb-8bbc-d668979bd8f6",
+    "objectType": "User"
+  }
+]
+ 
+ 
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+ 
+members.definition
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='OrthopedicsRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id=lh_response.json()['id'], role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+## There's no API to change from Delegated Identity to Users Identity, so this must be done manually (note that the owner of the lakehouse is different than the admin enabling onelake security and delegated identity)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+### The above still errors out
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Try on a fresh manually created lakehouse
+# - ID: 37b3f9d2-5cf6-4065-9172-29bd1bd75d11
+
+# CELL ********************
+
+try:
+    doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{lh_response.json()["workspaceId"]}@onelake.dfs.fabric.microsoft.com/37b3f9d2-5cf6-4065-9172-29bd1bd75d11/Tables/doctor_table')
+except:
+    print('ERROR')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# add all roles to it
+
+### Neuro Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_table"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "value": "SELECT * FROM doctor_table WHERE department = 'Neurology'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+
+
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/37b3f9d2-5cf6-4065-9172-29bd1bd75d11"
+          }
+        ]
+
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "662b14b6-a936-46b0-bde0-9f4d759dc46e",
+    "objectType": "User"
+  }
+]
+
+
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+
+members.definition
+ 
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='NeurologyRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id='37b3f9d2-5cf6-4065-9172-29bd1bd75d11', role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+
+
+### Gastro Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_table"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "value": "SELECT * FROM doctor_table WHERE department = 'Gastroenterology'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+ 
+# add members dr_muir@MngEnvMCAP372892.onmicrosoft.com | 6338eaf2-5a87-4eb3-b23b-ea30d04de02a
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/37b3f9d2-5cf6-4065-9172-29bd1bd75d11"
+          }
+        ]
+ 
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "6338eaf2-5a87-4eb3-b23b-ea30d04de02a",
+    "objectType": "User"
+  }
+]
+ 
+ 
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+ 
+members.definition
+ 
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='GastroenterologyRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id='37b3f9d2-5cf6-4065-9172-29bd1bd75d11', role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+### Ortho Role
+permissionRule_working_lh = [
+            {
+              "attributeName": "Path",
+              "attributeValueIncludedIn": [
+                "/Tables/doctor_table"
+              ]
+            },
+            {
+              "attributeName": "Action",
+              "attributeValueIncludedIn": [
+                "Read"
+              ]
+            }
+          ]
+constraints_working_lh = {
+            "columns": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "columnNames": [
+                  "*"
+                ],
+                "columnEffect": "Permit",
+                "columnAction": [
+                  "Read"
+                ]
+              }
+            ],
+            "rows": [
+              {
+                "tablePath": "/Tables/doctor_table",
+                "value": "SELECT * FROM doctor_table WHERE department = 'Orthopedics'"
+              }
+            ]
+          }
+ 
+dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
+ 
+# add members purview-admin@MngEnvMCAP372892.onmicrosoft.com | b00395d7-230b-41bb-8bbc-d668979bd8f6
+fabricItemMembers = [
+          {
+            "itemAccess": [
+              "ReadAll"
+            ],
+            "sourcePath": f"{lh_response.json()['workspaceId']}/37b3f9d2-5cf6-4065-9172-29bd1bd75d11"
+          }
+        ]
+ 
+ms_entra_members = [
+  {
+    "tenantId": "35acf02c-4b87-4ae6-9221-ff5cafd430b4",
+    "objectId": "b00395d7-230b-41bb-8bbc-d668979bd8f6",
+    "objectType": "User"
+  }
+]
+ 
+ 
+members = Members(fabricItemMembers=fabricItemMembers, msEntraMembers=ms_entra_members)
+ 
+members.definition
+ 
+# create data access role
+da_role = DataAccessRole(decisionRules=dec_rule_working_lh, id='', members=members, name='OrthopedicsRole')
+ 
+upsert_resp = upsert_data_access_role(workspace_id, item_id='37b3f9d2-5cf6-4065-9172-29bd1bd75d11', role=da_role, api_token=token)
+ 
+# da_role_create_resp = create_update_data_access_role(workspace_id, item_id='5090acaa-9246-4eb2-b9fc-93b8b6e7e60c', data_access_role=da_role, api_token=token)
+ 
+ 
+print(upsert_resp)
+print(upsert_resp.content)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Findings
+# - The Onelake Security and Change from Delegated to User's Identity MUST be performed by the principal that created the lakehouse
+# - This is the only difference between my manual deployment (which succeeded) and my automated one (which failed because it was provisioned by an SPN)
+# - There is no API to enable OneLake Security or change to User's Identity from delegated, so currently these steps have to be done manually
 
 # CELL ********************
 
