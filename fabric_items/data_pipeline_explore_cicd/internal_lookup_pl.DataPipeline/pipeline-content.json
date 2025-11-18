@@ -1,0 +1,93 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource"
+          },
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "table": "backup_control_tbl"
+            },
+            "schema": [],
+            "connectionSettings": {
+              "name": "internal_metadata_lh",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "e49e6b1e-93d8-8e8e-4705-9600510faf59",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Tables"
+                },
+                "externalReferences": {
+                  "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "same workspace table lookup",
+        "dependsOn": []
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource"
+          },
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "table": "shortcut_table"
+            },
+            "schema": [],
+            "connectionSettings": {
+              "name": "metadata_lh",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "e3fedc51-94ca-4ed7-86b7-9cc4e928401a",
+                  "workspaceId": "3f5b5f79-2192-4a03-a760-4d9ed9366cfc",
+                  "rootFolder": "Tables"
+                },
+                "externalReferences": {
+                  "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Cross Workspace Table Lookup",
+        "dependsOn": [
+          {
+            "activity": "same workspace table lookup",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
