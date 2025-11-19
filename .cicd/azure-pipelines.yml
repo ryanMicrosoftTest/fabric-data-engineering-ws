@@ -5,7 +5,9 @@ trigger:
       - release/*
   paths:
     include:
-      - 'fabric_items/**'  
+      - 'fabric_items/Data Science/**'  
+    exclude:
+      - '**'
 
 # Add resources section to define external repositories
 resources:
