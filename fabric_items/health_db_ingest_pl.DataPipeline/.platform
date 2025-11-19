@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "health_db_ingest_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "bb258ed9-f91b-b1d0-48e6-d578d2c54e0c"
+  }
+}
