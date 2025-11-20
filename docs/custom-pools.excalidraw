@@ -1,0 +1,51 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "RNBTa-IWxDkW5KdMQ0WlK",
+      "type": "text",
+      "x": 653.0000762939453,
+      "y": 394.16664123535156,
+      "width": 1355.5191650390625,
+      "height": 625,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 575266456,
+      "version": 1080,
+      "versionNonce": 749106072,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1762975071914,
+      "link": null,
+      "locked": false,
+      "text": "Problem Statement:\nFor getting the most out of notebooks and spark, it is best to define custom pools for the workload.  This means that pools can be \ncustom tailored to the data that is run through the notebook, maximizing the efficient use of the spark cluster.  In order for notebooks\nto use these custom pools, the pools need to be defined on the workspace and defined in an environment.  Since environments can only \nleverage pools that are available on the workspace, the first step to this process must be defining the custom pool on the workspace, as \npart of a CICD deployment\n\n\nProcess:\n- Define Custom Pool on Workspace\n- Create Environment using Custom Pool\n- Have lookup table that maps job to environment\n- Attach Environment to Notebook\n\n\nEnhancements\n- Parameterization for CICD\n- Validation step to ensure the expected pool is on the workspace\n- Lookup table design\n\n\n\nDefine Custom Pool on Workspace:\n- https://learn.microsoft.com/en-us/rest/api/fabric/spark/custom-pools/create-workspace-custom-pool?tabs=HTTP\n",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Problem Statement:\nFor getting the most out of notebooks and spark, it is best to define custom pools for the workload.  This means that pools can be \ncustom tailored to the data that is run through the notebook, maximizing the efficient use of the spark cluster.  In order for notebooks\nto use these custom pools, the pools need to be defined on the workspace and defined in an environment.  Since environments can only \nleverage pools that are available on the workspace, the first step to this process must be defining the custom pool on the workspace, as \npart of a CICD deployment\n\n\nProcess:\n- Define Custom Pool on Workspace\n- Create Environment using Custom Pool\n- Have lookup table that maps job to environment\n- Attach Environment to Notebook\n\n\nEnhancements\n- Parameterization for CICD\n- Validation step to ensure the expected pool is on the workspace\n- Lookup table design\n\n\n\nDefine Custom Pool on Workspace:\n- https://learn.microsoft.com/en-us/rest/api/fabric/spark/custom-pools/create-workspace-custom-pool?tabs=HTTP\n",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
