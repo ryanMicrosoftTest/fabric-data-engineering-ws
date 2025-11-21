@@ -17,6 +17,7 @@ DEV:
     - SQLDatabase
     - KQLDashboard
     - Dataflow
+    - Notebook
 
 QA:
   target_workspace_name: devops-test
@@ -37,6 +38,7 @@ QA:
     - SQLDatabase
     - KQLDashboard
     - Dataflow
+    - Notebook
 
 PROD:
   target_workspace_name: devops-prod
@@ -57,3 +59,4 @@ PROD:
     - SQLDatabase
     - KQLDashboard
     - Dataflow
+    - Notebook
