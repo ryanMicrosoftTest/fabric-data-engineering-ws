@@ -14,7 +14,6 @@ DEV:
     - KQLQueryset
     - Reflex
     - Eventstream
-    - Warehouse
     - SQLDatabase
     - KQLDashboard
     - Dataflow
@@ -35,7 +34,6 @@ QA:
     - KQLQueryset
     - Reflex
     - Eventstream
-    - Warehouse
     - SQLDatabase
     - KQLDashboard
     - Dataflow
@@ -56,7 +54,6 @@ PROD:
     - KQLQueryset
     - Reflex
     - Eventstream
-    - Warehouse
     - SQLDatabase
     - KQLDashboard
     - Dataflow
