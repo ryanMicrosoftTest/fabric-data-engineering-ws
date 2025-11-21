@@ -91,12 +91,44 @@ stages:
         # You can now access files from both repositories
       displayName: 'Show repository contents'
 
+
+    - script: |
+        echo "=== Creating filtered fabric_items for Data Science deployment ==="
+        
+        # Create a new filtered fabric_items directory
+        mkdir -p $(Build.SourcesDirectory)/current-repo/fabric_items_filtered
+        
+        # Copy the parameter.yml file (required)
+        cp $(Build.SourcesDirectory)/current-repo/fabric_items/parameter.yml $(Build.SourcesDirectory)/current-repo/fabric_items_filtered/
+        
+        # Copy only the Data Science folder and preserve its structure
+        if [ -d "$(Build.SourcesDirectory)/current-repo/fabric_items/Data Science" ]; then
+          cp -r "$(Build.SourcesDirectory)/current-repo/fabric_items/Data Science" "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/"
+          echo "✅ Data Science folder copied successfully"
+          echo "Contents of filtered fabric_items:"
+          ls -la "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/"
+          echo "Contents of Data Science folder:"
+          ls -la "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/Data Science/"
+        else
+          echo "❌ Data Science folder not found!"
+          exit 1
+        fi
+        
+        # Temporarily rename the original and filtered directories
+        mv $(Build.SourcesDirectory)/current-repo/fabric_items $(Build.SourcesDirectory)/current-repo/fabric_items_original
+        mv $(Build.SourcesDirectory)/current-repo/fabric_items_filtered $(Build.SourcesDirectory)/current-repo/fabric_items
+        
+        echo "✅ fabric_items now contains only Data Science folder"
+        ls -la $(Build.SourcesDirectory)/current-repo/fabric_items/
+      displayName: 'Filter fabric_items to Data Science only'
+
+
     - script: |
         echo "Target Environment: $(targetEnvironment)"
         echo "Working Directory: $(Build.SourcesDirectory)"
         ls -a
         ls -a fabric_items
-        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_data_science_deployment.yml
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
       condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
       workingDirectory: $(Build.SourcesDirectory)/current-repo/
       env:
@@ -110,7 +142,7 @@ stages:
         echo "Working Directory: $(Build.SourcesDirectory)"
         ls -a
         ls -a fabric_items
-        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_data_science_deployment.yml
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
       condition: eq(variables['targetEnvironment'], 'PROD')
       workingDirectory: $(Build.SourcesDirectory)/current-repo/
       env:
