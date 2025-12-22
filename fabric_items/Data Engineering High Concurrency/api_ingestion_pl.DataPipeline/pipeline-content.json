@@ -1,0 +1,85 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource"
+          },
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "table": "financials_reported"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "metadata_lh",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "e3fedc51-94ca-4ed7-86b7-9cc4e928401a",
+                  "workspaceId": "3f5b5f79-2192-4a03-a760-4d9ed9366cfc",
+                  "rootFolder": "Tables"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup APIs to Load - financials_reported",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('Lookup APIs to Load - financials_reported').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "InvokePipeline",
+              "typeProperties": {
+                "parameters": {},
+                "waitOnCompletion": true,
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "pipelineId": "e28c606d-aaba-9405-4a37-768b371b3a16",
+                "operationType": "InvokeFabricPipeline"
+              },
+              "externalReferences": {
+                "connection": "712d9a73-e5e3-4d3a-a58d-56bc433c1158"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Invoke pipeline",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "For each API Load",
+        "dependsOn": [
+          {
+            "activity": "Lookup APIs to Load - financials_reported",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
