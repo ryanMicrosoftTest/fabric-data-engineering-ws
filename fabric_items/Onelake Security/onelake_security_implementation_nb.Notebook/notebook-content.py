@@ -65,7 +65,7 @@ tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
 
 workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
-lakehouse_id = '25ae3fb0-1c96-49eb-8a0f-208c350dc4ba'
+lakehouse_id = '25ae3fb0-1c96-49eb-8a0f-208c350dc4ba'                   # standalone lakehouse
 
 tenant_id = '35acf02c-4b87-4ae6-9221-ff5cafd430b4'
 

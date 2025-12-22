@@ -22,7 +22,7 @@ dag = {
     'activities': [
         {
             'name': 'unique_activity_name',
-            'path': 'api-ingestion-to-files-bronze',
+            'path': 'Data Engineeringing High Concurrency/api-ingestion-to-files-bronze',
             'timeoutPerCellInSeconds': 90,
             'args': {
                 'kv_name': 'kvfabricprodeus2rh',

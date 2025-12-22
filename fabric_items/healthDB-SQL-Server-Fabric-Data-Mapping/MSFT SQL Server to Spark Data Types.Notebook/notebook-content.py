@@ -182,6 +182,37 @@ source_schema
 
 # CELL ********************
 
+# start with base reader
+reader = spark.read.format(source_format)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# check if defined schema
+if 'schema' in metadata['source']:
+    # generate schema
+    pyspark_schema = generate_pyspark_schema(metadata['source']['schema']['fields'], msft_sql_server_spark_mapping)
+
+    # add to reader
+    reader = reader.schema(pyspark_schema)
+
+# check merge schema
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # Generate schema
 pyspark_schema = generate_pyspark_schema(source_schema['fields'], msft_sql_server_spark_mapping)
 print(pyspark_schema)
