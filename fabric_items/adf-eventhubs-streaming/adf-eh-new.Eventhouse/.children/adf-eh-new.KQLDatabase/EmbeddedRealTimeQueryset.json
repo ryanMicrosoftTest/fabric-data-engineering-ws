@@ -1,0 +1,70 @@
+{
+  "queryset": {
+    "version": "1.0.0",
+    "dataSources": [
+      {
+        "id": "09a1775c-c8ea-41c0-8506-21563d6d09ca",
+        "clusterUri": "https://trd-e072h7tjkbkmz6nepn.z2.kusto.fabric.microsoft.com",
+        "type": "Fabric",
+        "databaseItemId": "870611eb-4679-45c3-a180-1650f653e473",
+        "databaseItemName": "adf-eh-new"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "9659fef3-26ba-456a-9dfe-6491817695db",
+        "content": "\n.create-or-alter function with (\n    folder = 'normalize',\n    docstring = 'Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields'\n)\nNormalize_PipelineRuns()\n{\n    PipelineRuns_tbl\n    | extend _records = iif(\n        isnull(array_length(ArrayValue_records)),\n        pack_array(ArrayValue_records),\n        ArrayValue_records\n      )\n    | mv-expand rec = _records\n    | where isnotnull(rec)\n    | extend p = todynamic(rec[\"properties\"])\n    | extend requestTime      = todatetime(p[\"PipelineRunRequestTime\"]),\n             executionStart   = todatetime(p[\"ExecutionStart\"]),\n             pipelineName     = tostring(rec[\"pipelineName\"]),\n             runId            = tostring(rec[\"runId\"]),\n             correlationId    = tostring(rec[\"correlationId\"]),\n             operationName    = tostring(rec[\"operationName\"]),\n             status           = tostring(rec[\"status\"]),\n             failureType      = tostring(rec[\"failureType\"]),\n             message          = coalesce(tostring(rec[\"Message\"]), tostring(p[\"Message\"])),\n             parameters       = todynamic(p[\"Parameters\"]),\n             systemParams     = todynamic(p[\"SystemParameters\"]),\n             predecessors     = todynamic(p[\"Predecessors\"]),\n             userProperties   = todynamic(p[\"UserProperties\"]),\n             annotations      = todynamic(p[\"Annotations\"]),\n             level            = tostring(rec[\"level\"]),\n             location         = tostring(rec[\"location\"]),\n             resourceId       = tostring(rec[\"resourceId\"]),\n             category         = tostring(rec[\"category\"]),\n             eventName        = tostring(rec[\"EventName\"]),\n             IngestionTime    = ingestion_time()\n    | project requestTime, executionStart, pipelineName, runId, operationName, status, failureType,\n              message, level, location, resourceId, category, parameters, systemParams,\n              predecessors, userProperties, annotations, eventName,\n              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId, IngestionTime\n}\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "1e762e94-6070-4c51-92cb-abd0e0c3fb9e",
+        "content": "\nNormalize_PipelineRuns()\n| take 10\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "1c35a0e6-34a6-43ea-96a8-7d1b4b29f6b1",
+        "content": "\n.create-or-alter function with (folder = \"normalize\", docstring = \"Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields\", skipvalidation = \"true\") Normalize_PipelineRuns() {\n    PipelineRuns_tbl\n    | extend _records = iif(\n        isnull(array_length(ArrayValue_records)),\n        pack_array(ArrayValue_records),\n        ArrayValue_records\n      )\n    | mv-expand rec = _records\n    | where isnotnull(rec)\n    | extend p = todynamic(rec[\"properties\"])\n    | extend requestTime      = todatetime(p[\"PipelineRunRequestTime\"]),\n             executionStart   = todatetime(p[\"ExecutionStart\"]),\n             pipelineName     = tostring(rec[\"pipelineName\"]),\n             runId            = tostring(rec[\"runId\"]),\n             correlationId    = tostring(rec[\"correlationId\"]),\n             operationName    = tostring(rec[\"operationName\"]),\n             status           = tostring(rec[\"status\"]),\n             failureType      = tostring(rec[\"failureType\"]),\n             message          = coalesce(tostring(rec[\"Message\"]), tostring(p[\"Message\"])),\n             parameters       = todynamic(p[\"Parameters\"]),\n             systemParams     = todynamic(p[\"SystemParameters\"]),\n             predecessors     = todynamic(p[\"Predecessors\"]),\n             userProperties   = todynamic(p[\"UserProperties\"]),\n             annotations      = todynamic(p[\"Annotations\"]),\n             level            = tostring(rec[\"level\"]),\n             location         = tostring(rec[\"location\"]),\n             resourceId       = tostring(rec[\"resourceId\"]),\n             category         = tostring(rec[\"category\"]),\n             eventName        = tostring(rec[\"EventName\"]),\n             IngestionTime    = ingestion_time()\n    | project requestTime, executionStart, pipelineName, runId, operationName, status, failureType,\n              message, level, location, resourceId, category, parameters, systemParams,\n              predecessors, userProperties, annotations, eventName,\n              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId, IngestionTime\n}\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "38168ffa-7b7b-42be-b6e0-f7397d8eea01",
+        "content": "\n.alter-merge table PipelineRuns_Failed\n(\n    correlationId: string,\n    level: string,\n    location: string,\n    resourceId: string,\n    category: string,\n    parameters: dynamic,\n    systemParams: dynamic,\n    predecessors: dynamic,\n    userProperties: dynamic,\n    annotations: dynamic,\n    eventName: string,\n    EventEnqueuedUtcTime: datetime,\n    EventProcessedUtcTime: datetime,\n    PartitionId: string\n)\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "86cc0d3a-5182-4630-8838-083030b59f0f",
+        "content": "\n.create table PipelineRuns_Failed (\n    requestTime: datetime,\n    executionStart: datetime,\n    pipelineName: string,\n    runId: string,\n    correlationId: string,\n    operationName: string,\n    status: string,\n    failureType: string,\n    message: string,\n    level: string,\n    location: string,\n    resourceId: string,\n    category: string,\n    parameters: dynamic,\n    systemParams: dynamic,\n    predecessors: dynamic,\n    userProperties: dynamic,\n    annotations: dynamic,\n    eventName: string,\n    EventEnqueuedUtcTime: datetime,\n    EventProcessedUtcTime: datetime,\n    PartitionId: string,\n    IngestionTime: datetime\n)\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "38e29ec7-46cf-4a04-9522-7fdd68d37087",
+        "content": "\n.alter table PipelineRuns_Failed policy update\n```[{\n    \"IsEnabled\": true,\n    \"Source\": \"PipelineRuns_tbl\",\n    \"Query\": \"Normalize_PipelineRuns() | where status == \\\"Failed\\\"\",\n    \"IsTransactional\": false,\n    \"PropagateIngestionProperties\": true\n}]```\n\n\n\n\n// QuerySchema=('datetime,datetime,string,string,string,string,string,string,string,string,string,string,dynamic,dynamic,dynamic,dynamic,dynamic,string,datetime,datetime,string,datetime')\n// \n// TableSchema=('datetime,datetime,string,string,string,string,string,string,string,string,string,string,string,dynamic,dynamic,dynamic,dynamic,dynamic,string,datetime,datetime,string,datetime')\n\n\n\n\n\nNormalize_PipelineRuns()\n| where status == \"Failed\"\n| getschema\n\n\n\n.show table PipelineRuns_Failed schema",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "e8cb7ed4-6d32-4e47-a42f-b42582ed2114",
+        "content": "\n\n.create-or-alter function with (folder = \"normalize\", docstring = \"Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields\", skipvalidation = \"true\") Normalize_PipelineRuns() {\n    PipelineRuns_tbl\n    | extend _records = iif(\n        isnull(array_length(ArrayValue_records)),\n        pack_array(ArrayValue_records),\n        ArrayValue_records\n      )\n    | mv-expand rec = _records\n    | where isnotnull(rec)\n    | extend p = todynamic(rec[\"properties\"])\n    | extend requestTime      = todatetime(p[\"PipelineRunRequestTime\"]),\n             executionStart   = todatetime(p[\"ExecutionStart\"]),\n             pipelineName     = tostring(rec[\"pipelineName\"]),\n             runId            = tostring(rec[\"runId\"]),\n             correlationId    = tostring(rec[\"correlationId\"]),\n             operationName    = tostring(rec[\"operationName\"]),\n             status           = tostring(rec[\"status\"]),\n             failureType      = tostring(rec[\"failureType\"]),\n             message          = coalesce(tostring(rec[\"Message\"]), tostring(p[\"Message\"])),\n             parameters       = todynamic(p[\"Parameters\"]),\n             systemParams     = todynamic(p[\"SystemParameters\"]),\n             predecessors     = todynamic(p[\"Predecessors\"]),\n             userProperties   = todynamic(p[\"UserProperties\"]),\n             annotations      = todynamic(p[\"Annotations\"]),\n             level            = tostring(rec[\"level\"]),\n             location         = tostring(rec[\"location\"]),\n             resourceId       = tostring(rec[\"resourceId\"]),\n             category         = tostring(rec[\"category\"]),\n             eventName        = tostring(rec[\"EventName\"]),\n             IngestionTime    = ingestion_time()\n    | project requestTime, executionStart, pipelineName, runId, operationName, status, failureType,\n              message, level, location, resourceId, category, parameters, systemParams,\n              predecessors, userProperties, annotations, eventName,\n              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId = tostring(rec[\"PartitionId\"]), IngestionTime\n}\n",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "14c98a18-0eb9-4369-a603-3f198c133d17",
+        "content": ".create-or-alter function with (folder = \"normalize\", docstring = \"Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields\", skipvalidation = \"true\") Normalize_PipelineRuns() {\n    PipelineRuns_tbl\n    | extend _records = iif(\n        isnull(array_length(ArrayValue_records)),\n        pack_array(ArrayValue_records),\n        ArrayValue_records\n      )\n    | mv-expand rec = _records\n    | where isnotnull(rec)\n    | extend p = todynamic(rec[\"properties\"])\n    | extend requestTime      = todatetime(p[\"PipelineRunRequestTime\"]),\n             executionStart   = todatetime(p[\"ExecutionStart\"]),\n             pipelineName     = tostring(rec[\"pipelineName\"]),\n             runId            = tostring(rec[\"runId\"]),\n             correlationId    = tostring(rec[\"correlationId\"]),\n             operationName    = tostring(rec[\"operationName\"]),\n             status           = tostring(rec[\"status\"]),\n             failureType      = tostring(rec[\"failureType\"]),\n             message          = coalesce(tostring(rec[\"Message\"]), tostring(p[\"Message\"])),\n             parameters       = todynamic(p[\"Parameters\"]),\n             systemParams     = todynamic(p[\"SystemParameters\"]),\n             predecessors     = todynamic(p[\"Predecessors\"]),\n             userProperties   = todynamic(p[\"UserProperties\"]),\n             annotations      = todynamic(p[\"Annotations\"]),\n             level            = tostring(rec[\"level\"]),\n             location         = tostring(rec[\"location\"]),\n             resourceId       = tostring(rec[\"resourceId\"]),\n             category         = tostring(rec[\"category\"]),\n             eventName        = tostring(rec[\"EventName\"]),\n             IngestionTime    = ingestion_time()\n    | project requestTime, executionStart, pipelineName, runId, correlationId, operationName, status, failureType,\n              message, level, location, resourceId, category, parameters, systemParams,\n              predecessors, userProperties, annotations, eventName,\n              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId = tostring(rec[\"PartitionId\"]), IngestionTime\n}\n\n\n\nNormalize_PipelineRuns()\n| where status == \"Failed\"\n| getschema",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      },
+      {
+        "id": "77ccf85d-24fa-49f2-b260-52857aa479e7",
+        "content": "\n.set-or-append PipelineRuns_Failed <|\nNormalize_PipelineRuns()\n| where status == \"Failed\"\n\n\n\nPipelineRuns_Failed",
+        "title": "",
+        "dataSourceId": "09a1775c-c8ea-41c0-8506-21563d6d09ca"
+      }
+    ]
+  }
+}

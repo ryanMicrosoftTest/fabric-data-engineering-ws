@@ -1,0 +1,43 @@
+// KQL script
+// Use management commands in this script to configure your database items, such as tables, functions, materialized views, and more.
+
+
+.create-merge table PipelineRuns_tbl (category:string, ArrayValue_records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
+.create-merge table ActivityRuns_tbl (category:string, ArrayValue_records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
+.create-merge table PipelineRuns_Failed (requestTime:datetime, executionStart:datetime, pipelineName:string, runId:string, correlationId:string, operationName:string, status:string, failureType:string, message:string, level:string, location:string, resourceId:string, category:string, parameters:dynamic, systemParams:dynamic, predecessors:dynamic, userProperties:dynamic, annotations:dynamic, eventName:string, EventEnqueuedUtcTime:datetime, EventProcessedUtcTime:datetime, PartitionId:string, IngestionTime:datetime) 
+.create-or-alter function with (folder = "normalize", docstring = "Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields", skipvalidation = "true") Normalize_PipelineRuns() {
+    PipelineRuns_tbl
+    | extend _records = iif(
+        isnull(array_length(ArrayValue_records)),
+        pack_array(ArrayValue_records),
+        ArrayValue_records
+      )
+    | mv-expand rec = _records
+    | where isnotnull(rec)
+    | extend p = todynamic(rec["properties"])
+    | extend requestTime      = todatetime(p["PipelineRunRequestTime"]),
+             executionStart   = todatetime(p["ExecutionStart"]),
+             pipelineName     = tostring(rec["pipelineName"]),
+             runId            = tostring(rec["runId"]),
+             correlationId    = tostring(rec["correlationId"]),
+             operationName    = tostring(rec["operationName"]),
+             status           = tostring(rec["status"]),
+             failureType      = tostring(rec["failureType"]),
+             message          = coalesce(tostring(rec["Message"]), tostring(p["Message"])),
+             parameters       = todynamic(p["Parameters"]),
+             systemParams     = todynamic(p["SystemParameters"]),
+             predecessors     = todynamic(p["Predecessors"]),
+             userProperties   = todynamic(p["UserProperties"]),
+             annotations      = todynamic(p["Annotations"]),
+             level            = tostring(rec["level"]),
+             location         = tostring(rec["location"]),
+             resourceId       = tostring(rec["resourceId"]),
+             category         = tostring(rec["category"]),
+             eventName        = tostring(rec["EventName"]),
+             IngestionTime    = ingestion_time()
+    | project requestTime, executionStart, pipelineName, runId, correlationId, operationName, status, failureType,
+              message, level, location, resourceId, category, parameters, systemParams,
+              predecessors, userProperties, annotations, eventName,
+              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId = tostring(rec["PartitionId"]), IngestionTime
+}
+.alter table PipelineRuns_Failed policy update "[{\"IsEnabled\":true,\"Source\":\"PipelineRuns_tbl\",\"Query\":\"Normalize_PipelineRuns() | where status == \\\"Failed\\\"\",\"IsTransactional\":false,\"PropagateIngestionProperties\":true,\"ManagedIdentity\":null}]"
