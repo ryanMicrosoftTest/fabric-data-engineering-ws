@@ -1,0 +1,19 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["sys_dq_metrics","ConstraintTable"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.144.7664.8 (Main)+69a73eef84ec776ff226f506a1fad2e170c47a85
+
+ref table sys_dq_metrics
+ref table ConstraintTable
+
+ref cultureInfo en-US
+

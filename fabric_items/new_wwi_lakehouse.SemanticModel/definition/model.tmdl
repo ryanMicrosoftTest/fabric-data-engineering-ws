@@ -1,0 +1,22 @@
+model d527f7cf-e890-48ad-b58d-028d3d67b8ea
+	culture: en-US
+	collation: Latin1_General_100_BIN2_UTF8
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["exec_requests_history","long_running_queries","frequently_run_queries","exec_sessions_history","sql_pool_insights","aggregate_sale_by_date_city","dimension_customer","dimension_stock_item","dimension_city","dimension_employee","fact_sale","dimension_date"]
+
+annotation SourceLineageTagType = DatabaseFullyQualifiedName
+
+ref table dimension_customer
+ref table dimension_stock_item
+ref table dimension_city
+ref table dimension_employee
+ref table fact_sale
+ref table dimension_date
+
