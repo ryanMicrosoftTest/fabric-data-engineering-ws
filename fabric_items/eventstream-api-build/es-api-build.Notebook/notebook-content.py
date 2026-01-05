@@ -18,7 +18,7 @@ tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
 
 workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
-es_id = '8f9baedb-6735-47b2-a0e7-400256b284a3'
+es_id = '8b3a0aca-3545-4f66-bde2-1d019c997205'
 
 # METADATA ********************
 
@@ -67,21 +67,11 @@ def get_api_token_via_akv(kv_uri:str, client_id_secret:str, tenant_id_secret:str
 
     return token
 
-def get_dataset_refresh_info(workspace_id:str, dataset_id:str, api_token:str)->pd.DataFrame:
+def list_items_in_workspace(workspace_id:str, api_token:str):
     """
-    https://learn.microsoft.com/en-us/rest/api/power-bi/datasets/get-refresh-history-in-group
-    scopes required: Dataset.ReadWrite.All or Dataset.Read.All
-
-    GET https://api.powerbi.com/v1.0/myorg/groups/{groupId}/datasets/{datasetId}/refreshes
-
-    workspace_id:str: The Workspace ID where the semantic model/dataset resides
-    dataset_id:str: The Dataset ID to get refresh info for
-    api_token:str: The api token to authenticate with the API
-
-    returns:
-        refresh_history_pd_df:pd.DataFrame: DataFrame of the refresh history
+    Given a workspace, list all items in it
     """
-    url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/datasets/{dataset_id}/refreshes'
+    url = f'https://api.fabric.microsoft.com/v1/workspaces/{workspace_id}/items'
 
     headers = {
     "Authorization": f"Bearer {api_token}",
@@ -90,7 +80,7 @@ def get_dataset_refresh_info(workspace_id:str, dataset_id:str, api_token:str)->p
 
     response = requests.get(url, headers=headers)
 
-    return pd.DataFrame(response.json()['value'])
+    return response
 
 def get_eventstream_definition(workspace_id:str, eventstream_id:str, api_token:str):
     """
@@ -106,6 +96,20 @@ def get_eventstream_definition(workspace_id:str, eventstream_id:str, api_token:s
 
     return response
 
+def decode_eventstream_definition(encoded_data:dict)->dict:
+    """
+    Given an eventstream defintion (such as  the defintion.json from the return of the get_eventstream_defintion function), decode and 
+    return the decoded json
+    """
+    payload = encoded_data['definition']['parts'][0]['payload']
+
+    # decode the base64 string
+    decoded = base64.b64decode(payload)
+
+    # convery bytes to dict
+    decoded_json = json.loads(decoded.decode('utf-8'))
+
+    return decoded_json
 
 # METADATA ********************
 
@@ -132,10 +136,7 @@ es_def = get_eventstream_definition(workspace_id, es_id, api_token=token)
 
 # CELL ********************
 
-# extract the json payload
-data = es_def.json()
-
-payload = data['definition']['parts'][0]['payload']
+es_def.json()
 
 # METADATA ********************
 
@@ -146,13 +147,9 @@ payload = data['definition']['parts'][0]['payload']
 
 # CELL ********************
 
-# decode the base64 string
-decoded = base64.b64decode(payload)
+decoded_data = decode_eventstream_definition(es_def.json())
 
-# convery bytes to dict
-decoded_json = json.loads(decoded.decode('utf-8'))
-
-decoded_json
+decoded_data
 
 # METADATA ********************
 
@@ -160,6 +157,106 @@ decoded_json
 # META   "language": "python",
 # META   "language_group": "jupyter_python"
 # META }
+
+# MARKDOWN ********************
+
+# # Get All Items in Workspace 
+
+# CELL ********************
+
+ws_items_list = list_items_in_workspace(workspace_id, token)
+
+ws_items_list.json()['value']
+
+# get pipelines now (can add notebooks later by adding  or pl['type']=='Notebook')
+pl_list = [pl for pl in ws_items_list.json()['value'] if pl['type']=='DataPipeline']
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+pl_list
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# MARKDOWN ********************
+
+# # Compare the Items in the EventStream Defintion to the Items in the Workspace
+# - If item in workspace and not in EventStream definition, add it to an add_to_eventstream_list list
+# - This is because the workspace item list has already been filtered to include all the items that should be on the eventstream definition
+
+# CELL ********************
+
+decoded_data['sources']
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+es_item_list = decoded_data['sources']
+es_item_list = [id['id'] for id in es_item_list]
+
+es_item_list
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+# for source in decoded_json['sources']:
+#     print(source)
+add_to_eventstream_list = []
+
+for item in pl_list:
+    check_item_id = item['id']
+
+    # lookup check_item_id
+    if check_item_id not in es_item_list:
+        add_to_eventstream_list.append(check_item_id)
+        print(f'Item Id: {check_item_id} is missing from the list and has been added to add_to_eventstream_list')
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+add_to_eventstream_list
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# MARKDOWN ********************
+
+# # Update Eventstream Item Definition
 
 # CELL ********************
 
