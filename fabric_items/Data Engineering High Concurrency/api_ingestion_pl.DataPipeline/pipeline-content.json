@@ -10,7 +10,7 @@
           "datasetSettings": {
             "type": "LakehouseTable",
             "typeProperties": {
-              "table": "financials_reported"
+              "table": "shortcut_table"
             },
             "schema": [],
             "linkedService": {
@@ -18,8 +18,8 @@
               "properties": {
                 "type": "Lakehouse",
                 "typeProperties": {
-                  "artifactId": "e3fedc51-94ca-4ed7-86b7-9cc4e928401a",
-                  "workspaceId": "3f5b5f79-2192-4a03-a760-4d9ed9366cfc",
+                  "artifactId": "69233f72-a67a-9ab7-4fa9-01774bd2cd19",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
                   "rootFolder": "Tables"
                 },
                 "annotations": []
