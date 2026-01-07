@@ -1,0 +1,89 @@
+{
+  "sources": [
+    {
+      "id": "456d2e38-1ce0-460b-b278-31c3a06c054c",
+      "name": "pl-api-ingestion-job",
+      "type": "FabricJobEvents",
+      "properties": {
+        "eventScope": "Item",
+        "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+        "itemId": "723b3cff-ebcf-4861-8286-bf5a36e22f3c",
+        "includedEventTypes": [
+          "Microsoft.Fabric.JobEvents.ItemJobCreated",
+          "Microsoft.Fabric.JobEvents.ItemJobStatusChanged",
+          "Microsoft.Fabric.JobEvents.ItemJobSucceeded",
+          "Microsoft.Fabric.JobEvents.ItemJobFailed"
+        ],
+        "filters": []
+      }
+    },
+    {
+      "id": "8deec49d-ff62-4b50-bb13-d51cd2fd5cfd",
+      "name": "pl-init-metadata-lh-tables-job",
+      "type": "FabricJobEvents",
+      "properties": {
+        "eventScope": "Item",
+        "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+        "itemId": "9f6819a2-620f-4483-bfdc-90492c67a4d9",
+        "includedEventTypes": [
+          "Microsoft.Fabric.JobEvents.ItemJobCreated",
+          "Microsoft.Fabric.JobEvents.ItemJobStatusChanged",
+          "Microsoft.Fabric.JobEvents.ItemJobSucceeded",
+          "Microsoft.Fabric.JobEvents.ItemJobFailed"
+        ],
+        "filters": []
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "de2a5c46-e5cc-4f53-bdbb-65f86bfeecc9",
+      "name": "job-monitoring-eh",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "fb6e822d-45b5-b483-4d70-98fde441ae3c",
+        "databaseName": "job-monitoring-eh",
+        "tableName": "raw-job-events",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "jobs-monitoring-es-stream"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "jobs-monitoring-es-stream",
+          "schema": {
+            "columns": []
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "id": "fcb7e34e-74e9-49c4-93f5-baa63008a9ab",
+      "name": "jobs-monitoring-es-stream",
+      "type": "DefaultStream",
+      "properties": {},
+      "inputNodes": [
+        {
+          "name": "pl-api-ingestion-job"
+        },
+        {
+          "name": "pl-init-metadata-lh-tables-job"
+        }
+      ]
+    }
+  ],
+  "operators": [],
+  "compatibilityLevel": "1.1"
+}

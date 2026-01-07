@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "new_onelake_test_lh",
+    "description": "lakehouse to test onelake security V2"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a1f20760-9146-acbd-42a4-4d31f3a935f5"
+  }
+}

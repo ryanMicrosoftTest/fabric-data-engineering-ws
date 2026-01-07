@@ -390,3 +390,25 @@ Academic medical centers and research organizations routinely process clinical n
 - Artifacts for Presidio are located here: fabric_items/presidio
 
 
+
+### Eventstream Jobs Tracker
+#### Problem Statement
+There are jobs in Fabric that run in Notebooks and Pipelines.  Notebooks and pipelines will be added over time.  It is desired that all of these
+have monitoring enabled such that alerts are fired by a centralized eventstream and activator.  Since it is difficult to know when a new notebook or pipeline
+is added (meaning, there are potential gaps if each is to be manually added) it is desired to have a service that looks at all notebooks and pipelines in a workspace
+and if an object is missing from the centralized eventstream, it is added to it.  This pipeline to update the eventstream, can then be run daily or on some 
+other scheduled trigger
+
+#### Architecture
+![Architecture](docs/fabric-es-jobs-images/architecture.png)
+
+#### Artifacts in this repository for Eventstream Jobs Tracker
+- fabric_items/eventstream-api-build
+
+
+
+
+
+
+
+

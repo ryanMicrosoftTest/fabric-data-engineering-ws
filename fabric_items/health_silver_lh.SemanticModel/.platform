@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "health_silver_lh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2976d91a-c9cc-aa3c-4395-b7684b7cfa6b"
+  }
+}

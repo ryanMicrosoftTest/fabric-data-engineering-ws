@@ -1,0 +1,47 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {},
+  "name": "health_transformations_df",
+  "queryGroups": [],
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "DefaultDestination": {
+      "queryId": "2650b089-23b9-44ae-aad9-ce3a791cb46e",
+      "queryName": "DefaultDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "dim_department": {
+      "queryId": "40d856b3-f1b9-4947-b57e-3b169de5f52c",
+      "queryName": "dim_department",
+      "loadEnabled": false
+    },
+    "dim_doctor": {
+      "queryId": "1589dd9d-a4a2-4ae9-9254-eae7a8d1eaad",
+      "queryName": "dim_doctor",
+      "loadEnabled": false
+    },
+    "doctor_memos_fact": {
+      "queryId": "6dc49dca-66ad-4627-a549-de6c3139933d",
+      "queryName": "doctor_memos_fact",
+      "loadEnabled": false
+    },
+    "Merge": {
+      "queryId": "f0510b1f-aef7-456a-90c1-7ef849d554f0",
+      "queryName": "Merge",
+      "loadEnabled": false
+    },
+    "Merge (2)": {
+      "queryId": "a858f233-ee17-4b14-8aa4-8ccaf569b9b4",
+      "queryName": "Merge (2)",
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"47c4c7d1-c57a-466b-a854-b60cc308f6cf\",\"DatasourceId\":\"332326e5-6ccb-473b-b4cf-6751de648cda\"}"
+    }
+  ]
+}

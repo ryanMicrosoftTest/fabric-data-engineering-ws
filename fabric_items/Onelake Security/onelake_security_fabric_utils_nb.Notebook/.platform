@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "onelake_security_fabric_utils_nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8055705c-33c2-b2b9-4c01-0133abc9ce7f"
+  }
+}

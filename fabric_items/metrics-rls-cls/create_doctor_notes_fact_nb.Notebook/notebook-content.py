@@ -31,6 +31,7 @@ lakehouse_id = '5090acaa-9246-4eb2-b9fc-93b8b6e7e60c'
 from pyspark.sql.functions import col, udf, row_number
 from pyspark.sql.types import StringType
 from pyspark.sql.window import Window
+from pyspark.sql import Row
 
 # METADATA ********************
 
@@ -45,7 +46,7 @@ from pyspark.sql.window import Window
 
 # CELL ********************
 
-df = spark.read.load(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/deidentified_dr_notes')
+doctor_df = spark.read.load(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/deidentified_dr_notes')
 
 # METADATA ********************
 
@@ -55,49 +56,6 @@ df = spark.read.load(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{
 # META }
 
 # CELL ********************
-
-display(df)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-"""
-id
-0 = Dr. Harley Muir, MD
-1 = Dr. Kwame M’Meeuwis, MD
-2 = NULL
-3 = Dr. Perla Swartz, MD
-4 = Dr. Monroe Koster, MD
-5 = Dr. Jean Urbonas, MD
-6 = Dr. Wesson Arkwright, MD
-7 = Dr. Antionette Klerkx, MD
-8 = Dr. Stephany Quixada, MD
-9 = Dr. Trista Beltran, MD
-"""
-
-
-doctor_map = {
-    0: "Dr. Harley Muir, MD",
-    1: "Dr. Kwame M’Meeuwis, MD",
-    2: None,
-    3: "Dr. Perla Swartz, MD",
-    4: "Dr. Monroe Koster, MD",
-    5: "Dr. Jean Urbonas, MD",
-    6: "Dr. Wesson Arkwright, MD",
-    7: "Dr. Antionette Klerkx, MD",
-    8: "Dr. Stephany Quixada, MD",
-    9: "Dr. Trista Beltran, MD"
-}
-
-get_doctor = udf(lambda id: doctor_map.get(id), StringType())
-
-doctor_df = doctor_df.withColumn('doctor', get_doctor('id'))
 
 display(doctor_df)
 
@@ -110,26 +68,11 @@ display(doctor_df)
 
 # CELL ********************
 
-# create doctor table
-doctor_table_df = doctor_df.select('doctor').where('doctor IS NOT NULL')
+# select the dim_doctor
 
+dim_doctor_df = spark.read.load(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/dim_doctor')
 
-display(doctor_table_df)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-window = Window.orderBy('doctor')
-
-doctor_table_df = doctor_table_df.withColumn('id', row_number().over(window))
-
-display(doctor_table_df)
+display(dim_doctor_df)
 
 # METADATA ********************
 
@@ -140,8 +83,153 @@ display(doctor_table_df)
 
 # CELL ********************
 
-# write doctor table df
-doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/dim_doctor')
+# add doctor column to doctor_df
+
+doctor_df = doctor_df.drop('doctor','id')
+
+# rename the id column in dim_doctor_df to doctor_id to make the join easier
+dim_doctor_df = dim_doctor_df.withColumnRenamed('id', 'doctor_id')
+
+doctor_df = doctor_df.join(dim_doctor_df, on='doctor_id', how='left')
+
+# drop the upn column
+doctor_df = doctor_df.drop('upn')
+
+display(doctor_df)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Add Department Dimension
+
+# CELL ********************
+
+
+department_df = spark.createDataFrame([
+    {
+        'department_id': 1,
+        'department_name': 'Cardiology'
+    },
+    {
+        'department_id': 2,
+        'department_name': 'Neurology'
+    },
+    {
+        'department_id': 3,
+        'department_name': 'Orthopedics'
+    },
+    {
+        'department_id': 4,
+        'department_name': 'Dermatology'
+    },
+    {
+        'department_id': 5,
+        'department_name': 'Gastroenterology'
+    }
+])
+
+
+display(department_df)
+
+department_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/dim_department')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Map existing fact records to doctor and department
+
+# CELL ********************
+
+department_map = {
+    1: "Cardiology",
+    2: "Neurology",
+    3: "Orthopedics",
+    4: "Dermatology",
+    5: "Gastroenterology",
+    6: "Cardiology",
+    7: "Neurology",
+    8: "Orthopedics",
+    9: "Gastroenterology"
+}
+department_dim_df = doctor_df
+
+# remove doctor and id if present
+try:
+    department_dim_df = department_dim_df.drop('id')
+except:
+    print('values already removed')
+
+# add department column and mapping udf
+get_department = udf(lambda id: department_map.get(id), StringType())
+department_dim_df = department_dim_df.withColumn('department', get_department('doctor_id'))
+
+# drop all columns except doctor and department
+department_dim_df = department_dim_df.drop('doctor_id', 'file_path', 'memo_content', 'memo_id')
+
+# drop any where doctor is NULL
+department_dim_df = department_dim_df.where('doctor IS NOT NULL')
+
+# append Dr. Harley Muir, MD if not present in dim_department
+dr_muir_exists = department_dim_df.filter(department_dim_df['doctor']=='Dr. Harley Muir, MD').count() > 0
+
+if not dr_muir_exists:
+    # append
+    new_row = spark.createDataFrame([Row(doctor='Dr. Harley Muir, MD',department='Gastroenterology')])
+    department_dim_df = department_dim_df.union(new_row)
+
+display(department_dim_df)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+department_dim_df.write.format('delta').option("overwriteSchema", "true").mode('overwrite').save('abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c/Tables/dim_department')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# write as obt fact table
+obt_fact = spark.read.format('delta').load('abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c/Tables/doctor_memos_fact_obt')
+
+# need to add department to this as t his is what will be used to filter
+obt_fact = obt_fact.join(department_dim_df, how='left', on='doctor')
+
+display(obt_fact)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# write as updated obt_fact
+obt_fact.write.format('delta').mode('overwrite').option('mergeSchema','true').save('abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/5090acaa-9246-4eb2-b9fc-93b8b6e7e60c/Tables/doctor_memos_fact_obt')
 
 # METADATA ********************
 
@@ -153,29 +241,12 @@ doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{workspac
 # CELL ********************
 
 # join the two pyspark dataframes
-doctor_table_df = doctor_table_df.withColumnRenamed('id', 'doctor_id')
-doctor_df = doctor_df.withColumnRenamed('id', 'memo_id')
+# doctor_table_df = doctor_table_df.withColumnRenamed('id', 'doctor_id')
+# doctor_df = doctor_df.withColumnRenamed('id', 'memo_id')
 
-df_joined = doctor_df.join(doctor_table_df, on='doctor', how='outer')
+# df_joined = doctor_df.join(doctor_table_df, on='doctor', how='outer')
 
-display(df_joined)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-doctor_df = doctor_df.drop('id', 'doctor')
-
-doctor_df = doctor_df.select('memo_id', 'memo_content', 'doctor_id', 'file_path')
-doctor_df = doctor_df.orderBy('memo_id')
-display(doctor_df)
-
-doctor_df.write.format('delta').mode('overwrite').option('mergeSchema', 'true').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/deidentified_dr_notes')
+# display(df_joined)
 
 # METADATA ********************
 
@@ -186,6 +257,13 @@ doctor_df.write.format('delta').mode('overwrite').option('mergeSchema', 'true').
 
 # CELL ********************
 
+# doctor_df = doctor_df.drop('id', 'doctor')
+
+# doctor_df = doctor_df.select('memo_id', 'memo_content', 'doctor_id', 'file_path')
+# doctor_df = doctor_df.orderBy('memo_id')
+# display(doctor_df)
+
+# doctor_df.write.format('delta').mode('overwrite').option('mergeSchema', 'true').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/deidentified_dr_notes')
 
 # METADATA ********************
 
@@ -193,6 +271,10 @@ doctor_df.write.format('delta').mode('overwrite').option('mergeSchema', 'true').
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# MARKDOWN ********************
+
+# ### Name this section
 
 # CELL ********************
 
@@ -427,7 +509,7 @@ display(joined_df)
 # CELL ********************
 
 # write to new table names doctor_memos_fact
-joined_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_memos_fact')
+# joined_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_memos_fact')
 
 # METADATA ********************
 
@@ -467,7 +549,7 @@ doctor_dim_df = doctor_dim_df.withColumn('upn', get_doctor_upn('id'))
 
 display(doctor_dim_df)
 
-doctor_dim_df.write.mode('overwrite').option('mergeSchema','true').format('delta').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/dim_doctor')
+# doctor_dim_df.write.mode('overwrite').option('mergeSchema','true').format('delta').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/dim_doctor')
 
 # METADATA ********************
 
@@ -486,18 +568,8 @@ joined_df = doctor_dim_df.join(doctor_memo_fact_df, doctor_memo_fact_df['doctor_
 joined_df = joined_df.select('doctor', 'memo_content', 'upn')
 
 
-joined_df = joined_df.write.mode('overwrite').format('delta').save('abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_memos_fact_obt')
+# joined_df = joined_df.write.mode('overwrite').format('delta').save('abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_memos_fact_obt')
 display(joined_df)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 
 # METADATA ********************
 

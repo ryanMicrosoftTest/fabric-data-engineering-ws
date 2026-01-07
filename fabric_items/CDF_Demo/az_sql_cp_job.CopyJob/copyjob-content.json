@@ -1,0 +1,373 @@
+{
+  "properties": {
+    "jobMode": "CDC",
+    "fullLoadBehavior": "Truncate",
+    "source": {
+      "type": "AzureSqlTable",
+      "connectionSettings": {
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "database": "FabricLabDB"
+        },
+        "externalReferences": {
+          "connection": "d691aef3-fca0-46d8-b79b-eb09b3a4e3cc"
+        }
+      }
+    },
+    "destination": {
+      "type": "LakehouseTable",
+      "connectionSettings": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "artifactId": "d1ec35f1-88ef-9757-4526-1a08e92e9c99",
+          "rootFolder": "Tables"
+        }
+      }
+    },
+    "policy": {
+      "timeout": "0.12:00:00"
+    }
+  },
+  "activities": [
+    {
+      "id": "8c2e0c10-9a7c-45f3-9c6f-0273fdb02403",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales1"
+          },
+          "changeDataSettings": {
+            "readMethod": "SnapshotPlusIncremental",
+            "columns": [
+              {
+                "name": "OrderDate",
+                "type": "DateTime",
+                "physicalType": "datetime"
+              }
+            ]
+          }
+        },
+        "destination": {
+          "writeBehavior": "Append",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales1"
+          }
+        },
+        "enableStaging": false,
+        "translator": {
+          "type": "TabularTranslator",
+          "mappings": [
+            {
+              "source": {
+                "name": "OnlineSalesKey",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "OnlineSalesKey",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "OrderDate",
+                "type": "DateTime",
+                "physicalType": "datetime"
+              },
+              "destination": {
+                "name": "OrderDate",
+                "physicalType": "timestamp"
+              }
+            },
+            {
+              "source": {
+                "name": "DeliveryDate",
+                "type": "DateTime",
+                "physicalType": "datetime"
+              },
+              "destination": {
+                "name": "DeliveryDate",
+                "physicalType": "timestamp"
+              }
+            },
+            {
+              "source": {
+                "name": "StoreKey",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "StoreKey",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "ProductKey",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "ProductKey",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "PromotionKey",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "PromotionKey",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "CustomerKey",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "CustomerKey",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "SalesOrderNumber",
+                "type": "String",
+                "physicalType": "nvarchar",
+                "length": "20"
+              },
+              "destination": {
+                "name": "SalesOrderNumber",
+                "physicalType": "string"
+              }
+            },
+            {
+              "source": {
+                "name": "SalesOrderLineNumber",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "SalesOrderLineNumber",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "SalesQuantity",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "SalesQuantity",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "SalesAmount",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "SalesAmount",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            },
+            {
+              "source": {
+                "name": "ReturnQuantity",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "ReturnQuantity",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "ReturnAmount",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "ReturnAmount",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            },
+            {
+              "source": {
+                "name": "DiscountQuantity",
+                "type": "Int32",
+                "physicalType": "int"
+              },
+              "destination": {
+                "name": "DiscountQuantity",
+                "physicalType": "integer"
+              }
+            },
+            {
+              "source": {
+                "name": "DiscountAmount",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "DiscountAmount",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            },
+            {
+              "source": {
+                "name": "TotalCost",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "TotalCost",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            },
+            {
+              "source": {
+                "name": "UnitCost",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "UnitCost",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            },
+            {
+              "source": {
+                "name": "UnitPrice",
+                "type": "Decimal",
+                "physicalType": "money",
+                "scale": 4,
+                "precision": 19
+              },
+              "destination": {
+                "name": "UnitPrice",
+                "physicalType": "decimal",
+                "scale": 18,
+                "precision": 38
+              }
+            }
+          ]
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "aa92962a-9b2a-4314-a3b3-6a712f76741c",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales2"
+          },
+          "changeDataSettings": {
+            "readMethod": "SnapshotPlusIncremental",
+            "columns": [
+              {
+                "name": "OrderDate",
+                "type": "DateTime",
+                "physicalType": "datetime"
+              }
+            ]
+          }
+        },
+        "destination": {
+          "writeBehavior": "Append",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales2"
+          }
+        },
+        "enableStaging": false,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "1095fc7a-ff6f-48db-a12d-f8b3664f6746",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales3"
+          },
+          "changeDataSettings": {
+            "readMethod": "SnapshotPlusIncremental",
+            "columns": [
+              {
+                "name": "OrderDate",
+                "type": "DateTime",
+                "physicalType": "datetime"
+              }
+            ]
+          }
+        },
+        "destination": {
+          "writeBehavior": "Append",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "Sales3"
+          }
+        },
+        "enableStaging": false,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    }
+  ]
+}

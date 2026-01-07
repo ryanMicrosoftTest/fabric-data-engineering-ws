@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Dataflow",
+    "displayName": "health_transformations_df"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "df81668e-2b1e-832f-4dc7-62b7457dc8e8"
+  }
+}

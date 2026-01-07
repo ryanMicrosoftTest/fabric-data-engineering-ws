@@ -1,0 +1,62 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "f033d956-a9d6-a28c-475d-5a452700a6cf",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "workspace_id": {
+              "value": {
+                "value": "@pipeline().libraryVariables.vars_workspace_id",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "kv_uri": {
+              "value": {
+                "value": "@pipeline().libraryVariables.vars_kv_uri",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "item_id": {
+              "value": {
+                "value": "@pipeline().libraryVariables.vars_item_id",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "run vars library nb",
+        "dependsOn": []
+      }
+    ],
+    "libraryVariables": {
+      "vars_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "vars"
+      },
+      "vars_item_id": {
+        "type": "String",
+        "variableName": "item_id",
+        "libraryName": "vars"
+      },
+      "vars_kv_uri": {
+        "type": "String",
+        "variableName": "kv_uri",
+        "libraryName": "vars"
+      }
+    }
+  }
+}
