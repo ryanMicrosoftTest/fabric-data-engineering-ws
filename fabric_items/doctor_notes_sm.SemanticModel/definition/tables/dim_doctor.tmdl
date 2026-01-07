@@ -1,0 +1,29 @@
+table dim_doctor
+	lineageTag: 2b79b4f6-ae24-4fb6-8e3c-eb4fa34b3e37
+	sourceLineageTag: [dbo].[dim_doctor]
+
+	column doctor
+		dataType: string
+		lineageTag: c928beba-302c-49fe-aa3e-067f9277878a
+		sourceLineageTag: doctor
+		summarizeBy: none
+		sourceColumn: doctor
+
+		annotation SummarizationSetBy = Automatic
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: ef390bae-174a-4af6-87c5-993e1e6304e4
+		sourceLineageTag: id
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_doctor = entity
+		mode: directLake
+		source
+			entityName: dim_doctor
+			expressionSource: 'DirectLake - deid_lh'
+

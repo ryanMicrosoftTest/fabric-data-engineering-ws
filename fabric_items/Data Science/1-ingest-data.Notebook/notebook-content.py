@@ -91,6 +91,10 @@ DATA_FILE = "churn.csv"  # data file name
 # META   "language_group": "synapse_pyspark"
 # META }
 
+# CELL ********************
+
+print('Added a new cell')
+
 # MARKDOWN ********************
 
 # This code downloads a publicly available version of the dataset and then stores it in a Fabric lakehouse.

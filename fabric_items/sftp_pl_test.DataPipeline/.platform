@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "sftp_pl_test"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ab29b63d-42ff-8256-4049-de9f79098ea4"
+  }
+}

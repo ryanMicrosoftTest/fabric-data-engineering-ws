@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "emal_test_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d5c96ab9-e3d8-9d1a-49b1-3b5f06502555"
+  }
+}

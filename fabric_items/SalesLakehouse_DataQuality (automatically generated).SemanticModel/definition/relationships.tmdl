@@ -1,0 +1,6 @@
+relationship a19e4d4b-22cb-327f-c124-b1516a8b77a8
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: ConstraintTable.MLVID
+	toColumn: sys_dq_metrics.MLVID
+
