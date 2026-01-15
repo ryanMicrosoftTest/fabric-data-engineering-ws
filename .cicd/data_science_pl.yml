@@ -5,18 +5,7 @@ trigger:
       - release/*
   paths:
     include:
-      - 'fabric_items/Data Science/**'  
-    exclude:
-      - '**'
-
-# Add resources section to define external repositories
-resources:
-  repositories:
-  - repository: fabric-cicd-demo
-    type: github
-    endpoint: RyanMicrosoftContosoUniversity  # This should be your GitHub service connection name
-    name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
-    ref: main
+      - 'fabric_items/**'  
 
 pool:
   vmImage: 'ubuntu-latest'  
@@ -39,125 +28,74 @@ stages:
 - stage: DeployFabricItems
   displayName: 'Deploy Fabric Items'
   jobs:
-  - deployment: AuthenticateAndDeploy
+  - job: AuthenticateAndDeploy
     displayName: 'Authenticate and Deploy'
-    ${{ if eq(parameters.environment, 'PROD') }}:
-      environment: Fabric-Prod
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          # Checkout the current repository
-          - checkout: self  
-            fetchDepth: 1
-            path: s/current-repo  # Optional: specify a subdirectory
-            displayName: 'Checkout current repository'
+    steps:
+    - checkout: self  
+      fetchDepth: 1   
 
-          # Checkout the external repository
-          - checkout: fabric-cicd-demo 
-            fetchDepth: 1
-            path: s/fabric-cicd-demo  # Optional: specify a subdirectory
-            displayName: 'Checkout fabric-cicd-demo repository'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.11' 
+        addToPath: true
+      displayName: 'Set up Python'
 
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.11' 
-              addToPath: true
-            displayName: 'Set up Python'
+    - task: AzureKeyVault@2
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      inputs:
+        azureSubscription: 'fabric-sc'  
+        KeyVaultName: '$(KeyVaultNameNonProd)'  
+        SecretsFilter: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (DEV/QA)'
 
-          # ...existing code...
-          - task: AzureKeyVault@2
-            condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
-            inputs:
-              azureSubscription: 'fabric-sc'  
-              KeyVaultName: '$(KeyVaultNameNonProd)'  
-              SecretsFilter: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
-            displayName: 'Get Key Vault Secrets (DEV/QA)'
+    - task: AzureKeyVault@2
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      inputs:
+        azureSubscription: 'fabric-sc-prod'  
+        KeyVaultName: '$(KeyVaultNameProd)'  
+        SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (PROD)'
 
-          - task: AzureKeyVault@2
-            condition: eq(variables['targetEnvironment'], 'PROD')
-            inputs:
-              azureSubscription: 'fabric-sc-prod'  
-              KeyVaultName: '$(KeyVaultNameProd)'  
-              SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
-            displayName: 'Get Key Vault Secrets (PROD)'
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r .cicd/requirements.txt
+      displayName: 'Install dependencies'
 
-          - script: |
-              python -m pip install --upgrade pip
-              pip install -r $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt
-            displayName: 'Install dependencies'
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        python ./.cicd/authenticate_spn.py $(targetEnvironment) ./.cicd/target_deployment.yml
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      workingDirectory: $(Build.SourcesDirectory)/
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
+      displayName: 'Run authentication and deployment script (DEV/QA)'
 
-          # Example of using files from the external repository
-          - script: |
-              echo "Current repo directory:"
-              ls -la $(Build.SourcesDirectory)/current-repo
-              echo "External repo directory:"
-              ls -la $(Build.SourcesDirectory)/fabric-cicd-demo
-              # You can now access files from both repositories
-            displayName: 'Show repository contents'
-
-          # filtering function to only have Data Science Folder in fabric_items deployed
-          - script: |
-              echo "=== Creating filtered fabric_items for Data Science deployment ==="
-              
-              # Create a new filtered fabric_items directory
-              mkdir -p $(Build.SourcesDirectory)/current-repo/fabric_items_filtered
-              
-              # Copy the parameter.yml file (required becuase fabric-cicd checks for this plus might be required for find-replace)
-              cp $(Build.SourcesDirectory)/current-repo/fabric_items/parameter.yml $(Build.SourcesDirectory)/current-repo/fabric_items_filtered/
-              
-              # Copy only the Data Science folder and preserve its structure
-              if [ -d "$(Build.SourcesDirectory)/current-repo/fabric_items/Data Science" ]; then
-                cp -r "$(Build.SourcesDirectory)/current-repo/fabric_items/Data Science" "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/"
-                echo "Data Science folder copied successfully"
-                echo "Contents of filtered fabric_items:"
-                ls -la "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/"
-                echo "Contents of Data Science folder:"
-                ls -la "$(Build.SourcesDirectory)/current-repo/fabric_items_filtered/Data Science/"
-              else
-                echo "Data Science folder not found!"
-                exit 1
-              fi
-              
-              # Temporarily rename the original and filtered directories
-              mv $(Build.SourcesDirectory)/current-repo/fabric_items $(Build.SourcesDirectory)/current-repo/fabric_items_original
-              mv $(Build.SourcesDirectory)/current-repo/fabric_items_filtered $(Build.SourcesDirectory)/current-repo/fabric_items
-              
-              echo "fabric_items now contains only Data Science folder"
-              ls -la $(Build.SourcesDirectory)/current-repo/fabric_items/
-            displayName: 'Filter fabric_items to Data Science only'
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        python ./.cicd/authenticate_spn.py $(targetEnvironment)
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      workingDirectory: $(Build.SourcesDirectory)/
+      env:
+        AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenantID)
+        AZURE_CLIENT_SECRET: $(fabric-prod-secret)
+      displayName: 'Run authentication and deployment script (PROD)'
+    
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/fabric_cicd.error.log'
+        ArtifactName: 'errorlog'
+        publishLocation: 'Container'
+      condition: always()
+      displayName: 'Publish error log artifact'
 
 
-          - script: |
-              echo "Target Environment: $(targetEnvironment)"
-              echo "Working Directory: $(Build.SourcesDirectory)"
-              ls -a fabric_items
-              python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
-            condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
-            workingDirectory: $(Build.SourcesDirectory)/current-repo/
-            env:
-              AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
-              AZURE_TENANT_ID: $(tenant-id-secret)
-              AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
-            displayName: 'Run authentication and deployment script (DEV/QA)'
 
-          - script: |
-              echo "Target Environment: $(targetEnvironment)"
-              echo "Working Directory: $(Build.SourcesDirectory)"
-              ls -a fabric_items
-              python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
-            condition: eq(variables['targetEnvironment'], 'PROD')
-            workingDirectory: $(Build.SourcesDirectory)/current-repo/
-            env:
-              AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
-              AZURE_TENANT_ID: $(tenantID)
-              AZURE_CLIENT_SECRET: $(fabric-prod-secret)
-            displayName: 'Run authentication and deployment script (PROD)'
-          
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/current-repo/fabric_cicd.error.log'
-              ArtifactName: 'errorlog'
-              publishLocation: 'Container'
-            condition: always()
-            displayName: 'Publish error log artifact'
+
+
