@@ -50,7 +50,6 @@ PROD:
     - SemanticModel
     - Lakehouse
     - VariableLibrary
-    - CopyJob
     - Eventhouse
     - KQLDatabase
     - KQLQueryset
