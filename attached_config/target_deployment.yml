@@ -54,7 +54,6 @@ PROD:
     - KQLDatabase
     - KQLQueryset
     - Reflex
-    - Eventstream
     - Warehouse
     - SQLDatabase
     - KQLDashboard
