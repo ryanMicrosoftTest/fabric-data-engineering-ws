@@ -3,9 +3,7 @@ DEV:
   target_workspace_id: c6477a7a-4704-4c20-a04d-7d81f3413ab0
   repo_directory: fabric_items
   items_in_scope:
-    - DataPipeline
-    - VariableLibrary
-    - CopyJob
+    - Notebook
 
 QA:
   target_workspace_name: data-backup-qa
