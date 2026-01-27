@@ -6,16 +6,10 @@ DEV:
     - DataPipeline
     - Report
     - SemanticModel
-    - Lakehouse
     - VariableLibrary
     - CopyJob
-    - Eventhouse
-    - KQLDatabase
     - KQLQueryset
     - Reflex
-    - Eventstream
-    - Warehouse
-    - SQLDatabase
     - KQLDashboard
     - Dataflow
 
