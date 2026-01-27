@@ -4,6 +4,20 @@ DEV:
   repo_directory: fabric_items
   items_in_scope:
     - DataPipeline
+    - Report
+    - SemanticModel
+    - Lakehouse
+    - VariableLibrary
+    - CopyJob
+    - Eventhouse
+    - KQLDatabase
+    - KQLQueryset
+    - Reflex
+    - Eventstream
+    - Warehouse
+    - SQLDatabase
+    - KQLDashboard
+    - Dataflow
 
 QA:
   target_workspace_name: data-backup-qa
