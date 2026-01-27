@@ -4,6 +4,7 @@ DEV:
   repo_directory: fabric_items
   items_in_scope:
     - Notebook
+    - Environment
 
 QA:
   target_workspace_name: data-backup-qa
