@@ -5,6 +5,7 @@ DEV:
   items_in_scope:
     - Notebook
     - Environment
+    - DataPipeline
 
 QA:
   target_workspace_name: data-backup-qa
