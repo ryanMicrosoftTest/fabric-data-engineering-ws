@@ -408,6 +408,39 @@ other scheduled trigger
 
 
 
+### Fabric Spark Emitter
+#### Problem Statement
+How to best do logging in spark applications in Fabric.  Logging to a lakehouse leads to high latency because spark is designed for large engineering jobs, so there is significant 
+overhead (creating a spark stage, jobs, sending them to workers, following ACID compliance to write to a table, etc).  This is not a good pattern for logging, since logging is a lot
+of smaller writes.  The ideal solution will persist to a location in near real time, support driver and executor visibility, allow for custom logging, and safely handle concurrency.  To achieve this,
+the best pattern is the use of a spark diagnostic emitter to an event hub (to allow for fast writes).  Then for an eventstream to ingest the logs into a EventHouse via an EventStream to 
+create alerts and perform analytics.
+
+#### Architecture
+![Architecture](docs/spark-emitter-images/spark-logging-design-overview.png)
+
+#### A custom environment is used to hold the spark properties and authentication to communicate with the Event Hub and emit the spark logs
+![Custom Environment](docs/spark-emitter-images/fabric-custom-environment-spark-settings.png)
+
+#### A log4j logger is used to get both driver and executor logs
+![log4j logger](docs/spark-emitter-images/notebook-log4j-logger-setup.png)
+
+#### Logs in the notebook are persisted to the event hub
+![Logs to Event Hub](docs/spark-emitter-images/event-hubs-logs-image.png)
+
+#### Logs from Event Hub are routed to EventHouse via EventStream
+![EventStream](docs/spark-emitter-images/spark-eventstream.png)
+
+#### Logs queryable in the EventHouse KQL Database
+![EventHouse](docs/spark-emitter-images/spark_emitter_logs_kql_table.png)
+
+
+
+
+
+
+
+
 
 
 
