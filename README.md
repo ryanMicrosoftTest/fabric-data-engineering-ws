@@ -403,7 +403,7 @@ other scheduled trigger
 ![Architecture](docs/fabric-es-jobs-images/architecture.png)
 
 #### Artifacts in this repository for Eventstream Jobs Tracker
-- fabric_items/eventstream-api-build
+- [fabric_items/eventstream-api-build](fabric_items/eventstream-api-build)
 
 
 
@@ -434,6 +434,8 @@ create alerts and perform analytics.
 #### Logs queryable in the EventHouse KQL Database
 ![EventHouse](docs/spark-emitter-images/spark_emitter_logs_kql_table.png)
 
+#### Artifacts in this repository for Eventstream Jobs Tracker
+- [scripts/diagnostic-emitter-nb.ipynb](scripts/diagnostic-emitter-nb.ipynb)
 
 
 
