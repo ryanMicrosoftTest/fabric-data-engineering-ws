@@ -305,6 +305,9 @@ Each step relied on manual parity checks, often belonging to different teams or 
 ### OneLake Security Overview
 OneLake Security introduces a centralized access-control layer that sits directly on top of data stored in OneLake. Roles, filters, and user assignments are defined once on the Lakehouse tables, and OneLake automatically enforces those policies when the data is accessed via SQL analytics endpoints or semantic models. Because the security metadata travels with the data, downstream artifacts inherit the same protections without extra configuration. This unified model removes redundant role definitions, shortens deployment cycles, and keeps governance policies consistent from storage through consumption.
 
+### For a detailed POC of this, go here
+For a detailed POC, see [fabric_onelake_security.md](fabric_onelake_security.md).
+
 ### New Approach
 With OneLake Security enabled:
 1. Define data roles and row-level security predicates at the Lakehouse layer.
