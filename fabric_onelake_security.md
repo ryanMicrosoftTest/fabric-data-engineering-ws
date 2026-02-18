@@ -107,10 +107,7 @@ This ensures the querying user's identity is passed through to the source Data_L
 | **Spark notebook access returns 403** | Users with RLS restrictions will receive `403 Forbidden` errors when accessing RLS-protected tables from a Spark notebook. The Spark engine makes direct file-level calls to OneLake storage (`onelake.dfs.fabric.microsoft.com`), and for RLS-protected tables, direct storage access is **blocked** rather than filtered. |
 | **Lakehouse table preview unavailable** | RLS-restricted users cannot preview table data in the Lakehouse UI. The table will appear in the explorer but data will not load. |
 | **Most permissive access wins** | When a user is a member of multiple roles, access combines via UNION (least restrictive). Ensure users are not inadvertently added to roles that grant broader access (e.g., DefaultReader). |
-| **fabricItemMembers auto-inclusion** | Setting `fabricItemMembers` with `"Read"` or `"ReadAll"` in a role definition auto-includes all users with that permission into the role. For RLS roles, use `fabricItemMembers: []` with explicit `microsoftEntraMembers` only. |
 | **Admin/Member/Contributor bypass RLS** | Users with Admin, Member, or Contributor workspace roles bypass OneLake Security entirely and see all data. RLS only applies to Viewers and users with shared item access. |
-| **Delegated Identity exposes data** | SQL Analytics Endpoints and shortcuts using Delegated Identity mode pass the item owner's identity instead of the querying user's, potentially exposing all data. Always use User's Identity mode for RLS enforcement. |
-| **Schema lakehouses** | This POC notebook does not support lakehouses with schemas. |
 | **OneLake Security roles not versioned to Git** | Data access roles are runtime security configuration and are **not** synced to Git via Fabric Git integration. Only `.platform`, `lakehouse.metadata.json`, and `shortcuts.metadata.json` are versioned. |
 
 ---
