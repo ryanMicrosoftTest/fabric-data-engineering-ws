@@ -1,27 +1,27 @@
 
 import socket
+import logging
+import subprocess
+import threading
+import time
 from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
 from deltalake import DeltaTable
 
+# logging.basicConfig(level=logging.WARNING)
+# logging.getLogger('urllib3').setLevel(logging.DEBUG)
+# logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.DEBUG)
 
-def resolve_dns(hostname: str):
-    """
-    Show the DNS resolution chain for a given hostname
-    """
+
+def resolve_dns(hostname: str) -> set:
+    """Resolve hostname to IPs and display results. Returns the set of IPs."""
     print(f'\n--- DNS Resolution: {hostname} ---')
+    ips = set()
     try:
-        # Get the CNAME chain
-        cname = socket.getfqdn(hostname)
-        if cname != hostname:
-            print(f'  CNAME: {hostname} → {cname}')
-
-        # Resolve to IP
         results = socket.getaddrinfo(hostname, 443, socket.AF_INET)
         ips = set(addr[4][0] for addr in results)
         for ip in ips:
             print(f'  Resolves to: {ip}')
-            # Check if it's a private IP (10.x.x.x, 172.16-31.x.x, 192.168.x.x)
             if ip.startswith('10.') or ip.startswith('192.168.') or \
                any(ip.startswith(f'172.{i}.') for i in range(16, 32)):
                 print(f'Private IP — traffic routed via Private Endpoint')
@@ -29,6 +29,7 @@ def resolve_dns(hostname: str):
                 print(f'Public IP — traffic routed over public internet')
     except socket.gaierror as e:
         print(f"  DNS resolution failed: {e}")
+    return ips
 
 def get_api_token_via_akv(kv_uri:str, client_id_secret:str, tenant_id_secret:str, client_secret_name:str)->str:
     """
@@ -69,15 +70,16 @@ token = get_api_token_via_akv(kv_uri, client_id_secret, tenant_id_secret, client
 
 # DNS resolution check — shows whether traffic routes via Private Endpoint or public internet
 resolve_dns('kvfabricprodeus2rh.vault.azure.net')
-resolve_dns('onelake.blob.fabric.microsoft.com')
-resolve_dns('onelake.dfs.fabric.microsoft.com')
+blob_ips = resolve_dns('onelake.blob.fabric.microsoft.com')
+dfs_ips = resolve_dns('onelake.dfs.fabric.microsoft.com')
 
-# read from onelake
+
+print('\n--- Reading Delta Table ---')
 dt = DeltaTable(
     path,
     storage_options={
         'bearer_token': token,
-        'use_fabric_endpoint': 'false'
+        'use_fabric_endpoint': 'true'
     }
 )
 
