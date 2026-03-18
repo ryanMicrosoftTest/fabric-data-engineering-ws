@@ -86,3 +86,19 @@ dt = DeltaTable(
 df = dt.to_pandas()
 
 print(df.head())
+
+### Read from Private-Workspace-Two
+print('\n--- Reading Delta Table on private-workspace-two ---')
+path = 'abfss://bd130da3-e9c1-4922-be03-e2560fc6465c@onelake.dfs.fabric.microsoft.com/22568ace-9152-47bf-883c-0c8c59b060eb/Tables/insider_transactions'
+
+dt = DeltaTable(
+    path,
+    storage_options={
+        'bearer_token': token,
+        'use_fabric_endpoint': 'true'
+    }
+)
+
+df = dt.to_pandas()
+
+print(df.head())
