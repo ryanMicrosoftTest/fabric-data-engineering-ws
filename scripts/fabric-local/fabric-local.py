@@ -64,9 +64,8 @@ def get_api_token_via_akv(kv_uri:str, client_id_secret:str, tenant_id_secret:str
 
 
 
-#================================================================================= MAIN EXECUTION ====================================================================================================================
+#================================================================================= VARIABLES ====================================================================================================================
 ### Variables
-### get secrets via akv === Replace with your own values
 kv_uri = 'https://kvfabricprodeus2rh.vault.azure.net/'
 client_id_secret = 'fuam-spn-client-id'
 tenant_id_secret = 'fuam-spn-tenant-id'
@@ -75,15 +74,11 @@ client_secret_name = 'fuam-spn-secret'
 workspace_path_1 = 'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@onelake.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions'
 workspace_path_2 = 'abfss://bd130da3-e9c1-4922-be03-e2560fc6465c@onelake.dfs.fabric.microsoft.com/22568ace-9152-47bf-883c-0c8c59b060eb/Tables/insider_transactions'
 
-### Main
+#================================================================================= MAIN EXECUTION ====================================================================================================================
 kv_dns = kv_uri.replace('https://', '').replace('/', '')
-workspace_id_ws_1 = workspace_path_1.split('//')[1].split('@')[0]  # b196641e-3340-48b6-975f-df7bb9e3aaee
-workspace_guid_ws_1 = workspace_id_ws_1.replace('-', '')                  # b196641e334048b6975fdf7bb9e3aaee
+workspace_id_ws_1 = workspace_path_1.split('//')[1].split('@')[0] 
+workspace_guid_ws_1 = workspace_id_ws_1.replace('-', '')                  
 account_name_ws_1 = f"{workspace_guid_ws_1}.z{workspace_guid_ws_1[:2]}"
-
-# read from onelake path
-# original path - 'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@onelake.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions'
-# abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@b196641e334048b6975fdf7bb9e3aaee.zb1.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions
 
 
 token = get_api_token_via_akv(kv_uri, client_id_secret, tenant_id_secret, client_secret_name)
@@ -107,7 +102,6 @@ dt = DeltaTable(
 df = dt.to_pandas()
 
 print(df.head())
-
 
 
 """
