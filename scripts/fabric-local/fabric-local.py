@@ -62,36 +62,45 @@ def get_api_token_via_akv(kv_uri:str, client_id_secret:str, tenant_id_secret:str
 
     return token
 
+
+
 #================================================================================= MAIN EXECUTION ====================================================================================================================
-
-
+### Variables
 ### get secrets via akv === Replace with your own values
 kv_uri = 'https://kvfabricprodeus2rh.vault.azure.net/'
 client_id_secret = 'fuam-spn-client-id'
 tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
 
+workspace_path_1 = 'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@onelake.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions'
+workspace_path_2 = 'abfss://bd130da3-e9c1-4922-be03-e2560fc6465c@onelake.dfs.fabric.microsoft.com/22568ace-9152-47bf-883c-0c8c59b060eb/Tables/insider_transactions'
+
+### Main
+kv_dns = kv_uri.replace('https://', '').replace('/', '')
+workspace_id_ws_1 = workspace_path_1.split('//')[1].split('@')[0]  # b196641e-3340-48b6-975f-df7bb9e3aaee
+workspace_guid_ws_1 = workspace_id_ws_1.replace('-', '')                  # b196641e334048b6975fdf7bb9e3aaee
+account_name_ws_1 = f"{workspace_guid_ws_1}.z{workspace_guid_ws_1[:2]}"
+
 # read from onelake path
 # original path - 'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@onelake.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions'
 # abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@b196641e334048b6975fdf7bb9e3aaee.zb1.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions
-path = 'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@b196641e334048b6975fdf7bb9e3aaee.zb1.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions'
 
 
 token = get_api_token_via_akv(kv_uri, client_id_secret, tenant_id_secret, client_secret_name)
 
 # DNS resolution check — shows whether traffic routes via Private Endpoint or public internet
-resolve_dns('kvfabricprodeus2rh.vault.azure.net')
+resolve_dns(kv_dns)
 blob_ips = resolve_dns('onelake.blob.fabric.microsoft.com')
 dfs_ips = resolve_dns('onelake.dfs.fabric.microsoft.com')
 
 
 print('\n--- Reading Delta Table ---')
 dt = DeltaTable(
-     'abfss://b196641e-3340-48b6-975f-df7bb9e3aaee@onelake.dfs.fabric.microsoft.com/0a69b54c-a7ff-4e66-b136-9ed481d43f83/Tables/insider_transactions',
+     workspace_path_1,
      storage_options={
          'bearer_token': token,
          'use_fabric_endpoint': 'true',
-         'account_name': 'b196641e334048b6975fdf7bb9e3aaee.zb1'
+         'account_name': account_name_ws_1
      }
  )
 
@@ -103,6 +112,7 @@ print(df.head())
 
 """
 the deltalake library won't work because it resolves to onelake
+
 ### Read from Private-Workspace-Two
 print('\n--- Reading Delta Table on private-workspace-two ---')
 # abfss://bd130da3-e9c1-4922-be03-e2560fc6465c@onelake.dfs.fabric.microsoft.com/22568ace-9152-47bf-883c-0c8c59b060eb/Tables/insider_transactions
@@ -127,7 +137,7 @@ print('\n--- Reading from private-workspace-two via DFS REST API ---')
 
 # Build SPN credential from Key Vault
 kv_credential = DefaultAzureCredential()
-kv_client = SecretClient(vault_url='https://kvfabricprodeus2rh.vault.azure.net/',
+kv_client = SecretClient(vault_url=kv_uri,
 credential=kv_credential)
 spn_credential = ClientSecretCredential(
     kv_client.get_secret('fuam-spn-tenant-id').value,
@@ -139,24 +149,26 @@ spn_credential = ClientSecretCredential(
 token = spn_credential.get_token('https://storage.azure.com/.default').token
 
 # Workspace 2 DFS endpoint
-dfs_base = "https://bd130da3e9c14922be03e2560fc6465c.zbd.dfs.fabric.microsoft.com"
-filesystem = "bd130da3-e9c1-4922-be03-e2560fc6465c"
+filesystem = workspace_path_2.split('//')[1].split('@')[0]
+workspace_guid = filesystem.replace('-', '')
+dfs_base = f"https://{workspace_guid}.z{workspace_guid[:2]}.dfs.fabric.microsoft.com"
+path = workspace_path_2.split('.com/')[1]
+
 
 # List files via SDK (DFS works)
 service_client = DataLakeServiceClient(account_url=dfs_base, credential=spn_credential)
 
-dfs_base = "https://bd130da3e9c14922be03e2560fc6465c.zbd.dfs.fabric.microsoft.com"
-filesystem = "bd130da3-e9c1-4922-be03-e2560fc6465c"
 headers = {"Authorization": f"Bearer {token}"}
 
 service_client = DataLakeServiceClient(
-     account_url="https://bd130da3e9c14922be03e2560fc6465c.zbd.dfs.fabric.microsoft.com",
+     account_url=dfs_base,
      credential=spn_credential
  )
 # List files (SDK works for this)
 fs_client = service_client.get_file_system_client(filesystem)
+fs_client = service_client.get_file_system_client(filesystem)
 paths = fs_client.get_paths(
-    path="22568ace-9152-47bf-883c-0c8c59b060eb/Tables/insider_transactions"
+    path=path
 )
 parquet_files = [p.name for p in paths if p.name.endswith('.parquet')]
 print(f"  Found {len(parquet_files)} parquet files")
