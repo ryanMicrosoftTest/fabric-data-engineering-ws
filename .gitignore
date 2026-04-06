@@ -1,3 +1,6 @@
 local_only/*
 .venv_3.10/*
 config/*
+wip/*
+.venv/*
+.vscode/settings.json
