@@ -1,12 +1,12 @@
 # Azure SQL Database Deployment Guide
 
-This guide provides instructions for deploying an Azure SQL Database with 25 concurrent read-only users for simple SELECT queries.
+This guide provides instructions for deploying an Azure SQL Database with 60 concurrent read-only users for simple SELECT queries.
 
 ## Architecture Overview
 
 - **Azure SQL Server**: Standard S0 tier (10 DTUs, ~$15/month)
 - **Database**: `labdb` with sample data for testing
-- **Users**: 25 read-only users (`reader01` through `reader25`)
+- **Users**: 60 read-only users (`reader01` through `reader60`)
 - **Location**: East US 2
 - **Network**: Public access with firewall rules
 
@@ -88,14 +88,14 @@ Configuration parameters including:
 
 ### 3. setup-database.sql
 SQL script for master database that:
-- Creates 25 SQL Server logins (reader01-reader25)
+- Creates 60 SQL Server logins (reader01-reader60)
 - Sets up authentication credentials
 - Must be run against master database first
 
 ### 4. setup-database-labdb.sql
 SQL script for labdb database that:
 - Creates sample table with test data
-- Creates 25 database users from the logins
+- Creates 60 database users from the logins
 - Assigns read-only permissions (db_datareader role)
 - Must be run against labdb database after step 3
 
@@ -141,7 +141,7 @@ Deployment automation script that:
 - **Max Concurrent Workers**: 200
 - **Max Concurrent Logins**: 200
 
-### Optimization Tips for 25 Concurrent Users
+### Optimization Tips for 60 Concurrent Users
 1. **Connection Pooling**: Use application-level connection pooling
 2. **Query Optimization**: Keep SELECT queries simple and indexed
 3. **Monitoring**: Watch DTU usage in Azure Portal
@@ -168,7 +168,7 @@ sqlcmd -S [your-server-name].database.windows.net -d labdb -U sqladmin -P '<PASS
 Use any SQL client to connect with:
 - **Server**: [your-server-name].database.windows.net
 - **Database**: labdb
-- **Username**: reader01 (or any reader01-reader25)
+- **Username**: reader01 (or any reader01-reader60)
 - **Password**: <PASSWORD> (corresponding password)
 
 ### 4. Test Read Permissions

@@ -1,6 +1,6 @@
 -- ============================================================
 -- Azure SQL Database Setup Script - Master Database
--- Creates 25 SQL Server logins on master database
+-- Creates 60 SQL Server logins on master database
 -- Run this script against the master database
 --
 -- Usage: sqlcmd -S <server> -d master -U <admin> -P <pw> \
@@ -11,13 +11,13 @@
 -- e.g. -v ReaderPasswordSuffix="_Pass123!"
 :setvar ReaderPasswordSuffix "_DefaultSuffix!"
 
--- Create 25 SQL Server logins with generated passwords
+-- Create 60 SQL Server logins with generated passwords
 DECLARE @Counter INT = 1;
 DECLARE @LoginName NVARCHAR(50);
 DECLARE @Password NVARCHAR(50);
 DECLARE @SQL NVARCHAR(MAX);
 
-PRINT 'Creating 25 SQL Server logins...';
+PRINT 'Creating 60 SQL Server logins...';
 PRINT '==========================================';
 
 WHILE @Counter <= 60

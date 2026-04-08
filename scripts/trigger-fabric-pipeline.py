@@ -14,7 +14,6 @@ from azure.keyvault.secrets import SecretClient
 import msal
 import argparse
 import logging
-import pandas as pd
 
 # Configure logging
 logging.basicConfig(
