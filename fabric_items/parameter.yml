@@ -43,9 +43,9 @@ key_value_replace:
       item_name: "vars"
     - find_key: $.schedules[?(@.jobType=="Execute")].enabled
       replace_value:
-        DEV: "false"
-        QA: "false"
-        PROD: "true"
+        DEV: false
+        QA: false
+        PROD: true
       file_path: "**/.schedules"
       item_type: "DataPipeline"
       item_name: "scheduled_pl"
