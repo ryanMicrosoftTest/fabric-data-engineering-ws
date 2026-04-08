@@ -1,0 +1,376 @@
+//***********************************************************************************************************
+// Here are two articles to help you get started with KQL:
+// KQL reference guide - https://aka.ms/KQLguide
+// SQL - KQL conversions - https://aka.ms/sqlcheatsheet
+//***********************************************************************************************************
+
+// Use "take" to view a sample number of records in the table and check the data.
+UpskillingDestinationRawData
+| take 100
+
+// See how many records are in the table.
+UpskillingDestinationRawData
+| count
+
+// This query returns the number of ingestions per hour in the given table.
+UpskillingDestinationRawData
+| summarize IngestionCount = count() by bin(ingestion_time(), 1h)
+
+// View a representation of the schema as a table with column names, column type, and data type.
+UpskillingDestinationRawData
+| getschema
+
+.show table UpskillingDestinationRawData schema as csl
+
+// .show tables
+
+// UpskillingDestinationRawData | take 1
+
+// dimlocation_taxizone | take 1   // if the shortcut is visible from the KQL DB
+
+// Create the local dimension table (no folder yet)
+.create table dimlocation_taxizone_local (
+    LocationID:int,
+    Borough:string,
+    Zone:string
+)
+
+// Set the folder (do this in a separate command)
+.alter table dimlocation_taxizone_local folder "Reference"
+
+// Load from the shortcut and cast types (note the <|)
+.set-or-append dimlocation_taxizone_local <|
+dimlocation_taxizone
+| project
+    LocationID = toint(LocationID),
+    Borough    = tostring(Borough),
+    Zone       = tostring(Zone)
+
+// Confirm KQL table was created
+dimlocation_taxizone_local | take 5
+
+// Create the Silver enriched table 
+.create table UpskillingDestination_enriched (
+    VendorID: long,
+    tpep_pickup_datetime: datetime,
+    tpep_dropoff_datetime: datetime,
+    passenger_count: real,
+    trip_distance: real,
+    RatecodeID: real,
+    store_and_fwd_flag: string,
+    PULocationID: int,
+    DOLocationID: int,
+    payment_type: long,
+    fare_amount: real,
+    extra: real,
+    mta_tax: real,
+    tip_amount: real,
+    tolls_amount: real,
+    improvement_surcharge: real,
+    total_amount: real,
+    congestion_surcharge: real,
+    airport_fee: real,
+    Timestamp: datetime,
+    PUBorough: string,
+    PUZone: string,
+    DOBorough: string,
+    DOZone: string
+)
+
+// Set the folder
+.alter table UpskillingDestination_enriched folder "Silver"
+// One‑time backfill from the streaming table (complete join query)
+.set-or-append UpskillingDestination_enriched <|
+UpskillingDestinationRawData
+| project
+    VendorID,
+    tpep_pickup_datetime=todatetime(tpep_pickup_datetime),
+    tpep_dropoff_datetime=todatetime(tpep_dropoff_datetime),
+    passenger_count,
+    trip_distance,
+    RatecodeID,
+    store_and_fwd_flag,
+    PULocationID = toint(PULocationID),
+    DOLocationID = toint(DOLocationID),
+    payment_type,
+    fare_amount,
+    extra,
+    mta_tax,
+    tip_amount,
+    tolls_amount,
+    improvement_surcharge,
+    total_amount,
+    congestion_surcharge,
+    airport_fee,
+    Timestamp
+| join kind=leftouter (
+    dimlocation_taxizone_local
+    | project
+        PULocationID=LocationID,
+        PUBorough=Borough,
+        PUZone=Zone
+) on PULocationID
+| join kind=leftouter (
+       dimlocation_taxizone_local
+    | project
+        DOLocationID=LocationID,
+        DOBorough=Borough,
+        DOZone=Zone
+) on DOLocationID
+| project
+    VendorID,
+    tpep_pickup_datetime,
+    tpep_dropoff_datetime,
+    passenger_count,
+    trip_distance,
+    RatecodeID,
+    store_and_fwd_flag,
+    PULocationID,
+    DOLocationID,
+    payment_type,
+    fare_amount,
+    extra,
+    mta_tax,
+    tip_amount,
+    tolls_amount,
+    improvement_surcharge,
+    total_amount,
+    congestion_surcharge,
+    airport_fee,
+    Timestamp,
+    PUBorough,
+    PUZone,
+    DOBorough,
+    DOZone
+
+// Query to verify
+UpskillingDestination_enriched
+| where Timestamp > ago(2h)
+| summarize Trips = count() by PUBorough, PUZone, DOBorough, DOZone
+| order by Trips desc
+
+// Top pickup/drop-off corridors by trips:
+
+UpskillingDestination_enriched
+| where Timestamp > ago(24h)
+| summarize Trips=count() by PUBorough, PUZone, DOBorough, DOZone
+| top 20 by Trips desc
+
+// Revenue by pickup borough (today):
+UpskillingDestination_enriched
+| where Timestamp > startofday(now())
+| summarize Revenue=sum(total_amount) by PUBorough
+| order by Revenue desc
+
+// Average trip distance by zone pair (last 7 days):
+
+UpskillingDestination_enriched
+| where Timestamp > ago(7d)
+| summarize AvgDistance=avg(trip_distance) by PUZone, DOZone
+| order by AvgDistance desc
+
+//1) Demand trends (counts over time): See how trip volume changes by borough or zone over time. Identify growth, drops, and typical diurnal patterns.
+// Trips per 15 minutes by pickup borough (last 24 hours)
+// Variations: swap PUBorough with PUZone, or use DOBorough / DOZone.
+UpskillingDestination_enriched
+| where Timestamp > ago(24h)
+| summarize Trips = count() by PUBorough, bin(Timestamp, 15m)
+| order by Timestamp asc
+| render timechart
+
+//2) Revenue time series (with moving average). What: Track total revenue per hour and smooth it to reveal trend vs noise. Why: Spot sustained increases/drops and compare boroughs.
+// Hourly revenue per pickup borough with 24-hour moving average (last 7 days)
+UpskillingDestination_enriched
+| where Timestamp > ago(7d)
+| make-series Revenue = sum(total_amount) on Timestamp from ago(7d) to now() step 1h by PUBorough
+| extend MA_24h = series_fir(Revenue, repeat(1, 24), true, true)   // normalize, centered
+| mv-expand Timestamp to typeof(datetime), Revenue to typeof(real), MA_24h to typeof(real)
+| project PUBorough, Timestamp, Revenue, MA_24h
+| render timechart
+
+// 3) Seasonality: Hour‑of‑day & Day‑of‑week. What: Understand typical busy hours and weekly cycles. Why: Staff planning, dynamic pricing, and operations.
+// Heatmap-friendly summary of trips by hour & day of week (last 30 days)
+UpskillingDestination_enriched
+| where Timestamp > ago(30d)
+| summarize Trips = count()
+          by PUBorough,
+             DayOfWeek = dayofweek(Timestamp),     // 0=Sun … 6=Sat
+             Hour=hourofday(Timestamp)
+| order by PUBorough, DayOfWeek, Hour
+
+// 4) Corridor flows over time (PU→DO). What: Time series for specific pickup→drop‑off corridors. Why: Measure demand on popular routes and monitor changes.
+// Choose a corridor and trend it hourly
+let targetPU = "Midtown";
+let targetDO = "JFK Airport";
+UpskillingDestination_enriched
+| where Timestamp > ago(7d)
+| where PUZone == targetPU and DOZone == targetDO
+| summarize Trips = count() by bin(Timestamp, 1h)
+| order by Timestamp asc
+
+// 5) Trip duration trends What: Average trip time over time (by zone or corridor). Why: Congestion monitoring, service level, and reliability.
+
+// Average trip duration by pickup zone per hour (last 7 days)
+UpskillingDestination_enriched
+| where Timestamp > ago(7d)
+| extend trip_duration_min = datetime_diff('minute', tpep_dropoff_datetime, tpep_pickup_datetime)
+| summarize AvgDuration = avg(trip_duration_min) by PUZone, bin(Timestamp, 1h)
+| order by Timestamp asc
+
+// 6) Distance & efficiency What: Average trip distance, load factor (passengers per trip), etc. Why: Operational efficiency and network health.
+// Average trip distance and load factor by hour (aggregate across boroughs)
+UpskillingDestination_enriched
+| where Timestamp > ago(3d)
+| summarize AvgDistance = avg(trip_distance),
+            LoadFactor  = avg(passenger_count)
+          by bin(Timestamp, 1h)
+| render timechart
+
+// 7) Spike detection / anomalies (series decomposition) What: Automatically flag abnormal demand spikes or troughs. Why: Incident detection, surge response, and alerting.
+
+// Detect anomalies in hourly trips by pickup borough (last 14 days)
+UpskillingDestination_enriched
+| where Timestamp > ago(14d)
+| make-series Trips = count() on Timestamp from ago(14d) to now() step 1h by PUBorough
+| extend Anom = series_decompose_anomalies(Trips, 3.0)      // 3.0 ~ sensitivity
+| mv-expand Timestamp to typeof(datetime), Trips to typeof(long), Anom to typeof(double)
+| where isnotempty(Anom)
+| project PUBorough, Timestamp, Trips, AnomalyScore = Anom
+| order by Timestamp asc
+
+// 8) Congestion & surcharges over time What: Track congestion or toll surcharges as proxies for traffic and cost. Why: Policy impact, budgeting, and user experience.
+// Hourly sum and average of congestion surcharge by pickup borough
+UpskillingDestination_enriched
+| where Timestamp > ago(14d)
+| summarize SurchargeSum = sum(congestion_surcharge),
+            SurchargeAvg = avg(congestion_surcharge)
+          by PUBorough, bin(Timestamp, 1h)
+| render timechart
+
+// 9) Percentiles & SLAs What: 90th percentile duration or distance—upper-tail behavior. Why: SLA monitoring and worst‑case performance.
+// 90th percentile trip duration per hour by pickup borough// 90th percentile trip duration per
+UpskillingDestination_enriched
+| where Timestamp > ago(7d)
+| extend trip_duration_min = datetime_diff('minute', tpep_dropoff_datetime, tpep_pickup_datetime)
+| summarize P90Duration = percentile(trip_duration_min, 90)
+          by PUBorough, bin(Timestamp, 1h)
+
+ // 10) “Same hour last week” comparisons (seasonal benchmarking) What: Compare current hour to same hour one week ago. Why: Spot deviations controlling for hour‑of‑day effects.
+// Current hour vs same hour last week
+let nowHour = bin(now(), 1h);
+let lastWeekHour = nowHour - 7d;
+let cur = UpskillingDestination_enriched
+         | where Timestamp between (nowHour .. nowHour + 1h)
+         | summarize Trips = count() by PUBorough;
+let prev = UpskillingDestination_enriched
+          | where Timestamp between (lastWeekHour .. lastWeekHour + 1h)
+          | summarize TripsLW = count() by PUBorough;
+cur
+| join kind=leftouter prev on PUBorough
+| extend Delta = Trips - coalesce(TripsLW, 0)
+| order by Delta desc
+
+// Choose the right bin size: bin(Timestamp, 5m|15m|1h) depends on data volume and the story you want.
+// Group wisely: Start with PUBorough and only drill to PUZone when needed to avoid too many series.
+// Make-series for advanced TS analytics: Use series_moving_avg, series_decompose(_anomalies) for trend/seasonality/anomaly work.
+// Dashboards: Real-Time Dashboards or Power BI can render these nicely; pair with Data Activator for threshold alerts (e.g., “Trips drop >30% vs last week for Midtown between 5–7 PM”).
+
+// stable, query‑friendly KPIs for the Gold layer
+
+// Trips per time window (e.g., hourly per borough/zone/corridor)
+// Revenue per time window (sum of total_amount)
+// Average/percentile trip duration per hour
+// Average distance & load factor per hour
+// Corridor flows (PU → DO) per hour
+
+//********************* Gold MVs; Example queries on MVs **************************
+
+// 1. Hourly trips by PU/DO (corridors)
+.create-or-alter materialized-view with (folder="Gold") TripsByHour
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize Trips = count()
+      by PUBorough, PUZone, DOBorough, DOZone, bin(Timestamp, 1h)
+}
+
+// 2.  Hourly revenue by pickup borough
+
+.create-or-alter materialized-view with (folder="Gold") RevenueByHour
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize Revenue = sum(total_amount)
+      by PUBorough, bin(Timestamp, 1h) 
+}
+
+//  3. 90th percentile trip duration per hour (pickup zone)
+
+.create-or-alter materialized-view with (folder="Gold") DurationP90ByHour
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize P90Duration =
+        percentile(datetime_diff('minute',
+                                 tpep_dropoff_datetime,
+                                 tpep_pickup_datetime), 90)
+      by PUZone, bin(Timestamp, 1h)
+}
+
+// 4. Hourly averages (distance & load factor)
+
+.create-or-alter materialized-view with (folder="Gold") EfficiencyByHour
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize AvgDistance = avg(trip_distance),
+                LoadFactor  = avg(passenger_count)
+      by bin(Timestamp, 1h)
+}
+
+//   5. Latest record per corridor (optional “snapshot” view) Uses arg_max, which is supported and handy for “latest row per group”.
+    
+.create-or-alter materialized-view with (folder="Gold") LatestTripPerCorridor
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize arg_max(Timestamp, *)
+      by PUBorough, PUZone, DOBorough, DOZone
+}
+
+// for hisotrical  backfill when creating MV
+
+.create async materialized-view with (folder="Gold", backfill=true)
+TripsByHour_Backfilled
+on table UpskillingDestination_enriched
+{
+    UpskillingDestination_enriched
+    | summarize Trips = count()
+      by PUBorough, PUZone, DOBorough, DOZone, bin(Timestamp, 1h)
+}
+
+//How to use the Gold MVs; Example queries on MVs 
+
+// Top corridors by trips (last 24h)
+TripsByHour
+| where Timestamp > ago(24h)
+| top 20 by Trips desc
+
+// Revenue trend per borough (last 7d)
+RevenueByHour
+| where Timestamp > ago(7d)
+| order by Timestamp asc
+| render timechart
+
+// SLA view: 90th percentile duration by PU zone (last 7d)
+DurationP90ByHour
+| where Timestamp > ago(7d)
+| order by Timestamp| order by Timestamp asc
+
+// Apply moving average at query time (on Gold series); Use make-series + series_fir to smooth, then mv-expand for charting.
+TripsByHour
+| where Timestamp > ago(7d)
+| make-series Trips = sum(Trips) on Timestamp from ago(7d) to now() step 1h by PUBorough
+| extend MA_24h = series_fir(Trips, repeat(1, 24), true, true)   //| extend MA_24h = series_fir(Trips, repeat(1, 24), true, true)   // normalized, centered
+| mv-expand Timestamp to typeof(datetime), Trips to typeof(long), MA_24h to typeof(real)
+| project PUBorough, Timestamp, Trips, MA_24h

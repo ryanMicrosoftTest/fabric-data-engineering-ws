@@ -14,3 +14,4 @@ scripts/iac/user-credentials.md
 scripts/iac/sql-logs.log
 scripts/iac/azure-sql.parameters.json
 scripts/iac/iac.config
+.vscode/launch.json

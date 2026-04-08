@@ -1,0 +1,198 @@
+// Overview:  event h ubs -> eventstream -> raw_pipelineRuns_tbl -> (call function to normalize data -> store output of function to failed_table) --> table policy
+// Function to normalize records once they land in raw PipelineRuns_tbl
+// later a policy will be applied to the failed table so this function executes when new files land in raw
+.create-or-alter function with (folder = "normalize", docstring = "Normalize PipelineRuns_tbl: expand ArrayValue_records", skipvalidation = "true") Normalize_PipelineRuns() {
+    PipelineRuns_tbl
+    | extend _records = iif(
+        isnull(array_length(ArrayValue_records)),
+        pack_array(ArrayValue_records),
+        ArrayValue_records
+      )
+    | mv-expand rec = _records
+    | where isnotnull(rec)
+    | extend p = todynamic(rec["properties"])
+    | extend requestTime      = todatetime(p["PipelineRunRequestTime"]),
+             executionStart   = todatetime(p["ExecutionStart"]),
+             pipelineName     = tostring(rec["pipelineName"]),
+             runId            = tostring(rec["runId"]),
+             correlationId    = tostring(rec["correlationId"]),
+             operationName    = tostring(rec["operationName"]),
+             status           = tostring(rec["status"]),
+             failureType      = tostring(rec["failureType"]),
+             message          = coalesce(tostring(rec["Message"]), tostring(p["Message"])),
+             parameters       = todynamic(p["Parameters"]),
+             systemParams     = todynamic(p["SystemParameters"]),
+             predecessors     = todynamic(p["Predecessors"]),
+             userProperties   = todynamic(p["UserProperties"]),
+             annotations      = todynamic(p["Annotations"]),
+             level            = tostring(rec["level"]),
+             location         = tostring(rec["location"]),
+             resourceId       = tostring(rec["resourceId"]),
+             category         = tostring(rec["category"]),
+             eventName        = tostring(rec["EventName"]),
+             IngestionTime    = ingestion_time()
+    | project requestTime, executionStart, pipelineName, runId, correlationId, operationName, status, failureType,
+              message, level, location, resourceId, category, parameters, systemParams,
+              predecessors, userProperties, annotations, eventName,
+              EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId = tostring(rec["PartitionId"]), IngestionTime
+}
+
+
+// Check Schema
+Normalize_PipelineRuns()
+| where status == "Failed"
+| getschema
+
+
+// Create failed pipelines table
+.create table PipelineRuns_Failed (
+    requestTime: datetime,
+    executionStart: datetime,
+    pipelineName: string,
+    runId: string,
+    correlationId: string,
+    operationName: string,
+    status: string,
+    failureType: string,
+    message: string,
+    level: string,
+    location: string,
+    resourceId: string,
+    category: string,
+    parameters: dynamic,
+    systemParams: dynamic,
+    predecessors: dynamic,
+    userProperties: dynamic,
+    annotations: dynamic,
+    eventName: string,
+    EventEnqueuedUtcTime: datetime,
+    EventProcessedUtcTime: datetime,
+    PartitionId: string,
+    IngestionTime: datetime
+)
+
+
+// Add table policy to have this done in real-time.  Policy only applies to NEW data
+.alter table PipelineRuns_Failed policy update
+```[{
+    "IsEnabled": true,
+    "Source": "PipelineRuns_tbl",
+    "Query": "Normalize_PipelineRuns() | where status == \"Failed\"",
+    "IsTransactional": false,
+    "PropagateIngestionProperties": true
+}]```
+
+
+// Backfill for data already in raw table
+.set-or-append PipelineRuns_Failed <|
+Normalize_PipelineRuns()
+| where status == "Failed"
+
+
+
+// Create ActivityRuns Failed Table
+.create table ActivityRuns_Failed_tbl (
+    activityIterationCount:int,
+    activityName:string,
+    activityRetryCount:int,
+    activityRunId:string,
+    activityType:string,
+    billingResourceId:string,
+    body:string,
+    correlationId:string,
+    level:string,
+    location:string,
+    name:string,
+    operationName:string,
+    pipelineName:string,
+    pipelineRunId:string,
+    recoveryStatus:string,
+    resourceId:string,
+    severityNumber:int,
+    severityText:string,
+    start:string,
+    status:string,
+    tags:dynamic,
+    timestamp:string,
+    run_time:string,
+    source:dynamic,
+    sink:dynamic,
+    error:dynamic,
+    errorCode:string,
+    errorMessage:string,
+    errorFailureType:string,
+    errorTarget:string,
+    eventProcessedUtcTime:datetime,
+    eventEnqueuedUtcTime:datetime,
+    ingestion_time:datetime
+)
+
+
+
+// Building out function for ActivityRuns_tbl
+.create-or-alter function with (folder = "normalize", docstring = "Normalize ActivityRuns_tbl: expand ArrayValue_records", skipvalidation = "true") NormalizeActivityRuns() 
+{
+    ActivityRuns_tbl
+| extend _records = iif(
+    isnull(array_length(ArrayValue_records)),
+    pack_array(ArrayValue_records),
+    ArrayValue_records
+)
+| mv-expand rec = _records
+| where isnotnull(rec)
+| extend p = todynamic(rec["properties"])
+| extend activityIterationCount = toint(rec['activityIterationCount']),
+        activityName = tostring(rec['activityName']),
+        activityRetryCount = toint(rec['activityRetryCount']),
+        activityRunId = tostring(rec['activityRunId']),
+        activityType = tostring(rec['activityType']),
+        billingResourceId = tostring(rec['billingResourceId']),
+        body = tostring(rec['body']),
+        correlationId = tostring(rec['correlationId']),
+        level = tostring(rec['level']),
+        location = tostring(rec['location']),
+        name = tostring(rec['name']),
+        operationName = tostring(rec['operationName']),
+        pipelineName = tostring(rec['pipelineName']),
+        pipelineRunId = tostring(rec['pipelineRunId']),
+        recoveryStatus = tostring(rec['recoveryStatus']),
+        resourceId = tostring(rec['resourceId']),
+        severityNumber = toint(rec['severityNumber']),
+        severityText = tostring(rec['severityText']),
+        start = tostring(rec['start']),
+        status = tostring(rec['status']),
+        tags = todynamic(rec['tags']),
+        timestamp = tostring(rec['timestamp']),
+        run_time = tostring(rec['time']),
+        source = todynamic(p.Input.source),
+        sink = todynamic(p.Input.sink),
+        error = todynamic(p.Error),
+        errorCode = tostring(p.Error.errorCode),
+        errorMessage = tostring(p.Error.message),
+        errorFailureType = tostring(p.Error.failureType),
+        errorTarget = tostring(p.Error.target),
+        eventProcessedUtcTime = todatetime(EventProcessedUtcTime),
+        eventEnqueuedUtcTime = todatetime(EventEnqueuedUtcTime),
+        ingestion_time = todatetime(rec['ingestion_time'])
+| project activityIterationCount, activityName, activityRetryCount, activityRunId, activityType, billingResourceId,
+        body, correlationId, level, location, name, operationName, pipelineName, pipelineRunId, recoveryStatus,
+        resourceId, severityNumber, severityText, start, status, tags, timestamp, run_time, source, sink, error,
+        errorCode, errorMessage, errorFailureType, errorTarget, eventProcessedUtcTime, eventEnqueuedUtcTime, ingestion_time
+}
+
+
+.alter table ActivityRuns_Failed_tbl policy update
+```[{
+    "IsEnabled": true,
+    "Source": "ActivityRuns_tbl",
+    "Query": "NormalizeActivityRuns() | where status == \"Failed\"",
+    "IsTransactional": false,
+    "PropagateIngestionProperties": true
+}]```
+
+
+
+// Backfill ActivityRuns_Failed_tbl
+.set-or-append ActivityRuns_Failed_tbl <|
+NormalizeActivityRuns()
+| where status == "Failed"
