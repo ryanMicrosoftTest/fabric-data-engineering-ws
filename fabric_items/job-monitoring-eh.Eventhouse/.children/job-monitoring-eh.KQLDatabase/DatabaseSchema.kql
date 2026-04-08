@@ -1,0 +1,105 @@
+// KQL script
+// Use management commands in this script to configure your database items, such as tables, functions, materialized views, and more.
+
+
+.create-merge table ['raw-job-events'] (datacontenttype:string, subject:string, source:string, type:string, dataschemaversion:string, ['time']:string, specversion:string, id:string, data:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
+.create-merge table spark_emitter_logs (timestamp:string, category:string, fabricLivyId:string, applicationId:string, applicationName:string, executorId:string, userId:string, fabricTenantId:string, capacityId:string, artifactType:string, artifactId:string, fabricWorkspaceId:string, fabricEnvId:string, executorMin:string, executorMax:string, isHighConcurrencyEnabled:string, properties:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
+.create-or-alter function with (skipvalidation = "true") getSparkEmitterLogs() {
+    spark_emitter_logs
+   | where category == "Log"
+   | extend msg = tostring(parse_json(properties).message)
+   | extend loggerName = tostring(parse_json(properties).logger_name)
+   | where loggerName == "PySparkLogger"
+   | project timestamp, msg, loggerName, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, artifactId, artifactType, capacityId
+}
+.create-or-alter function with (skipvalidation = "true") getStageCompletions() {
+       // Stage completions
+   spark_emitter_logs
+   | where category == "EventLog"
+   | extend eventName = tostring(parse_json(properties).["Event"])
+   | where eventName == "SparkListenerStageCompleted"
+   | extend stageInfo = parse_json(properties).["Stage Info"]
+   | project timestamp, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, artifactId, artifactType, capacityId,
+       executorMin, executorMax,
+       stageId = toint(stageInfo.["Stage ID"]),
+       stageName = tostring(stageInfo.["Stage Name"]),
+       numTasks = toint(stageInfo.["Number of Tasks"]),
+       submissionTime = todatetime(stageInfo.["Submission Time"]),
+       completionTime = todatetime(stageInfo.["Completion Time"]),
+       inputBytes = tolong(stageInfo.["Input Bytes"]),
+       inputRecords = tolong(stageInfo.["Input Records"]),
+       outputBytes = tolong(stageInfo.["Output Bytes"]),
+       outputRecords = tolong(stageInfo.["Output Records"]),
+       shuffleReadBytes = tolong(stageInfo.["Shuffle Read Bytes"]),
+       shuffleWriteBytes = tolong(stageInfo.["Shuffle Write Bytes"]),
+       failureReason = tostring(stageInfo.["Failure Reason"])
+   | order by timestamp asc
+}
+.create-or-alter function with (skipvalidation = "true") getFailedJobs() {
+    spark_emitter_logs
+   | where category == "EventLog"
+   | extend eventName = tostring(parse_json(properties).["Event"])
+   | where eventName == "SparkListenerJobEnd"
+   | extend jobResult = tostring(parse_json(properties).["Job Result"].Result)
+   | where jobResult == "JobFailed"
+   | project timestamp, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, artifactId, artifactType, capacityId, jobResult
+}
+.create-or-alter function with (skipvalidation = "true") getTaskLevelDetail() {
+       // Task-level detail
+   spark_emitter_logs
+   | where category == "EventLog"
+   | extend eventName = tostring(parse_json(properties).["Event"])
+   | where eventName == "SparkListenerTaskEnd"
+   | extend taskInfo = parse_json(properties).["Task Info"]
+   | extend taskMetrics = parse_json(properties).["Task Metrics"]
+   | project timestamp, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, artifactId, capacityId,
+       stageId = toint(parse_json(properties).["Stage ID"]),
+       taskId = tolong(taskInfo.["Task ID"]),
+       executorId = tostring(taskInfo.["Executor ID"]),
+       duration = tolong(taskInfo.["Finish Time"]) - tolong(taskInfo.["Launch Time"]),
+       gcTime = tolong(taskMetrics.["JVM GC Time"]),
+       inputBytes = tolong(taskMetrics.["Input Metrics"].["Bytes Read"]),
+       shuffleRead = tolong(taskMetrics.["Shuffle Read Metrics"].["Remote Bytes Read"]),
+       shuffleWrite = tolong(taskMetrics.["Shuffle Write Metrics"].["Bytes Written"]),
+       failReason = tostring(parse_json(properties).["Task End Reason"].Reason)
+   | order by duration desc
+}
+.create-or-alter function with (skipvalidation = "true") getExecutorScalingDetail() {
+    // Executor scaling
+   spark_emitter_logs
+   | where category == "EventLog"
+   | extend eventName = tostring(parse_json(properties).["Event"])
+   | where eventName in ("SparkListenerExecutorAdded", "SparkListenerExecutorRemoved")
+   | project timestamp, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, capacityId, executorMin, executorMax,
+       eventName,
+       addedExecutorId = tostring(parse_json(properties).["Executor ID"]),
+       totalCores = toint(parse_json(properties).["Executor Info"].["Total Cores"])
+   | order by timestamp asc
+}
+.create-or-alter function with (skipvalidation = "true") getSparkConfigSnapshot() {
+       // Spark config snapshot
+   spark_emitter_logs
+   | where category == "EventLog"
+   | extend eventName = tostring(parse_json(properties).["Event"])
+   | where eventName == "SparkListenerEnvironmentUpdate"
+   | project timestamp, fabricLivyId, applicationId, applicationName,
+       fabricWorkspaceId, artifactId, capacityId,
+       sparkProps = parse_json(properties).["Spark Properties"]
+}
+.create-or-alter function with (folder = "SparkDiagnostics", docstring = "Get all diagnostic events for a Spark application", skipvalidation = "true") fn_spark_app_events(app_id:string) {
+       spark_emitter_logs
+       | where applicationId == app_id
+       | extend eventName = case(
+           category == "EventLog", tostring(parse_json(properties).["Event"]),
+           category == "Log", tostring(parse_json(properties).logger_name),
+           category == "Metrics", "Metric",
+           "Unknown")
+       | project timestamp, category, eventName, applicationName, artifactId,
+           fabricLivyId, capacityId, executorMin, executorMax, properties
+       | order by timestamp asc
+   }

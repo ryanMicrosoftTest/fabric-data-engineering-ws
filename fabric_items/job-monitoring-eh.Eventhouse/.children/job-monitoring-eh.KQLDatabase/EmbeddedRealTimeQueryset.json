@@ -1,0 +1,34 @@
+{
+  "queryset": {
+    "version": "1.0.0",
+    "dataSources": [
+      {
+        "id": "1ffb6111-a267-4279-be12-3fab8bb94023",
+        "clusterUri": "https://trd-3m9x46gwgqq3k2damf.z9.kusto.fabric.microsoft.com",
+        "type": "Fabric",
+        "databaseItemId": "e441ae3c-98fd-4d70-b483-45b5fb6e822d",
+        "databaseItemName": "job-monitoring-eh"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "b5aa1c97-1009-4267-9796-916cd8fc58ed",
+        "content": "//***********************************************************************************************************\n// Here are two articles to help you get started with KQL:\n// KQL reference guide - https://aka.ms/KQLguide\n// SQL - KQL conversions - https://aka.ms/sqlcheatsheet\n//***********************************************************************************************************\n\n// Use \"take\" to view a sample number of records in the table and check the data.\nYOUR_TABLE_HERE\n| take 100\n\n// See how many records are in the table.\nYOUR_TABLE_HERE\n| count\n\n// This query returns the number of ingestions per hour in the given table.\nYOUR_TABLE_HERE\n| summarize IngestionCount = count() by bin(ingestion_time(), 1h)\n\n",
+        "title": "Tab",
+        "dataSourceId": "1ffb6111-a267-4279-be12-3fab8bb94023"
+      },
+      {
+        "id": "3f1d70b2-0b3c-48f4-b97c-e3bd3e6c2708",
+        "content": "// APP ID application_1771612052121_0001\n// LIVY ID 48f25100-1a57-44ea-9344-ee3c769f06ea\n// ITEM_ID 08eb76df-a61b-4f66-9e5a-5eaf1046cfc9\nfn_spark_app_events(\"application_1771612052121_0001\")",
+        "title": "",
+        "dataSourceId": "1ffb6111-a267-4279-be12-3fab8bb94023"
+      },
+      {
+        "id": "0608ca9a-a4c1-4bea-9c3a-f951cc97817c",
+        "content": "fn_spark_app_events('application_1772122622482_0001')\n",
+        "title": "",
+        "dataSourceId": "1ffb6111-a267-4279-be12-3fab8bb94023"
+      }
+    ]
+  }
+}
