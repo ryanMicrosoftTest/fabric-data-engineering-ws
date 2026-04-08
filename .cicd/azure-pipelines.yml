@@ -39,7 +39,7 @@ stages:
   jobs:
   - job: AuthenticateAndDeploy
     displayName: 'Authenticate and Deploy'
-    timeoutInMinutes: 0
+    timeoutInMinutes: 360
     steps:
     # Checkout the current repository
     - checkout: self  
