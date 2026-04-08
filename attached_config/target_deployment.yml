@@ -5,6 +5,7 @@ DEV:
   items_in_scope:
     - DataPipeline
     - Notebook
+    - Environment
 
 
 QA:
