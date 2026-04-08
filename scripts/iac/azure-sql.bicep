@@ -32,6 +32,9 @@ param clientIpAddress string = ''
 @description('Whether to allow Azure services and resources to access this server')
 param allowAzureIps bool = true
 
+@description('Whether to allow all public internet access (0.0.0.1–255.255.255.255). Defaults to false for security. Enable only when required and prefer explicit client IP rules instead.')
+param allowAllPublicIps bool = false
+
 // SQL Server
 resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
   name: serverName
@@ -86,8 +89,8 @@ resource firewallRuleClient 'Microsoft.Sql/servers/firewallRules@2023-05-01-prev
   }
 }
 
-// Firewall rule to allow all public internet access
-resource firewallRulePublic 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview' = {
+// Firewall rule to allow all public internet access (optional, disabled by default)
+resource firewallRulePublic 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview' = if (allowAllPublicIps) {
   parent: sqlServer
   name: 'AllowAllPublicIps'
   properties: {
