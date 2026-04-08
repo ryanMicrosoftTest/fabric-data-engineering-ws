@@ -2,15 +2,10 @@
 
 """
 import socket
-import logging
-import subprocess
-import threading
-import time
 from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
 from deltalake import DeltaTable
 from azure.storage.filedatalake import DataLakeServiceClient
-from azure.identity import ClientSecretCredential
 import pyarrow.parquet as pq
 import pandas as pd
 import io

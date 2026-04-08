@@ -87,7 +87,8 @@ def run_on_demand_pipeline_job(workspace_id:str, item_id:str, api_token:str):
     }
     }
 
-    response = requests.post(url, headers=headers, json=body)
+    response = requests.post(url, headers=headers, json=body, timeout=600)
+    response.raise_for_status()
 
     return response
 
