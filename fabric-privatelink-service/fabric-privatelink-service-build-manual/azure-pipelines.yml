@@ -1,0 +1,164 @@
+# Azure DevOps YAML Pipeline — Fabric Workspace Private Link (Manual)
+# Deploys PLS + PE + DNS only. Workspace inbound policy must be set manually.
+
+trigger: none
+
+parameters:
+  - name: resource_name
+    displayName: 'Resource Name (free-form, unique within RG)'
+    type: string
+
+  - name: tenant_id
+    displayName: 'Microsoft Entra Tenant ID'
+    type: string
+
+  - name: workspace_id
+    displayName: 'Fabric Workspace ID (GUID)'
+    type: string
+
+variables:
+  - name: scriptPath
+    value: '$(Build.SourcesDirectory)/fabric-privatelink-service/fabric-privatelink-service-build-manual'
+
+stages:
+  # Stage 1: Validate
+  - stage: Validate
+    displayName: 'Validate Deployment'
+    jobs:
+      - job: ValidateBicep
+        displayName: 'Lint and What-If'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Bicep Lint'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az bicep lint --file $(scriptPath)/fabric-workspace-private-link.bicep
+
+          - task: AzureCLI@2
+            displayName: 'Check Subnet Capacity'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -euo pipefail
+                CONFIG="$(scriptPath)/config.json"
+
+                VNET_RG=$(jq -r '.vnet.resource_group' "$CONFIG")
+                VNET_NAME=$(jq -r '.vnet.name' "$CONFIG")
+                SUBNET_NAME=$(jq -r '.subnet.name' "$CONFIG")
+                RESERVED_IPS=$(jq -r '.subnet.reserved_ips_per_workspace' "$CONFIG")
+
+                SUBNET_INFO=$(az network vnet subnet show \
+                  --resource-group "$VNET_RG" \
+                  --vnet-name "$VNET_NAME" \
+                  --name "$SUBNET_NAME" \
+                  --query '{addressPrefix: addressPrefix, ipConfigurations: ipConfigurations}' \
+                  -o json)
+
+                ADDRESS_PREFIX=$(echo "$SUBNET_INFO" | jq -r '.addressPrefix')
+                USED_IPS=$(echo "$SUBNET_INFO" | jq '.ipConfigurations | length')
+                CIDR_BITS="${ADDRESS_PREFIX##*/}"
+                TOTAL_IPS=$(( (1 << (32 - CIDR_BITS)) - 5 ))
+                AVAILABLE_IPS=$(( TOTAL_IPS - USED_IPS ))
+
+                echo "Subnet: $SUBNET_NAME ($ADDRESS_PREFIX)"
+                echo "  Available IPs: $AVAILABLE_IPS / $TOTAL_IPS"
+                echo "  Required IPs: $RESERVED_IPS"
+
+                if [[ "$AVAILABLE_IPS" -lt "$RESERVED_IPS" ]]; then
+                  echo "##vso[task.logissue type=error]Insufficient subnet capacity. Available: $AVAILABLE_IPS, Required: $RESERVED_IPS"
+                  exit 1
+                fi
+
+                echo "Subnet capacity check passed."
+
+          - task: AzureCLI@2
+            displayName: 'What-If Deployment'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -euo pipefail
+                CONFIG="$(scriptPath)/config.json"
+
+                SUBSCRIPTION_ID=$(jq -r '.subscription_id' "$CONFIG")
+                RESOURCE_GROUP=$(jq -r '.resource_group' "$CONFIG")
+                LOCATION=$(jq -r '.location' "$CONFIG")
+                VNET_RG=$(jq -r '.vnet.resource_group' "$CONFIG")
+                VNET_NAME=$(jq -r '.vnet.name' "$CONFIG")
+                SUBNET_NAME=$(jq -r '.subnet.name' "$CONFIG")
+                DNS_ZONE_RG=$(jq -r '.dns_zones.fabric.resource_group' "$CONFIG")
+                DNS_ZONE_NAME=$(jq -r '.dns_zones.fabric.name' "$CONFIG")
+
+                SUBNET_ID="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${VNET_RG}/providers/Microsoft.Network/virtualNetworks/${VNET_NAME}/subnets/${SUBNET_NAME}"
+                DNS_ZONE_ID="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${DNS_ZONE_RG}/providers/Microsoft.Network/privateDnsZones/${DNS_ZONE_NAME}"
+
+                az deployment group what-if \
+                  --resource-group "$RESOURCE_GROUP" \
+                  --template-file $(scriptPath)/fabric-workspace-private-link.bicep \
+                  --parameters \
+                    resourceName="${{ parameters.resource_name }}" \
+                    workspaceId="${{ parameters.workspace_id }}" \
+                    tenantId="${{ parameters.tenant_id }}" \
+                    subnetId="$SUBNET_ID" \
+                    fabricDnsZoneId="$DNS_ZONE_ID" \
+                    location="$LOCATION"
+
+  # Stage 2: Approval Gate
+  - stage: Approve
+    displayName: 'Approval Gate'
+    dependsOn: Validate
+    jobs:
+      - job: WaitForApproval
+        displayName: 'Awaiting Approval (Security, Networking, Cloud Team)'
+        pool: server
+        steps:
+          - task: ManualValidation@1
+            displayName: 'Approve Private Link Deployment'
+            inputs:
+              notifyUsers: |
+                [Security Team]
+                [Networking Team]
+                [Cloud Team]
+              instructions: |
+                Requesting approval to deploy a Fabric workspace-level Private Link.
+
+                Resource Name: ${{ parameters.resource_name }}
+                Tenant ID:     ${{ parameters.tenant_id }}
+                Workspace ID:  ${{ parameters.workspace_id }}
+
+                This will:
+                1. Create a Private Link Service (Microsoft.Fabric/privateLinkServicesForFabric)
+                2. Create a Private Endpoint in the configured subnet
+                3. Register DNS A records in privatelink.fabric.microsoft.com
+
+                NOTE: Workspace inbound policy (deny public access) will NOT be set.
+                This must be configured manually after deployment.
+
+                Review the What-If output from the Validate stage before approving.
+
+  # Stage 3: Deploy
+  - stage: Deploy
+    displayName: 'Deploy Private Link'
+    dependsOn: Approve
+    jobs:
+      - job: DeployPrivateLink
+        displayName: 'Deploy PLS + PE + DNS'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Run Deployment Script'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath: '$(scriptPath)/deploy-workspace-private-link.sh'
+              arguments: '"${{ parameters.resource_name }}" "${{ parameters.tenant_id }}" "${{ parameters.workspace_id }}"'

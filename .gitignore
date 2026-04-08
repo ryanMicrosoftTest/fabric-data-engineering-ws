@@ -4,3 +4,13 @@ config/*
 wip/*
 .venv/*
 .vscode/settings.json
+.stubs/
+.vfscache/
+.vfsmeta/
+.work-folder-info
+docs/spark-emitter-images/58db0c3b-49cb-4b63-95e7-7364b46e5281/*
+scripts/event-hubs
+scripts/iac/user-credentials.md
+scripts/iac/sql-logs.log
+scripts/iac/azure-sql.parameters.json
+scripts/iac/iac.config
