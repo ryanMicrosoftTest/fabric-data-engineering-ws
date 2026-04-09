@@ -17,3 +17,4 @@ scripts/iac/iac.config
 .vscode/launch.json
 __pycache__/
 *.pyc
+*.error.log
