@@ -84,7 +84,12 @@ def main():
         token_credential=credential,
     )
 
-    publish_all_items(workspace)
+    try:
+        publish_all_items(workspace)
+    except Exception as e:
+        print(f"ERROR: Deployment failed for environment '{environment}': {e}")
+        sys.exit(1)
+
     print(f"Deployment completed successfully for environment: {environment}")
 
 
