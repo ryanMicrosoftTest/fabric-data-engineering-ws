@@ -65,7 +65,7 @@ stages:
               echo "Target Environment: $(targetEnvironment)"
               echo "Working Directory: $(Build.SourcesDirectory)"
               ls -a
-              python ./.cicd/authenticate_spn.py $(targetEnvironment) ./.cicd/target_deployment.yml
+              python ./.cicd/authenticate_spn.py $(targetEnvironment) ./attached_config/target_deployment.yml
             workingDirectory: $(Build.SourcesDirectory)/
             env:
               AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
@@ -121,7 +121,7 @@ stages:
               echo "Target Environment: $(targetEnvironment)"
               echo "Working Directory: $(Build.SourcesDirectory)"
               ls -a
-              python ./.cicd/authenticate_spn.py $(targetEnvironment) ./.cicd/target_deployment.yml
+              python ./.cicd/authenticate_spn.py $(targetEnvironment) ./attached_config/target_deployment.yml
             workingDirectory: $(Build.SourcesDirectory)/
             env:
               AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
