@@ -437,7 +437,7 @@ create alerts and perform analytics.
 #### Logs queryable in the EventHouse KQL Database
 ![EventHouse](docs/spark-emitter-images/spark_emitter_logs_kql_table.png)
 
-#### Artifacts in this repository for Eventstream Jobs Tracker
+#### Artifacts in this repository for Fabric Spark Emitter
 - [scripts/diagnostic-emitter-nb.ipynb](scripts/diagnostic-emitter-nb.ipynb)
 
 
