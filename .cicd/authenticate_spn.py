@@ -13,7 +13,7 @@ import os
 import sys
 
 from azure.identity import ClientSecretCredential
-from fabric_cicd import deploy_with_config
+from fabric_cicd import DeploymentStatus, deploy_with_config
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
     print(f"Deployment status: {result.status}")
     print(f"Deployment message: {result.message}")
 
-    if result.status != "completed":
+    if result.status != DeploymentStatus.COMPLETED:
         print("ERROR: Deployment did not complete successfully.")
         sys.exit(1)
 
