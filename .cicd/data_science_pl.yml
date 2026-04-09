@@ -39,11 +39,13 @@ stages:
           - checkout: self  
             fetchDepth: 1   
 
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.11' 
-              addToPath: true
-            displayName: 'Set up Python'
+    - task: AzureKeyVault@2
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      inputs:
+        azureSubscription: 'fabric-sc-prod'  
+        KeyVaultName: '$(KeyVaultNameProd)'  
+        SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (PROD)'
 
           - task: AzureKeyVault@2
             inputs:
