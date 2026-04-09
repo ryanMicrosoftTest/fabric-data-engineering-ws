@@ -41,6 +41,14 @@ key_value_replace:
         PROD: spn-secret
       item_type: "VariableLibrary"
       item_name: "vars"
+    - find_key: $.schedules[?(@.jobType=="Execute")].enabled
+      replace_value:
+        DEV: false
+        QA: false
+        PROD: true
+      file_path: "**/.schedules"
+      item_type: "DataPipeline"
+      item_name: "scheduled_pl"
 
 
 # spark_pool:

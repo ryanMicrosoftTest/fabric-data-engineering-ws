@@ -41,6 +41,7 @@ stages:
   jobs:
   - job: AuthenticateAndDeploy
     displayName: 'Authenticate and Deploy'
+    timeoutInMinutes: 360
     steps:
     # Checkout the current repository
     - checkout: self  
@@ -103,6 +104,7 @@ stages:
         AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
         AZURE_TENANT_ID: $(tenant-id-secret)
         AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
+        FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
       displayName: 'Run authentication and deployment script (DEV/QA)'
 
     - script: |
@@ -117,6 +119,7 @@ stages:
         AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
         AZURE_TENANT_ID: $(tenantID)
         AZURE_CLIENT_SECRET: $(fabric-prod-secret)
+        FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
       displayName: 'Run authentication and deployment script (PROD)'
     
     - task: PublishBuildArtifacts@1

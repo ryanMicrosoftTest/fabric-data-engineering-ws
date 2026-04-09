@@ -1,0 +1,19 @@
+{
+  "subscription_id": "<your-azure-subscription-id>",
+  "resource_group": "<resource-group-for-private-link-resources>",
+  "location": "<azure-region, e.g. eastus2>",
+  "vnet": {
+    "name": "<vnet-name>",
+    "resource_group": "<vnet-resource-group>"
+  },
+  "subnet": {
+    "name": "<subnet-name-for-private-endpoints>",
+    "reserved_ips_per_workspace": 10
+  },
+  "dns_zones": {
+    "fabric": {
+      "name": "privatelink.fabric.microsoft.com",
+      "resource_group": "<dns-zone-resource-group>"
+    }
+  }
+}

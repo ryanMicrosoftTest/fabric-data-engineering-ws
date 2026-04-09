@@ -305,6 +305,9 @@ Each step relied on manual parity checks, often belonging to different teams or 
 ### OneLake Security Overview
 OneLake Security introduces a centralized access-control layer that sits directly on top of data stored in OneLake. Roles, filters, and user assignments are defined once on the Lakehouse tables, and OneLake automatically enforces those policies when the data is accessed via SQL analytics endpoints or semantic models. Because the security metadata travels with the data, downstream artifacts inherit the same protections without extra configuration. This unified model removes redundant role definitions, shortens deployment cycles, and keeps governance policies consistent from storage through consumption.
 
+### For a detailed POC of this, go here
+For a detailed POC, see [fabric_onelake_security.md](fabric_onelake_security.md).
+
 ### New Approach
 With OneLake Security enabled:
 1. Define data roles and row-level security predicates at the Lakehouse layer.
@@ -403,7 +406,42 @@ other scheduled trigger
 ![Architecture](docs/fabric-es-jobs-images/architecture.png)
 
 #### Artifacts in this repository for Eventstream Jobs Tracker
-- fabric_items/eventstream-api-build
+- [fabric_items/eventstream-api-build](fabric_items/eventstream-api-build)
+
+
+
+
+### Fabric Spark Emitter
+#### Problem Statement
+How to best do logging in spark applications in Fabric.  Logging to a lakehouse leads to high latency because spark is designed for large engineering jobs, so there is significant 
+overhead (creating a spark stage, jobs, sending them to workers, following ACID compliance to write to a table, etc).  This is not a good pattern for logging, since logging is a lot
+of smaller writes.  The ideal solution will persist to a location in near real time, support driver and executor visibility, allow for custom logging, and safely handle concurrency.  To achieve this,
+the best pattern is the use of a spark diagnostic emitter to an event hub (to allow for fast writes).  Then for an eventstream to ingest the logs into a EventHouse via an EventStream to 
+create alerts and perform analytics.
+
+#### Architecture
+![Architecture](docs/spark-emitter-images/spark-logging-design-overview.png)
+
+#### A custom environment is used to hold the spark properties and authentication to communicate with the Event Hub and emit the spark logs
+![Custom Environment](docs/spark-emitter-images/fabric-custom-environment-spark-settings.png)
+
+#### A log4j logger is used to get both driver and executor logs
+![log4j logger](docs/spark-emitter-images/notebook-log4j-logger-setup.png)
+
+#### Logs in the notebook are persisted to the event hub
+![Logs to Event Hub](docs/spark-emitter-images/event-hubs-logs-image.png)
+
+#### Logs from Event Hub are routed to EventHouse via EventStream
+![EventStream](docs/spark-emitter-images/spark-eventstream.png)
+
+#### Logs queryable in the EventHouse KQL Database
+![EventHouse](docs/spark-emitter-images/spark_emitter_logs_kql_table.png)
+
+#### Artifacts in this repository for Fabric Spark Emitter
+- [scripts/diagnostic-emitter-nb.ipynb](scripts/diagnostic-emitter-nb.ipynb)
+
+
+
 
 
 
