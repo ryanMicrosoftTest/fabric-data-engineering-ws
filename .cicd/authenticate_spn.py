@@ -50,6 +50,10 @@ def main():
     print(f"Deployment status: {result.status}")
     print(f"Deployment message: {result.message}")
 
+    if result.status != "completed":
+        print("ERROR: Deployment did not complete successfully.")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
