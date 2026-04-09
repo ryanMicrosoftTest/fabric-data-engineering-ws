@@ -3,6 +3,15 @@
 Usage:
     python authenticate_spn.py <environment> <config_file_path>
 
+The config file should be a YAML file with environment-keyed sections:
+
+    DEV:
+      target_workspace_id: <workspace-id>
+      repo_directory: fabric_items
+      items_in_scope:
+        - Notebook
+        - DataPipeline
+
 Environment variables required:
     AZURE_TENANT_ID      - Azure AD tenant ID
     AZURE_CLIENT_ID      - Service principal client ID
@@ -12,8 +21,9 @@ Environment variables required:
 import os
 import sys
 
+import yaml
 from azure.identity import ClientSecretCredential
-from fabric_cicd import DeploymentStatus, deploy_with_config
+from fabric_cicd import FabricWorkspace, publish_all_items
 
 
 def main():
@@ -35,24 +45,47 @@ def main():
     print(f"Authenticating as service principal for environment: {environment}")
     print(f"Config file: {config_file_path}")
 
+    # Load the config file
+    with open(config_file_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    if environment not in config:
+        print(f"ERROR: Environment '{environment}' not found in config file. Available: {list(config.keys())}")
+        sys.exit(1)
+
+    env_config = config[environment]
+    workspace_id = env_config.get("target_workspace_id")
+    repo_directory = env_config.get("repo_directory", "fabric_items")
+    items_in_scope = env_config.get("items_in_scope")
+
+    if not workspace_id:
+        print(f"ERROR: 'target_workspace_id' not found for environment '{environment}'.")
+        sys.exit(1)
+
+    # Resolve repo_directory relative to the config file
+    config_dir = os.path.dirname(os.path.abspath(config_file_path))
+    repository_directory = os.path.normpath(os.path.join(config_dir, "..", repo_directory))
+
+    print(f"Workspace ID: {workspace_id}")
+    print(f"Repository directory: {repository_directory}")
+    print(f"Item types in scope: {items_in_scope}")
+
     credential = ClientSecretCredential(
         tenant_id=tenant_id,
         client_id=client_id,
         client_secret=client_secret,
     )
 
-    result = deploy_with_config(
-        config_file_path=config_file_path,
+    workspace = FabricWorkspace(
+        workspace_id=workspace_id,
+        repository_directory=repository_directory,
+        item_type_in_scope=items_in_scope,
         environment=environment,
         token_credential=credential,
     )
 
-    print(f"Deployment status: {result.status}")
-    print(f"Deployment message: {result.message}")
-
-    if result.status != DeploymentStatus.COMPLETED:
-        print("ERROR: Deployment did not complete successfully.")
-        sys.exit(1)
+    publish_all_items(workspace)
+    print(f"Deployment completed successfully for environment: {environment}")
 
 
 if __name__ == "__main__":

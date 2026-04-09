@@ -1,43 +1,51 @@
-core:
-  workspace_id:
-    DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
-    QA: 2ae91835-ea46-482c-8656-14362495e197
-    PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
-  repository_directory: ../fabric_items
-  item_types_in_scope:
-    DEV:
-      - DataPipeline
-      - Notebook
-      - Environment
-    QA:
-      - DataPipeline
-      - Report
-      - SemanticModel
-      - Lakehouse
-      - VariableLibrary
-      - CopyJob
-      - Eventhouse
-      - KQLDatabase
-      - KQLQueryset
-      - Reflex
-      - Eventstream
-      - Warehouse
-      - SQLDatabase
-      - KQLDashboard
-      - Dataflow
-    PROD:
-      - DataPipeline
-      - Report
-      - SemanticModel
-      - Lakehouse
-      - VariableLibrary
-      - CopyJob
-      - Eventhouse
-      - KQLDatabase
-      - KQLQueryset
-      - Reflex
-      - Eventstream
-      - Warehouse
-      - SQLDatabase
-      - KQLDashboard
-      - Dataflow
+DEV:
+  target_workspace_name: devops-dev
+  target_workspace_id: 7afc490e-115f-472c-a205-17dc6a5bee52
+  repo_directory: fabric_items
+  items_in_scope:
+    - DataPipeline
+    - Notebook
+    - Environment
+
+
+QA:
+  target_workspace_name: devops-test
+  target_workspace_id: 2ae91835-ea46-482c-8656-14362495e197
+  repo_directory: fabric_items
+  items_in_scope:
+    - DataPipeline
+    - Report
+    - SemanticModel
+    - Lakehouse
+    - VariableLibrary
+    - CopyJob
+    - Eventhouse
+    - KQLDatabase
+    - KQLQueryset
+    - Reflex
+    - Eventstream
+    - Warehouse
+    - SQLDatabase
+    - KQLDashboard
+    - Dataflow
+
+PROD:
+  target_workspace_name: devops-prod
+  target_workspace_id: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+  repo_directory: fabric_items
+  items_in_scope:
+    - DataPipeline
+    - Report
+    - SemanticModel
+    - Lakehouse
+    - VariableLibrary
+    - CopyJob
+    - Eventhouse
+    - KQLDatabase
+    - KQLQueryset
+    - Reflex
+    - Eventstream
+    - Warehouse
+    - SQLDatabase
+    - KQLDashboard
+    - Dataflow
