@@ -194,7 +194,7 @@ setup_database() {
     
     print_status "Next: Set up database users..."
     echo ""
-    echo "To create the 25 read-only users, run this command:"
+    echo "To create the 60 read-only users, run this command:"
     echo ""
     echo "sqlcmd -S $server_fqdn -d master -U $SQL_ADMIN_LOGIN -P '<see iac.config>' -v ReaderPasswordSuffix=\"$READER_PASSWORD_SUFFIX\" -i '$SQL_SCRIPT'"
     echo ""

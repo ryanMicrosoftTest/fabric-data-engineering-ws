@@ -34,7 +34,7 @@ chmod +x deploy-azure-sql.sh
 ```
 
 ### 3. Review Parameters
-Edit `azure-sql.parameters.json` to customize:
+Edit `azure-sql.parameters.json` to customize (note: this file is not included in the repo for security reasons):
 - Server name
 - Administrator credentials
 - Tags and other settings

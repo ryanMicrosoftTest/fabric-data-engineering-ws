@@ -40,7 +40,7 @@ PRINT '';
 PRINT 'Creating database users and assigning read permissions...';
 PRINT '========================================================';
 
-WHILE @Counter <= 25
+WHILE @Counter <= 60
 BEGIN
     SET @LoginName = 'reader' + RIGHT('00' + CAST(@Counter AS VARCHAR(2)), 2);
     
@@ -69,14 +69,14 @@ PRINT 'LabDB database setup completed successfully!';
 PRINT '';
 PRINT 'Summary:';
 PRINT '- Database: labdb';
-PRINT '- Users created: reader01 through reader25';
+PRINT '- Users created: reader01 through reader60';
 PRINT '- Permissions: Read-only access to all tables';
 PRINT '- Sample table: SampleData (with 5 test records)';
 PRINT '';
 PRINT 'Test connection with any user:';
 PRINT 'Server: <your-server>.database.windows.net';
 PRINT 'Database: labdb';
-PRINT 'Username: reader01 (or any reader01-reader25)';
+PRINT 'Username: reader01 (or any reader01-reader60)';
 PRINT 'Password: Read<NN> + configured suffix (see iac.config)';
 PRINT '';
 PRINT 'Test query: SELECT * FROM SampleData;';

@@ -365,7 +365,7 @@ RevenueByHour
 // SLA view: 90th percentile duration by PU zone (last 7d)
 DurationP90ByHour
 | where Timestamp > ago(7d)
-| order by Timestamp| order by Timestamp asc
+| order by Timestamp asc
 
 // Apply moving average at query time (on Gold series); Use make-series + series_fir to smooth, then mv-expand for charting.
 TripsByHour
