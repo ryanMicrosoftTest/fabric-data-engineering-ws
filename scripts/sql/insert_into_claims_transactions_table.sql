@@ -19,8 +19,8 @@ BEGIN
             WHEN 1 THEN 'Insurance'
             ELSE 'Cash'
         END,
+        DATEADD(DAY, -(@i % 30 + 1), GETDATE()),
         DATEADD(DAY, -(@i % 30), GETDATE()),
-        DATEADD(DAY, -(@i % 30 - 1), GETDATE()),
         DATEADD(DAY, -1, GETDATE())
     );
     SET @i = @i + 1;
