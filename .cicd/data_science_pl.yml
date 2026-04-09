@@ -114,14 +114,14 @@ stages:
 
           - script: |
               python -m pip install --upgrade pip
-              pip install -r .cicd/requirements.txt
+              pip install -r requirements.txt
             displayName: 'Install dependencies'
 
           - script: |
               echo "Target Environment: $(targetEnvironment)"
               echo "Working Directory: $(Build.SourcesDirectory)"
               ls -a
-              python ./.cicd/authenticate_spn.py $(targetEnvironment)
+              python ./.cicd/authenticate_spn.py $(targetEnvironment) ./.cicd/target_deployment.yml
             workingDirectory: $(Build.SourcesDirectory)/
             env:
               AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
