@@ -1,4 +1,4 @@
-  Liquid Clustering vs. Partitioning in Fabric
+# Liquid Clustering vs. Partitioning in Fabric
 
   Liquid clustering has largely replaced Hive-style partitioning for most use cases in Microsoft Fabric / Delta Lake. Microsoft's official
   guidance is to prefer liquid clustering over partitioning for new tables. But there are nuances:
