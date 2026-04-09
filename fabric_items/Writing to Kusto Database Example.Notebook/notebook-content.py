@@ -12,7 +12,7 @@
 # PARAMETERS CELL ********************
 
 # ingest parameters from pipeline
-parameter = "ImputVar_Two"
+parameter = "InputVar_Two"
 kustoUri = "https://trd-e072h7tjkbkmz6nepn.z2.kusto.fabric.microsoft.com"
 database = "adf-eh-new"
 
@@ -57,7 +57,7 @@ accessToken = mssparkutils.credentials.getToken(kustoUri)
 import pandas as pd
 
 df = pd.DataFrame(
-    [(parameter)]
+    {"parameter": [parameter]}
 )
 
 display(df)

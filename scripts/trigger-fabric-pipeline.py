@@ -81,9 +81,7 @@ def run_on_demand_pipeline_job(workspace_id:str, item_id:str, api_token:str):
 
     body = {
     "executionData": {
-        "pipelineName": "pipeline",
-        "OwnerUserPrincipalName": "<user@domain.com>",
-        "OwnerUserObjectId": "<Your ObjectId>"
+        "pipelineName": "pipeline"
     }
     }
 

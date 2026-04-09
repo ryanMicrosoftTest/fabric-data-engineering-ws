@@ -52,4 +52,4 @@ PRINT 'Database: FabricLabDB';
 PRINT 'Username: reader01 (or any reader01-reader60)';
 PRINT 'Password: Read<NN> + configured suffix (see iac.config)';
 PRINT '';
-PRINT 'Test query: SELECT * FROM Sales1;';
+PRINT 'Test query: SELECT * FROM sys.tables;';

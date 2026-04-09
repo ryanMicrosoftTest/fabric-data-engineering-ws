@@ -338,7 +338,7 @@ on table UpskillingDestination_enriched
       by PUBorough, PUZone, DOBorough, DOZone
 }
 
-// for hisotrical  backfill when creating MV
+// for historical backfill when creating MV
 
 .create async materialized-view with (folder="Gold", backfill=true)
 TripsByHour_Backfilled
