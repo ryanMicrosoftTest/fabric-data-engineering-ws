@@ -9,7 +9,7 @@
       "python": "${workspaceFolder}/.venv/bin/python",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "justMyCode": true,
+      "justMyCode": false,
       "envFile": "${workspaceFolder}/.env",
       "env": {
         "PYTHONUNBUFFERED": "1"

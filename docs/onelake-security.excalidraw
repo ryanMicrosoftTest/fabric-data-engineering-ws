@@ -1,0 +1,1447 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "YDqxOwCk9TS8fIgQVOC11",
+      "type": "rectangle",
+      "x": 720,
+      "y": 300,
+      "width": 644,
+      "height": 348,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1184990170,
+      "version": 91,
+      "versionNonce": 908647110,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "F7f-04syYtexoF5TsyGbg"
+        }
+      ],
+      "updated": 1771441984991,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "F7f-04syYtexoF5TsyGbg",
+      "type": "text",
+      "x": 963.1700668334961,
+      "y": 305,
+      "width": 157.6598663330078,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 243902426,
+      "version": 18,
+      "versionNonce": 990250330,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771441991165,
+      "link": null,
+      "locked": false,
+      "text": "Data Workspace",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": "YDqxOwCk9TS8fIgQVOC11",
+      "originalText": "Data Workspace",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "EiK0QNZ7iLhBVsnIvU4pF",
+      "type": "rectangle",
+      "x": 824,
+      "y": 401,
+      "width": 418,
+      "height": 141,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2146694874,
+      "version": 73,
+      "versionNonce": 1260851078,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "qpGOIcl5MicE4I3IAJAU3"
+        },
+        {
+          "id": "_yIyAoTNEKRyXh9j87Dqt",
+          "type": "arrow"
+        },
+        {
+          "id": "sg_VBDtVsisuJmbCL5xBq",
+          "type": "arrow"
+        },
+        {
+          "id": "h0I3pagD4_0uF5_sd008Y",
+          "type": "arrow"
+        },
+        {
+          "id": "pVRUg8PTWyKTR7S2i7eIX",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1771442438068,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "qpGOIcl5MicE4I3IAJAU3",
+      "type": "text",
+      "x": 951.6100616455078,
+      "y": 459,
+      "width": 162.77987670898438,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 976229594,
+      "version": 31,
+      "versionNonce": 1875858330,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442041271,
+      "link": null,
+      "locked": false,
+      "text": "Data_Lakehouse",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "EiK0QNZ7iLhBVsnIvU4pF",
+      "originalText": "Data_Lakehouse",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sjjtdKhALr_WmQQk02bYu",
+      "type": "text",
+      "x": 1467,
+      "y": 349,
+      "width": 497.61968994140625,
+      "height": 275,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1112343002,
+      "version": 296,
+      "versionNonce": 1202551238,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442467590,
+      "link": null,
+      "locked": false,
+      "text": "Data_Lakehouse has OneLake Security Enabled\nUsing User's Identity as OneLake access mode\n\n\nRoles in Data_Lakehouse\nDefaultReader\nNeurologyRole\nGastroenterologyRole\nOrthopedicRole\n\nAll roles are applied to a table named doctor_table",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Data_Lakehouse has OneLake Security Enabled\nUsing User's Identity as OneLake access mode\n\n\nRoles in Data_Lakehouse\nDefaultReader\nNeurologyRole\nGastroenterologyRole\nOrthopedicRole\n\nAll roles are applied to a table named doctor_table",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "type": "line",
+      "version": 2385,
+      "versionNonce": 1339671898,
+      "isDeleted": false,
+      "id": "5e5-jsoOqESlw00jDwDjS",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 581.4899428467388,
+      "y": 839.5843180039394,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 47.286016090347765,
+      "height": 31.66291285806764,
+      "seed": 1373113094,
+      "groupIds": [
+        "dEbpmg21tpf4_yemcZG_v",
+        "1MG0WWxywIY-BjGrC0VSy",
+        "wKYysxjW9Gl9gqnNpuisf"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442218933,
+      "link": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null,
+      "lastCommittedPoint": null,
+      "startArrowhead": null,
+      "endArrowhead": null,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          33.19506769347463,
+          0.16581179633123969
+        ],
+        [
+          38.35646028606222,
+          3.106239078563937
+        ],
+        [
+          39.68195798745727,
+          8.075265751275134
+        ],
+        [
+          39.019214962826396,
+          16.13271994666999
+        ],
+        [
+          35.65543984302941,
+          24.031697375742933
+        ],
+        [
+          30.43408188143888,
+          27.914245603592335
+        ],
+        [
+          25.28561373853073,
+          30.38106395514557
+        ],
+        [
+          18.786437197890596,
+          31.66291285806764
+        ],
+        [
+          11.690745609062395,
+          31.52903188469354
+        ],
+        [
+          3.3632738790855887,
+          29.249730242280286
+        ],
+        [
+          -3.9666780856028487,
+          22.76654097388421
+        ],
+        [
+          -7.5212367252122565,
+          14.546224146677817
+        ],
+        [
+          -7.6040581028905,
+          5.9129689866142305
+        ],
+        [
+          -4.7020282345297115,
+          1.360765271538639
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "index": "a6"
+    },
+    {
+      "type": "ellipse",
+      "version": 1924,
+      "versionNonce": 1844185626,
+      "isDeleted": false,
+      "id": "9N_xuaKGmsYIxBvcsiYuH",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 585.0808895666678,
+      "y": 810.3983284634703,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 25.303503967708213,
+      "height": 25.303503967708213,
+      "seed": 1374468678,
+      "groupIds": [
+        "dEbpmg21tpf4_yemcZG_v",
+        "1MG0WWxywIY-BjGrC0VSy",
+        "wKYysxjW9Gl9gqnNpuisf"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442218933,
+      "link": null,
+      "locked": false,
+      "index": "a7"
+    },
+    {
+      "type": "rectangle",
+      "version": 838,
+      "versionNonce": 263572890,
+      "isDeleted": false,
+      "id": "MNnYHHysOvC0pzSWYLsXR",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 574.7645269995492,
+      "y": 812.1796326179194,
+      "strokeColor": "transparent",
+      "backgroundColor": "transparent",
+      "width": 44.01272717630554,
+      "height": 58.19924874398079,
+      "seed": 573145478,
+      "groupIds": [
+        "1MG0WWxywIY-BjGrC0VSy",
+        "wKYysxjW9Gl9gqnNpuisf"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [
+        {
+          "id": "h0I3pagD4_0uF5_sd008Y",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1771442251660,
+      "link": null,
+      "locked": false,
+      "index": "a8"
+    },
+    {
+      "type": "text",
+      "version": 1521,
+      "versionNonce": 1070869402,
+      "isDeleted": false,
+      "id": "XPA_iOn6oQUdDVZeuJurG",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 555.8960342407227,
+      "y": 874.6016715365297,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#1595d5",
+      "width": 86.20793151855469,
+      "height": 20,
+      "seed": 902521030,
+      "groupIds": [
+        "9wB5Bp2juZIkcvST0vOLE",
+        "7qWUcMbyqbSA_0jskWbI0",
+        "DWS7i_xy0IsYBC-lfTZ7R",
+        "n9SNYufVRu844PcZKzj7Z",
+        "HD7_pf1SY3X6nae8dtF3B",
+        "pQGdcmW2NO_uE1zYBeXBM",
+        "wKYysxjW9Gl9gqnNpuisf"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442261048,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 1,
+      "text": "Neurologist",
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Neurologist",
+      "lineHeight": 1.25,
+      "baseline": 14,
+      "index": "a9",
+      "autoResize": true
+    },
+    {
+      "type": "line",
+      "version": 2432,
+      "versionNonce": 2051395482,
+      "isDeleted": false,
+      "id": "xJatmRH86oq1M73m9dIlZ",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1039.4899428467388,
+      "y": 839.0843180039394,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 47.286016090347765,
+      "height": 31.66291285806764,
+      "seed": 1459860678,
+      "groupIds": [
+        "OlRChal6tcdBGLxGnsSP2",
+        "tOTofwDL0ZD2-v8WFRXjY",
+        "7HbGtdP3PlZQ6DPcMUFIg"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442263617,
+      "link": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null,
+      "lastCommittedPoint": null,
+      "startArrowhead": null,
+      "endArrowhead": null,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          33.19506769347463,
+          0.16581179633123969
+        ],
+        [
+          38.35646028606222,
+          3.106239078563937
+        ],
+        [
+          39.68195798745727,
+          8.075265751275134
+        ],
+        [
+          39.019214962826396,
+          16.13271994666999
+        ],
+        [
+          35.65543984302941,
+          24.031697375742933
+        ],
+        [
+          30.43408188143888,
+          27.914245603592335
+        ],
+        [
+          25.28561373853073,
+          30.38106395514557
+        ],
+        [
+          18.786437197890596,
+          31.66291285806764
+        ],
+        [
+          11.690745609062395,
+          31.52903188469354
+        ],
+        [
+          3.3632738790855887,
+          29.249730242280286
+        ],
+        [
+          -3.9666780856028487,
+          22.76654097388421
+        ],
+        [
+          -7.5212367252122565,
+          14.546224146677817
+        ],
+        [
+          -7.6040581028905,
+          5.9129689866142305
+        ],
+        [
+          -4.7020282345297115,
+          1.360765271538639
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "index": "aA"
+    },
+    {
+      "type": "ellipse",
+      "version": 1971,
+      "versionNonce": 2061290586,
+      "isDeleted": false,
+      "id": "Qsj1RXMlkkBlN9ACi1dyC",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1043.0808895666678,
+      "y": 809.8983284634703,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 25.303503967708213,
+      "height": 25.303503967708213,
+      "seed": 259861510,
+      "groupIds": [
+        "OlRChal6tcdBGLxGnsSP2",
+        "tOTofwDL0ZD2-v8WFRXjY",
+        "7HbGtdP3PlZQ6DPcMUFIg"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442263617,
+      "link": null,
+      "locked": false,
+      "index": "aB"
+    },
+    {
+      "type": "rectangle",
+      "version": 883,
+      "versionNonce": 1895182618,
+      "isDeleted": false,
+      "id": "SpBY2CFcpgWVgYktmGyGD",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1032.7645269995492,
+      "y": 811.6796326179194,
+      "strokeColor": "transparent",
+      "backgroundColor": "transparent",
+      "width": 44.01272717630554,
+      "height": 58.19924874398079,
+      "seed": 1078311750,
+      "groupIds": [
+        "tOTofwDL0ZD2-v8WFRXjY",
+        "7HbGtdP3PlZQ6DPcMUFIg"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [
+        {
+          "id": "_yIyAoTNEKRyXh9j87Dqt",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1771442263617,
+      "link": null,
+      "locked": false,
+      "index": "aC"
+    },
+    {
+      "type": "text",
+      "version": 1575,
+      "versionNonce": 635536154,
+      "isDeleted": false,
+      "id": "naqNCxyQEyfY4T_AsAItG",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 982.5760498046875,
+      "y": 874.1016715365297,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#1595d5",
+      "width": 148.847900390625,
+      "height": 20,
+      "seed": 1069179526,
+      "groupIds": [
+        "FCewKT1Vpjk0qmj3VgCH7",
+        "kv-16gAS3oD7HNS_-hyOq",
+        "EndRaQWcPCEHmIo4nD67W",
+        "ew--YVxczotlFNqRrB42_",
+        "0ukuABWQYDd8Wmntd2TK9",
+        "2btYfROy1wHs7KdQNdVIg",
+        "7HbGtdP3PlZQ6DPcMUFIg"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442269464,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 1,
+      "text": "Gastroenterologist",
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Gastroenterologist",
+      "lineHeight": 1.25,
+      "baseline": 14,
+      "index": "aD",
+      "autoResize": true
+    },
+    {
+      "type": "line",
+      "version": 2409,
+      "versionNonce": 1797881862,
+      "isDeleted": false,
+      "id": "FUNVWus7mffaGB-T3VYf1",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1394.4899428467388,
+      "y": 828.0843180039394,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 47.286016090347765,
+      "height": 31.66291285806764,
+      "seed": 154566214,
+      "groupIds": [
+        "V-iHBUGaK4p99Af3DbarB",
+        "uRHgJ9pu-EELTt2QUfkbF",
+        "0wLixaFiIhWkRD0twPEnJ"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442203555,
+      "link": null,
+      "locked": false,
+      "startBinding": null,
+      "endBinding": null,
+      "lastCommittedPoint": null,
+      "startArrowhead": null,
+      "endArrowhead": null,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          33.19506769347463,
+          0.16581179633123969
+        ],
+        [
+          38.35646028606222,
+          3.106239078563937
+        ],
+        [
+          39.68195798745727,
+          8.075265751275134
+        ],
+        [
+          39.019214962826396,
+          16.13271994666999
+        ],
+        [
+          35.65543984302941,
+          24.031697375742933
+        ],
+        [
+          30.43408188143888,
+          27.914245603592335
+        ],
+        [
+          25.28561373853073,
+          30.38106395514557
+        ],
+        [
+          18.786437197890596,
+          31.66291285806764
+        ],
+        [
+          11.690745609062395,
+          31.52903188469354
+        ],
+        [
+          3.3632738790855887,
+          29.249730242280286
+        ],
+        [
+          -3.9666780856028487,
+          22.76654097388421
+        ],
+        [
+          -7.5212367252122565,
+          14.546224146677817
+        ],
+        [
+          -7.6040581028905,
+          5.9129689866142305
+        ],
+        [
+          -4.7020282345297115,
+          1.360765271538639
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "index": "aE"
+    },
+    {
+      "type": "ellipse",
+      "version": 1948,
+      "versionNonce": 189239110,
+      "isDeleted": false,
+      "id": "4UOluPZaxJqa9nEgBbFsj",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1398.0808895666678,
+      "y": 798.8983284634703,
+      "strokeColor": "#000000",
+      "backgroundColor": "#c2255c",
+      "width": 25.303503967708213,
+      "height": 25.303503967708213,
+      "seed": 1402652038,
+      "groupIds": [
+        "V-iHBUGaK4p99Af3DbarB",
+        "uRHgJ9pu-EELTt2QUfkbF",
+        "0wLixaFiIhWkRD0twPEnJ"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442203555,
+      "link": null,
+      "locked": false,
+      "index": "aF"
+    },
+    {
+      "type": "rectangle",
+      "version": 860,
+      "versionNonce": 267290246,
+      "isDeleted": false,
+      "id": "hIN1A9YoUPFpCQInrOR_-",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1387.7645269995492,
+      "y": 800.6796326179194,
+      "strokeColor": "transparent",
+      "backgroundColor": "transparent",
+      "width": 44.01272717630554,
+      "height": 58.19924874398079,
+      "seed": 812917958,
+      "groupIds": [
+        "uRHgJ9pu-EELTt2QUfkbF",
+        "0wLixaFiIhWkRD0twPEnJ"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [
+        {
+          "id": "sg_VBDtVsisuJmbCL5xBq",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1771442216764,
+      "link": null,
+      "locked": false,
+      "index": "aG"
+    },
+    {
+      "type": "text",
+      "version": 1545,
+      "versionNonce": 1945932038,
+      "isDeleted": false,
+      "id": "nUqPF2leIFdM6HUrKBTlD",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 1366.3600387573242,
+      "y": 863.1016715365297,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#1595d5",
+      "width": 91.27992248535156,
+      "height": 20,
+      "seed": 1096784902,
+      "groupIds": [
+        "y2FBPHm8v_LBeLmv4rcJm",
+        "gq8JXZEouQJSd_Zmus5si",
+        "wTc6r-X3U2ZxyliVJ-Kri",
+        "o0LAh5ZjbOCQpc8npQj8N",
+        "p6ZnebRVQoTF1i4Ph9bGY",
+        "-v3IuvBF8SOs05A4PsGCB",
+        "0wLixaFiIhWkRD0twPEnJ"
+      ],
+      "frameId": null,
+      "roundness": null,
+      "boundElements": [],
+      "updated": 1771442274755,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 1,
+      "text": "Orthopedist",
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Orthopedist",
+      "lineHeight": 1.25,
+      "baseline": 14,
+      "index": "aH",
+      "autoResize": true
+    },
+    {
+      "id": "h0I3pagD4_0uF5_sd008Y",
+      "type": "arrow",
+      "x": 612.4552921118055,
+      "y": 805,
+      "width": 237.06780750166115,
+      "height": 262.93981636538456,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 685423686,
+      "version": 94,
+      "versionNonce": 361933338,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "kgC9JF4bbfp_Bm7wwWyy-"
+        }
+      ],
+      "updated": 1771442438070,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          89.54470788819447,
+          -89
+        ],
+        [
+          237.06780750166115,
+          -262.93981636538456
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "MNnYHHysOvC0pzSWYLsXR",
+        "focus": -0.4059133581950737,
+        "gap": 7.1796326179195376
+      },
+      "endBinding": {
+        "elementId": "EiK0QNZ7iLhBVsnIvU4pF",
+        "focus": 0.4599557960189412,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "kgC9JF4bbfp_Bm7wwWyy-",
+      "type": "text",
+      "x": 640.1036587484275,
+      "y": 623.5854529583393,
+      "width": 183.33987426757812,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aIV",
+      "roundness": null,
+      "seed": 388509338,
+      "version": 66,
+      "versionNonce": 800784410,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442245613,
+      "link": null,
+      "locked": false,
+      "text": "NeurologyRole\nOnly records where\ndepartment =\nNeurology shown",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "h0I3pagD4_0uF5_sd008Y",
+      "originalText": "NeurologyRole\nOnly records where department = Neurology shown",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "_yIyAoTNEKRyXh9j87Dqt",
+      "type": "arrow",
+      "x": 1054.1487809656637,
+      "y": 808,
+      "width": 13.45654813642227,
+      "height": 265.67769322768186,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 832628378,
+      "version": 67,
+      "versionNonce": 880576666,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nTbDJD9A_CHCJygunAX61"
+        }
+      ],
+      "updated": 1771442438069,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -7.148780965663718,
+          -85
+        ],
+        [
+          -13.45654813642227,
+          -265.67769322768186
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "SpBY2CFcpgWVgYktmGyGD",
+        "focus": 0.0872968470382913,
+        "gap": 3.679632617919424
+      },
+      "endBinding": {
+        "elementId": "EiK0QNZ7iLhBVsnIvU4pF",
+        "focus": -0.024683975841630908,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nTbDJD9A_CHCJygunAX61",
+      "type": "text",
+      "x": 941.0505728154214,
+      "y": 612.6611533861591,
+      "width": 212.7398681640625,
+      "height": 125,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJV",
+      "roundness": null,
+      "seed": 1068869318,
+      "version": 81,
+      "versionNonce": 1083302406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442320704,
+      "link": null,
+      "locked": false,
+      "text": "GastroenterologyRole\nOnly records where\ndepartment =\nGastroenterology\nshown",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "_yIyAoTNEKRyXh9j87Dqt",
+      "originalText": "GastroenterologyRole\nOnly records where department = Gastroenterology shown",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sg_VBDtVsisuJmbCL5xBq",
+      "type": "arrow",
+      "x": 1403,
+      "y": 798,
+      "width": 185.99646362094404,
+      "height": 255.9951323991146,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 548788294,
+      "version": 55,
+      "versionNonce": 265577818,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "XyUy-0p7VrmtkOSWkPByV"
+        }
+      ],
+      "updated": 1771442438070,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -70,
+          -89
+        ],
+        [
+          -185.99646362094404,
+          -255.9951323991146
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "hIN1A9YoUPFpCQInrOR_-",
+        "focus": 0.4059372951956502,
+        "gap": 2.679632617919424
+      },
+      "endBinding": {
+        "elementId": "EiK0QNZ7iLhBVsnIvU4pF",
+        "focus": -0.5234335939028752,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "XyUy-0p7VrmtkOSWkPByV",
+      "type": "text",
+      "x": 1217.7218305223969,
+      "y": 620.0024337919242,
+      "width": 184.55987548828125,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1143943174,
+      "version": 71,
+      "versionNonce": 1648105030,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442365343,
+      "link": null,
+      "locked": false,
+      "text": "OrthopedicRole\nOnly records where\ndepartment =\nOrthopedics shown",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sg_VBDtVsisuJmbCL5xBq",
+      "originalText": "OrthopedicRole\nOnly records where department = Orthopedics shown",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "gpE45vawijzYhA9JqBk-K",
+      "type": "rectangle",
+      "x": 715,
+      "y": 1121,
+      "width": 644,
+      "height": 348,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 373226202,
+      "version": 139,
+      "versionNonce": 1230211398,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "GG4662UiC1saScxYG64GO"
+        }
+      ],
+      "updated": 1771442384292,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "GG4662UiC1saScxYG64GO",
+      "type": "text",
+      "x": 936.7300720214844,
+      "y": 1126,
+      "width": 200.53985595703125,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1829670810,
+      "version": 85,
+      "versionNonce": 224839322,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1771442390017,
+      "link": null,
+      "locked": false,
+      "text": "Neurology Workspace",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": "gpE45vawijzYhA9JqBk-K",
+      "originalText": "Neurology Workspace",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pVRUg8PTWyKTR7S2i7eIX",
+      "type": "arrow",
+      "x": 823.0533647246601,
+      "y": 466.9289411580439,
+      "width": 438.1655189905306,
+      "height": 837.2290198877133,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 193292314,
+      "version": 314,
+      "versionNonce": 824705114,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "PRVqEX1zuz12eG5aSaJ9a"
+        }
+      ],
+      "updated": 1771442452151,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -427.0533647246601,
+          419.0710588419561
+        ],
+        [
+          11.112154265870458,
+          837.2290198877133
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "EiK0QNZ7iLhBVsnIvU4pF",
+        "focus": 0.7641453447954286,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "yBLzz5H3vHu6Y4fkkDY9E",
+        "focus": -0.7309308953747007,
+        "gap": 3
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "PRVqEX1zuz12eG5aSaJ9a",
+      "type": "text",
+      "x": 311.07005310058594,
+      "y": 861,
+      "width": 169.85989379882812,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aOV",
+      "roundness": null,
+      "seed": 905749318,
+      "version": 37,
+      "versionNonce": 1239417798,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442450872,
+      "link": null,
+      "locked": false,
+      "text": "Shortcut created\nfor doctor_table",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pVRUg8PTWyKTR7S2i7eIX",
+      "originalText": "Shortcut created\nfor doctor_table",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "yBLzz5H3vHu6Y4fkkDY9E",
+      "type": "rectangle",
+      "x": 837,
+      "y": 1238.5,
+      "width": 418,
+      "height": 141,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 21928282,
+      "version": 99,
+      "versionNonce": 708318170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "6WnqVkKs93iiHgYiBq3vn"
+        },
+        {
+          "id": "pVRUg8PTWyKTR7S2i7eIX",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1771442438068,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "6WnqVkKs93iiHgYiBq3vn",
+      "type": "text",
+      "x": 943.1700668334961,
+      "y": 1296.5,
+      "width": 205.6598663330078,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1101422106,
+      "version": 75,
+      "versionNonce": 440290394,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1771442412584,
+      "link": null,
+      "locked": false,
+      "text": "Neurology_Lakehouse",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "yBLzz5H3vHu6Y4fkkDY9E",
+      "originalText": "Neurology_Lakehouse",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "3DXBagBv5pyZ_JzcSa2qn",
+      "type": "text",
+      "x": 1440,
+      "y": 1171,
+      "width": 556.4396362304688,
+      "height": 175,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1788757894,
+      "version": 340,
+      "versionNonce": 180400454,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1771442584649,
+      "link": null,
+      "locked": false,
+      "text": "Neurology_Lakehouse\nEnable onelake security and user \nidentity.  Otherwise, the access of the user\nwho setup the shortcut will be used (delegated identity)\nand this may expose more data than desired.\nUsing user identity will enforce RLS/CLS of the roles\napplied in the source lakehouse (Data_Lakehouse)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Neurology_Lakehouse\nEnable onelake security and user \nidentity.  Otherwise, the access of the user\nwho setup the shortcut will be used (delegated identity)\nand this may expose more data than desired.\nUsing user identity will enforce RLS/CLS of the roles\napplied in the source lakehouse (Data_Lakehouse)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
