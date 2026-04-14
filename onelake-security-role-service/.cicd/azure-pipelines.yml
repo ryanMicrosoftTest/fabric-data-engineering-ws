@@ -109,7 +109,6 @@ stages:
               python -m twine upload \
                 --repository onelake-security-feed \
                 --config-file $(PYPIRC_PATH) \
-                dist/*.whl \
-                --skip-existing
+                dist/*.whl
             displayName: 'Publish to Azure Artifacts'
             workingDirectory: $(workingDirectory)
