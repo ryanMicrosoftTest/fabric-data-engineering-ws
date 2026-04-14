@@ -81,7 +81,7 @@ stages:
   - stage: Publish
     displayName: 'Build & Publish Package'
     dependsOn: Test
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual')))
     jobs:
       - job: PublishWheel
         displayName: 'Build wheel → Azure Artifacts'
