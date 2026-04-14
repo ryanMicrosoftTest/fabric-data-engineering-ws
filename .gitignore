@@ -18,3 +18,4 @@ scripts/iac/iac.config
 __pycache__/
 *.pyc
 *.error.log
+onelake-security-role-service\.pytest_cache

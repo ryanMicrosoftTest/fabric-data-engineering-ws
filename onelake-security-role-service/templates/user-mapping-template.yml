@@ -1,0 +1,21 @@
+# OneLake Security User-Role Mapping Template
+# ==============================================
+# Copy this file to Files/role-mappings/<role-name>-users.yml
+# Fill in the values below and drop it in the lakehouse.
+# The daily pipeline will pick it up and assign users to the role.
+#
+# IMPORTANT: This file is AUTHORITATIVE. It defines the COMPLETE member
+# list for this role. Users not listed here will be removed from the role.
+#
+# See examples/ for complete working examples.
+
+version: "1.0"
+
+mapping:
+  role_name: ""                   # REQUIRED — must match a role name in role-definitions
+
+  members:
+    entra_members:
+      - object_id: ""             # Entra object ID (GUID)
+        display_name: ""          # For readability only (not sent to API)
+        object_type: ""           # User, Group, ServicePrincipal, or Application

@@ -1,0 +1,29 @@
+# Example: Schema-level access for a reporting team.
+# Grants read access to ALL tables in the gold_reporting schema,
+# plus specific tables in silver_sales with CLS restrictions.
+
+version: "1.0"
+state: present
+
+role:
+  name: ReportingAnalystRole
+  metadata:
+    description: "Full read on gold_reporting schema, limited silver_sales access"
+    owner: "admin@MngEnvMCAP372892.onmicrosoft.com"
+    created_by: "rharrington"
+    tags: [reporting, schema-level, gold]
+
+  tables:
+    # Full access to everything in gold_reporting schema
+    - path: /Tables/gold_reporting/*
+
+    # Selective access to silver_sales — only specific columns, with RLS
+    - path: /Tables/silver_sales/orders
+      columns:
+        names: [order_id, customer_id, order_date, total_amount, region]
+      row_filter: "SELECT * FROM orders WHERE region IN ('West', 'Central')"
+
+    - path: /Tables/silver_sales/returns
+      columns:
+        names: [return_id, order_id, return_date, reason_code]
+      # No row filter — all returns visible
