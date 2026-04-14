@@ -19,3 +19,8 @@ __pycache__/
 *.pyc
 *.error.log
 onelake-security-role-service\.pytest_cache
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/

@@ -30,6 +30,7 @@ pool:
 variables:
   pythonVersion: '3.11'
   workingDirectory: 'onelake-security-role-service'
+  artifactFeed: 'Fabric/onelake-security-feed'   # Format: 'ProjectName/FeedName' — update this
 
 stages:
   - stage: Test
@@ -76,3 +77,39 @@ stages:
             inputs:
               summaryFileLocation: '$(workingDirectory)/test-results/coverage.xml'
             displayName: 'Publish code coverage'
+
+  - stage: Publish
+    displayName: 'Build & Publish Package'
+    dependsOn: Test
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: PublishWheel
+        displayName: 'Build wheel → Azure Artifacts'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python $(pythonVersion)'
+
+          - script: |
+              python -m pip install --upgrade pip build twine
+            displayName: 'Install build tools'
+
+          - script: |
+              python -m build --wheel
+            displayName: 'Build .whl'
+            workingDirectory: $(workingDirectory)
+
+          - task: TwineAuthenticate@1
+            inputs:
+              artifactFeed: '$(artifactFeed)'
+            displayName: 'Authenticate with Azure Artifacts'
+
+          - script: |
+              python -m twine upload \
+                --repository $(artifactFeed) \
+                --config-file $(PYPIRC_PATH) \
+                dist/*.whl \
+                --skip-existing
+            displayName: 'Publish to Azure Artifacts'
+            workingDirectory: $(workingDirectory)
