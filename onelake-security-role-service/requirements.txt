@@ -1,0 +1,7 @@
+# Runtime dependencies
+pyyaml>=6.0
+requests>=2.28
+
+# Test dependencies
+pytest>=7.0
+pytest-cov>=4.0
