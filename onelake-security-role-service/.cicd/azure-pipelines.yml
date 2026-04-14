@@ -107,7 +107,7 @@ stages:
 
           - script: |
               python -m twine upload \
-                --repository $(artifactFeed) \
+                --repository onelake-security-feed \
                 --config-file $(PYPIRC_PATH) \
                 dist/*.whl \
                 --skip-existing
