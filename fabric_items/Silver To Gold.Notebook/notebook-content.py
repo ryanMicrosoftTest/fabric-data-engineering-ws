@@ -72,7 +72,7 @@ display(df_dimCustomer_with_surrogate_key)
 from pyspark.sql.functions import monotonically_increasing_id
 
 #Create dimProduct
-df_dimProduct = <ENTER HERE>
+df_dimProduct = spark.table("silver.product")
 
 
 
@@ -140,7 +140,7 @@ display(df_dimDate)
 # CELL ********************
 
 # Write dimCustomer table into Gold Lakehouse as Delta Table
-basePathGoldLakeHouse = "<ENTER HERE>"
+basePathGoldLakeHouse = "Tables"
 tableName="dimCustomer"
 df_dimCustomer_with_surrogate_key.write.mode("overwrite").format("delta").save(basePathGoldLakeHouse + '//' + tableName)
 
@@ -167,7 +167,7 @@ df_dimProduct_with_surrogate_key.write.mode("overwrite").format("delta").save(ba
 # CELL ********************
 
 #Create factSales
-df_factSales = <ENTER HERE>
+df_factSales = spark.table("silver.factSales")
 display(df_factSales)
 
 # METADATA ********************

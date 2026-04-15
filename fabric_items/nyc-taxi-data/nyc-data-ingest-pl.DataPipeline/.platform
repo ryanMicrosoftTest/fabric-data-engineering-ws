@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "nyc-data-ingest-pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "dff2f06e-18a2-a66a-4197-0f7de1e657b1"
+  }
+}

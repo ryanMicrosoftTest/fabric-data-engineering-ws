@@ -5,6 +5,8 @@
 .create-merge table PipelineRuns_tbl (category:string, ArrayValue_records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
 .create-merge table ActivityRuns_tbl (category:string, ArrayValue_records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
 .create-merge table PipelineRuns_Failed (requestTime:datetime, executionStart:datetime, pipelineName:string, runId:string, correlationId:string, operationName:string, status:string, failureType:string, message:string, level:string, location:string, resourceId:string, category:string, parameters:dynamic, systemParams:dynamic, predecessors:dynamic, userProperties:dynamic, annotations:dynamic, eventName:string, EventEnqueuedUtcTime:datetime, EventProcessedUtcTime:datetime, PartitionId:string, IngestionTime:datetime) 
+.create-merge table ActivityRuns_Failed_tbl (activityIterationCount:int, activityName:string, activityRetryCount:int, activityRunId:string, activityType:string, billingResourceId:string, body:string, correlationId:string, level:string, location:string, name:string, operationName:string, pipelineName:string, pipelineRunId:string, recoveryStatus:string, resourceId:string, severityNumber:int, severityText:string, start:string, status:string, tags:dynamic, timestamp:string, run_time:string, source:dynamic, sink:dynamic, error:dynamic, errorCode:string, errorMessage:string, errorFailureType:string, errorTarget:string, eventProcessedUtcTime:datetime, eventEnqueuedUtcTime:datetime, ingestion_time:datetime) 
+.create-merge table ppipelineParamsTbl (Param1:string) 
 .create-or-alter function with (folder = "normalize", docstring = "Normalize PipelineRuns_tbl: expand ArrayValue_records safely and project commonly used fields", skipvalidation = "true") Normalize_PipelineRuns() {
     PipelineRuns_tbl
     | extend _records = iif(
@@ -40,4 +42,53 @@
               predecessors, userProperties, annotations, eventName,
               EventEnqueuedUtcTime, EventProcessedUtcTime, PartitionId = tostring(rec["PartitionId"]), IngestionTime
 }
+.create-or-alter function with (folder = "normalize", docstring = "Normalize ActivityRuns_tbl: expand ArrayValue_records", skipvalidation = "true") NormalizeActivityRuns() {
+    ActivityRuns_tbl
+| extend _records = iif(
+    isnull(array_length(ArrayValue_records)),
+    pack_array(ArrayValue_records),
+    ArrayValue_records
+)
+| mv-expand rec = _records
+| where isnotnull(rec)
+| extend p = todynamic(rec["properties"])
+| extend activityIterationCount = toint(rec['activityIterationCount']),
+        activityName = tostring(rec['activityName']),                
+        activityRetryCount = toint(rec['activityRetryCount']),
+        activityRunId = tostring(rec['activityRunId']),
+        activityType = tostring(rec['activityType']),
+        billingResourceId = tostring(rec['billingResourceId']),
+        body = tostring(rec['body']),
+        correlationId = tostring(rec['correlationId']),
+        level = tostring(rec['level']),
+        location = tostring(rec['location']),
+        name = tostring(rec['name']),
+        operationName = tostring(rec['operationName']),
+        pipelineName = tostring(rec['pipelineName']),
+        pipelineRunId = tostring(rec['pipelineRunId']),
+        recoveryStatus = tostring(rec['recoveryStatus']),
+        resourceId = tostring(rec['resourceId']),
+        severityNumber = toint(rec['severityNumber']),
+        severityText = tostring(rec['severityText']),
+        start = tostring(rec['start']),
+        status = tostring(rec['status']),
+        tags = todynamic(rec['tags']),
+        timestamp = tostring(rec['timestamp']),
+        run_time = tostring(rec['time']),
+        source = todynamic(p.Input.source),
+        sink = todynamic(p.Input.sink),
+        error = todynamic(p.Error),
+        errorCode = tostring(p.Error.errorCode),
+        errorMessage = tostring(p.Error.message),
+        errorFailureType = tostring(p.Error.failureType),
+        errorTarget = tostring(p.Error.target),
+        eventProcessedUtcTime = todatetime(EventProcessedUtcTime),
+        eventEnqueuedUtcTime = todatetime(EventEnqueuedUtcTime),
+        ingestion_time = todatetime(rec['ingestion_time'])
+| project activityIterationCount, activityName, activityRetryCount, activityRunId, activityType, billingResourceId,
+        body, correlationId, level, location, name, operationName, pipelineName, pipelineRunId, recoveryStatus,
+        resourceId, severityNumber, severityText, start, status, tags, timestamp, run_time, source, sink, error,
+        errorCode, errorMessage, errorFailureType, errorTarget, eventProcessedUtcTime, eventEnqueuedUtcTime, ingestion_time
+}
 .alter table PipelineRuns_Failed policy update "[{\"IsEnabled\":true,\"Source\":\"PipelineRuns_tbl\",\"Query\":\"Normalize_PipelineRuns() | where status == \\\"Failed\\\"\",\"IsTransactional\":false,\"PropagateIngestionProperties\":true,\"ManagedIdentity\":null}]"
+.alter table ActivityRuns_Failed_tbl policy update "[{\"IsEnabled\":true,\"Source\":\"ActivityRuns_tbl\",\"Query\":\"NormalizeActivityRuns() | where status == \\\"Failed\\\"\",\"IsTransactional\":false,\"PropagateIngestionProperties\":true,\"ManagedIdentity\":null}]"

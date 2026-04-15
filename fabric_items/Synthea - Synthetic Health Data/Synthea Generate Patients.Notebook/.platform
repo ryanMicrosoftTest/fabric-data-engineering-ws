@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "Synthea Generate Patients"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "facc137a-312c-9636-4ccd-36e63bb2fd7c"
+  }
+}

@@ -10,12 +10,15 @@
 # META   "dependencies": {}
 # META }
 
+# MARKDOWN ********************
+
+
 # CELL ********************
 
-kv_uri = 'https://kvfabricprodeus2rh.vault.azure.net/'
 client_id_secret = 'fuam-spn-client-id'
 tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
+kv_uri = 'https://kvfabricprodeus2rh.vault.azure.net/'
 
 workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
 es_id = '8b3a0aca-3545-4f66-bde2-1d019c997205'

@@ -1,0 +1,109 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings"
+            },
+            "storeSettings": {
+              "type": "LakehouseReadSettings",
+              "recursive": true,
+              "enablePartitionDiscovery": false
+            }
+          },
+          "datasetSettings": {
+            "type": "DelimitedText",
+            "typeProperties": {
+              "location": {
+                "type": "LakehouseLocation",
+                "fileName": "hc_tables.txt"
+              },
+              "columnDelimiter": ",",
+              "quoteChar": "\"",
+              "escapeChar": "\\",
+              "firstRowAsHeader": false
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "hc_lakehouse",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "6fcf1a51-d33c-9614-459f-9bbadbf98102",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Files"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup Tables List",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "batchCount": 50,
+          "items": {
+            "value": "@activity('Lookup Tables List').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "cd4ca471-9e4d-9565-44c0-809b1da52dbc",
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "parameters": {
+                  "table_name": {
+                    "value": {
+                      "value": "@item().Prop_0",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                },
+                "sessionTag": "high_concurrency"
+              },
+              "externalReferences": {
+                "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Run Notebook",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "ForEach Table",
+        "dependsOn": [
+          {
+            "activity": "Lookup Tables List",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -27,7 +27,7 @@
 
 # CELL ********************
 
-spark.conf.set("sprk.sql.parquet.vorder.enabled", "true")
+spark.conf.set("spark.sql.parquet.vorder.enabled", "true")
 spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
 spark.conf.set("spark.microsoft.delta.optimizeWrite.binSize", "1073741824")
 

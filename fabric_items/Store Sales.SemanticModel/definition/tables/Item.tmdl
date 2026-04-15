@@ -38,11 +38,11 @@ table Item
 
 		annotation SummarizationSetBy = Automatic
 
-	column FamilyNane
+	column FamilyName
 		dataType: string
 		lineageTag: c352317e-a257-40b3-947b-aa7cf8edfb76
 		summarizeBy: none
-		sourceColumn: FamilyNane
+		sourceColumn: FamilyName
 
 		annotation SummarizationSetBy = Automatic
 
@@ -91,9 +91,9 @@ table Item
 		mode: import
 		source =
 				let
-				    Source = Sql.Database(".", "RetailBIDW", [Query="SELECT [ItemID]#(lf)     -- ,[SupplierID]#(lf)      --,[Name]#(lf)      --,[Description]#(lf)      --,[BrandName]#(lf)      ,[ResponsibleBuyerLastName] +', ' + [ResponsibleBuyerFirstName] Buyer#(lf)      ,left([SegmentName], 4) [SegmentName]#(lf)     -- ,[SegmentID]#(lf)      ,left([FamilyName], 3) FamilyNane#(lf)    --  ,[FamilyID]#(lf)      ,[ClassName]#(lf)     -- ,[ClassID]#(lf)   --   ,[ItemCost]#(lf)     -- ,[OriginalItemCost]#(lf)  FROM [RetailBIDW].[dbo].[Item_Dimension]"]),
-				    #"Renamed Columns" = Table.RenameColumns(Source, {{"ItemID", "ItemID"}, {"SegmentName", "Segment"}, {"ClassName", "Category"}, {"Buyer", "Buyer"}, {"FamilyNane", "FamilyNane"}}),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"ItemID", Int64.Type}, {"Segment", type text}, {"Category", type text}, {"Buyer", type text}, {"FamilyNane", type text}})
+				    Source = Sql.Database(".", "RetailBIDW", [Query="SELECT [ItemID]#(lf)     -- ,[SupplierID]#(lf)      --,[Name]#(lf)      --,[Description]#(lf)      --,[BrandName]#(lf)      ,[ResponsibleBuyerLastName] +', ' + [ResponsibleBuyerFirstName] Buyer#(lf)      ,left([SegmentName], 4) [SegmentName]#(lf)     -- ,[SegmentID]#(lf)      ,left([FamilyName], 3) FamilyName#(lf)    --  ,[FamilyID]#(lf)      ,[ClassName]#(lf)     -- ,[ClassID]#(lf)   --   ,[ItemCost]#(lf)     -- ,[OriginalItemCost]#(lf)  FROM [RetailBIDW].[dbo].[Item_Dimension]"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source, {{"ItemID", "ItemID"}, {"SegmentName", "Segment"}, {"ClassName", "Category"}, {"Buyer", "Buyer"}, {"FamilyName", "FamilyName"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"ItemID", Int64.Type}, {"Segment", type text}, {"Category", type text}, {"Buyer", type text}, {"FamilyName", type text}})
 				in
 				    #"Changed Type"
 

@@ -13,10 +13,9 @@ table Table
 		mode: import
 		source =
 				let
-				  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WykvMTVWK1YlWcspPUoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
-				  #"Changed column type" = Table.TransformColumnTypes(Source, {})
+				  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WykvMTVWK1YlWcspPUoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t])
 				in
-				  #"Changed column type"
+				  Source
 
 	annotation PBI_ResultType = Table
 

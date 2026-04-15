@@ -1,0 +1,41 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "cd4ca471-9e4d-9565-44c0-809b1da52dbc",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "table_name": {
+              "value": {
+                "value": "@pipeline().parameters.table_name",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          },
+          "sessionTag": "high_concurrency"
+        },
+        "externalReferences": {
+          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Execute Notebook",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "table_name": {
+        "type": "string",
+        "defaultValue": "'No Table'"
+      }
+    }
+  }
+}
