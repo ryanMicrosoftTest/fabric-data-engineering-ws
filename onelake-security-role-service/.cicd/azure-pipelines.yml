@@ -103,7 +103,7 @@ stages:
 
               if [[ "$BRANCH" == "refs/heads/main" ]]; then
                 PACKAGE_VERSION="$BASE_VERSION"
-              elif [[ "$BRANCH" == refs/heads/release/* ]]; then
+              elif [[ "$BRANCH" == "refs/heads/release/"* ]]; then
                 PACKAGE_VERSION="${BASE_VERSION}rc$(Build.BuildId)"
               else
                 PACKAGE_VERSION="${BASE_VERSION}.dev$(Build.BuildId)"
