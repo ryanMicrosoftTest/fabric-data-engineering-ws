@@ -9,6 +9,7 @@ trigger:
       - main
       - feature/*
       - release/*
+      - copilot/*
   paths:
     include:
       - 'onelake-security-role-service/**'
