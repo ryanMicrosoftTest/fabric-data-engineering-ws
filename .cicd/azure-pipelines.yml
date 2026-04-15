@@ -23,6 +23,7 @@ resources:
             - main
             - feature/*
             - release/*
+            - copilot/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -72,14 +73,28 @@ stages:
       artifact: package_metadata
       displayName: 'Download package metadata from Pipeline A'
 
+    # Install pyyaml early — needed by patch_onelake_env.py
+    - script: |
+        pip install pyyaml
+      displayName: 'Install pyyaml for environment patch'
+
     # Patch the Fabric Environment with exact package version and feed connection
     - script: |
+        if [ "$(targetEnvironment)" = "DEV" ]; then
+          FEED_ID="$(DEV_FEED_CONNECTION_ID)"
+        elif [ "$(targetEnvironment)" = "QA" ]; then
+          FEED_ID="$(QA_FEED_CONNECTION_ID)"
+        elif [ "$(targetEnvironment)" = "PROD" ]; then
+          FEED_ID="$(PROD_FEED_CONNECTION_ID)"
+        else
+          echo "ERROR: unexpected targetEnvironment '$(targetEnvironment)'"
+          exit 1
+        fi
+        export FEED_CONNECTION_ID="$FEED_ID"
+        export PACKAGE_METADATA_FILE="$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json"
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/patch_onelake_env.py
       displayName: 'Patch onelake_security_utils environment.yml'
       workingDirectory: $(Build.SourcesDirectory)/current-repo
-      env:
-        PACKAGE_METADATA_FILE: $(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json
-        FEED_CONNECTION_ID: $(QA_FEED_CONNECTION_ID)
 
     # ...existing code...
     - task: AzureKeyVault@2
@@ -160,12 +175,25 @@ stages:
     # Run the validation Fabric pipeline and poll for success
     - script: |
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
+          --workspace-id "$(DEV_WORKSPACE_ID)" \
+          --pipeline-name "onelake_security_role_pl" \
+          --poll-interval 30 \
+          --timeout 3600
+      condition: eq(variables['targetEnvironment'], 'DEV')
+      displayName: 'Run and validate onelake_security_role_pl (DEV)'
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
+
+    - script: |
+        python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
           --workspace-id "$(QA_WORKSPACE_ID)" \
           --pipeline-name "onelake_security_role_pl" \
           --poll-interval 30 \
           --timeout 3600
-      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
-      displayName: 'Run and validate onelake_security_role_pl'
+      condition: eq(variables['targetEnvironment'], 'QA')
+      displayName: 'Run and validate onelake_security_role_pl (QA)'
       env:
         AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
         AZURE_TENANT_ID: $(tenant-id-secret)

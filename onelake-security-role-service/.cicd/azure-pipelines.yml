@@ -99,7 +99,18 @@ stages:
           - bash: |
               set -euo pipefail
 
-              BASE_VERSION="0.2.1"
+              # Read base version from pyproject.toml (single source of truth)
+              BASE_VERSION=$(python -c "
+              import re, sys; from pathlib import Path
+              text = Path('$(workingDirectory)/pyproject.toml').read_text()
+              m = re.search(r'version\s*=\s*\"([^\"]+)\"', text)
+              if not m:
+                  print('ERROR: version not found in pyproject.toml', file=sys.stderr)
+                  sys.exit(1)
+              print(m.group(1))
+              ")
+              echo "Base version from pyproject.toml: $BASE_VERSION"
+
               BRANCH="$(Build.SourceBranch)"
 
               if [[ "$BRANCH" == "refs/heads/main" ]]; then
@@ -152,6 +163,9 @@ stages:
               WHL_FILENAME=$(basename "$WHL_FILE")
               echo "##vso[task.setvariable variable=WHEEL_FILENAME]${WHL_FILENAME}"
 
+              # Export for the embedded Python in this same step
+              export WHEEL_FILENAME="${WHL_FILENAME}"
+
               # Append wheel filename to metadata
               python - <<'PY'
               import json, os
@@ -163,8 +177,6 @@ stages:
               meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
               PY
             displayName: 'Record wheel filename in metadata'
-            env:
-              WHEEL_FILENAME: $(WHEEL_FILENAME)
 
           - publish: $(workingDirectory)/dist
             artifact: python_dist
