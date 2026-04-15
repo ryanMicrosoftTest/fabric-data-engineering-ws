@@ -98,9 +98,6 @@ def create_data_pipeline(workspace_id:str, dataset_id:str, api_token:str)->pd.Da
 
 # CELL ********************
 
-vars = notebookutils.variableLibrary.
-
-dir(vars)
 
 # METADATA ********************
 

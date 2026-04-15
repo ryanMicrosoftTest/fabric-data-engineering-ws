@@ -73,7 +73,7 @@ import pyodbc
 from onelake_security.yaml_parser import parse_user_mapping
 from onelake_security.file_tracker import compute_content_hash
 from onelake_security.api_client import OneLakeSecurityClient
-from onelake_security.workflow_service import process_user_mappings
+from onelake_security.workflow_service import process_user_mappings, MappingWorkflowResult
 from onelake_security.audit import AuditLogger
 
 # METADATA ********************
@@ -144,7 +144,7 @@ client = OneLakeSecurityClient(api_token=api_token)
 audit = AuditLogger(correlation_id=run_id)
 
 result = MappingWorkflowResult(success=True, mappings_applied=0)
-    if user_mappings:
+if user_mappings:
     mappings = [m for (_, _, m) in user_mappings]
 
     result = process_user_mappings(
@@ -258,16 +258,6 @@ if audit.records:
         raise Exception(f"User mapping failed: {result.error}")
 
 print(f"✅ Run complete | {run_id}")
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 
 # METADATA ********************
 

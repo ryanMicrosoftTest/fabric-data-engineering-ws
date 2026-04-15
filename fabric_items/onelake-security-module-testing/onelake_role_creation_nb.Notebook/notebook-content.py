@@ -73,7 +73,7 @@ import pandas as pd
 from onelake_security.yaml_parser import parse_role_definition
 from onelake_security.file_tracker import FileTracker, compute_content_hash
 from onelake_security.api_client import OneLakeSecurityClient
-from onelake_security.workflow_service import process_role_definitions
+from onelake_security.workflow_service import process_role_definitions, RoleWorkflowResult
 from onelake_security.audit import AuditLogger
 
 # METADATA ********************
