@@ -182,7 +182,6 @@ stages:
               python -m twine upload \
                 --repository onelake-security-dev \
                 --config-file $(PYPIRC_PATH) \
-                --skip-existing \
                 dist/*.whl
             displayName: 'Publish wheel to DEV feed'
             workingDirectory: $(workingDirectory)
@@ -196,7 +195,6 @@ stages:
               python -m twine upload \
                 --repository onelake-security-qa \
                 --config-file $(PYPIRC_PATH) \
-                --skip-existing \
                 dist/*.whl
             displayName: 'Republish same wheel to QA feed'
             workingDirectory: $(workingDirectory)
