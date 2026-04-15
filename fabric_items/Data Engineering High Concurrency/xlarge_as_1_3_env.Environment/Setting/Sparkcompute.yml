@@ -1,9 +1,9 @@
 enable_native_execution_engine: false
 instance_pool_id: 5fcf0b6e-c489-4aa9-a557-4c318964c655
-driver_cores: 32
-driver_memory: 224g
-executor_cores: 32
-executor_memory: 224g
+driver_cores: 8
+driver_memory: 56g
+executor_cores: 8
+executor_memory: 56g
 dynamic_executor_allocation:
   enabled: true
   min_executors: 1
