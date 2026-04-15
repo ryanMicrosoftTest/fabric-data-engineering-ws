@@ -1,7 +1,7 @@
-# OneLake Security Role Service — CI/CD Test Pipeline
-# =====================================================
-# Runs pytest on every push/PR that touches the service code.
-# Publishes test results and coverage to Azure DevOps.
+# OneLake Security Role Service — CI/CD Pipeline
+# ================================================
+# Pipeline A: tests, builds, and publishes the onelake-security package.
+# Publishes the wheel to DEV and QA feeds and emits metadata for Pipeline B.
 
 trigger:
   branches:
@@ -11,9 +11,10 @@ trigger:
       - release/*
   paths:
     include:
-      - 'onelake-security-role-service/src/**'
-      - 'onelake-security-role-service/tests/**'
-      - 'onelake-security-role-service/.cicd/**'
+      - 'onelake-security-role-service/**'
+      - 'fabric_items/**'
+      - 'attached_config/**'
+      - '.cicd/**'
 
 pr:
   branches:
@@ -21,8 +22,10 @@ pr:
       - main
   paths:
     include:
-      - 'onelake-security-role-service/src/**'
-      - 'onelake-security-role-service/tests/**'
+      - 'onelake-security-role-service/**'
+      - 'fabric_items/**'
+      - 'attached_config/**'
+      - '.cicd/**'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -30,7 +33,8 @@ pool:
 variables:
   pythonVersion: '3.11'
   workingDirectory: 'onelake-security-role-service'
-  artifactFeed: 'Fabric/onelake-security-feed'   # Format: 'ProjectName/FeedName' — update this
+  devArtifactFeed: 'Fabric/onelake-security-dev'
+  qaArtifactFeed: 'Fabric/onelake-security-qa'
 
 stages:
   - stage: Test
@@ -81,15 +85,56 @@ stages:
   - stage: Publish
     displayName: 'Build & Publish Package'
     dependsOn: Test
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual')))
+    condition: succeeded()
     jobs:
       - job: PublishWheel
-        displayName: 'Build wheel → Azure Artifacts'
+        displayName: 'Build wheel → DEV & QA feeds'
         steps:
           - task: UsePythonVersion@0
             inputs:
               versionSpec: '$(pythonVersion)'
             displayName: 'Use Python $(pythonVersion)'
+
+          - bash: |
+              set -euo pipefail
+
+              BASE_VERSION="0.2.1"
+              BRANCH="$(Build.SourceBranch)"
+
+              if [[ "$BRANCH" == "refs/heads/main" ]]; then
+                PACKAGE_VERSION="$BASE_VERSION"
+              elif [[ "$BRANCH" == refs/heads/release/* ]]; then
+                PACKAGE_VERSION="${BASE_VERSION}rc$(Build.BuildId)"
+              else
+                PACKAGE_VERSION="${BASE_VERSION}.dev$(Build.BuildId)"
+              fi
+
+              export PACKAGE_VERSION
+
+              python - <<'PY'
+              import os, re
+              from pathlib import Path
+
+              path = Path("$(workingDirectory)/pyproject.toml")
+              text = path.read_text(encoding="utf-8")
+              version = os.environ["PACKAGE_VERSION"]
+              text = re.sub(r'version = "[^"]+"', f'version = "{version}"', text, count=1)
+              path.write_text(text, encoding="utf-8")
+              print(f"Stamped package version: {version}")
+              PY
+
+              mkdir -p "$(Build.ArtifactStagingDirectory)/package-metadata"
+              cat > "$(Build.ArtifactStagingDirectory)/package-metadata/package-metadata.json" <<JSON
+              {
+                "packageName": "onelake-security",
+                "packageVersion": "${PACKAGE_VERSION}",
+                "sourceBranch": "$(Build.SourceBranch)",
+                "sourceVersion": "$(Build.SourceVersion)"
+              }
+              JSON
+
+              echo "##vso[task.setvariable variable=PACKAGE_VERSION]${PACKAGE_VERSION}"
+            displayName: 'Compute and stamp package version'
 
           - script: |
               python -m pip install --upgrade pip build twine
@@ -100,15 +145,61 @@ stages:
             displayName: 'Build .whl'
             workingDirectory: $(workingDirectory)
 
+          - bash: |
+              set -euo pipefail
+              WHL_FILE=$(ls $(workingDirectory)/dist/*.whl | head -1)
+              WHL_FILENAME=$(basename "$WHL_FILE")
+              echo "##vso[task.setvariable variable=WHEEL_FILENAME]${WHL_FILENAME}"
+
+              # Append wheel filename to metadata
+              python - <<'PY'
+              import json, os
+              from pathlib import Path
+
+              meta_path = Path("$(Build.ArtifactStagingDirectory)/package-metadata/package-metadata.json")
+              meta = json.loads(meta_path.read_text(encoding="utf-8"))
+              meta["wheelFilename"] = os.environ.get("WHEEL_FILENAME", "")
+              meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+              PY
+            displayName: 'Record wheel filename in metadata'
+            env:
+              WHEEL_FILENAME: $(WHEEL_FILENAME)
+
+          - publish: $(workingDirectory)/dist
+            artifact: python_dist
+            displayName: 'Publish wheel as build artifact'
+
+          - publish: $(Build.ArtifactStagingDirectory)/package-metadata
+            artifact: package_metadata
+            displayName: 'Publish package metadata artifact'
+
           - task: TwineAuthenticate@1
             inputs:
-              artifactFeed: '$(artifactFeed)'
-            displayName: 'Authenticate with Azure Artifacts'
+              artifactFeed: '$(devArtifactFeed)'
+            displayName: 'Authenticate DEV feed'
 
           - script: |
               python -m twine upload \
-                --repository onelake-security-feed \
+                --repository onelake-security-dev \
                 --config-file $(PYPIRC_PATH) \
+                --skip-existing \
                 dist/*.whl
-            displayName: 'Publish to Azure Artifacts'
+            displayName: 'Publish wheel to DEV feed'
             workingDirectory: $(workingDirectory)
+
+          - download: current
+            artifact: python_dist
+            displayName: 'Download built wheel for QA publish'
+
+          - task: TwineAuthenticate@1
+            inputs:
+              artifactFeed: '$(qaArtifactFeed)'
+            displayName: 'Authenticate QA feed'
+
+          - script: |
+              python -m twine upload \
+                --repository onelake-security-qa \
+                --config-file $(PYPIRC_PATH) \
+                --skip-existing \
+                $(Pipeline.Workspace)/python_dist/*.whl
+            displayName: 'Republish same wheel to QA feed'
