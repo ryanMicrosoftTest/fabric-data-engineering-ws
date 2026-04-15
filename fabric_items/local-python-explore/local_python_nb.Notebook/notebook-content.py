@@ -50,28 +50,6 @@ df = pd.read_parquet('abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.f
 
 # CELL ********************
 
-from deltalake import DeltaTable
-
-dt = DeltaTable(
-    "abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/a1e15297-7fc9-41fa-89b4-b72ba14ab3c4/Tables/insider_transactions",
-    storage_options={
-        "bearer_token": access_token,      
-        "use_fabric_endpoint": "true"
-    }
-)
-
-df = dt.to_pandas()
-df.head()
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "jupyter_python"
-# META }
-
-# CELL ********************
-
 df = pd.read_parquet('https://onelake.dfs.fabric.microsoft.com/a8cbda3d-903e-4154-97d9-9a91c95abb42/a1e15297-7fc9-41fa-89b4-b72ba14ab3c4/Tables/insider_transactions')
 
 # METADATA ********************
@@ -127,6 +105,36 @@ dt = DeltaTable(
 df = dt.to_pandas()
 
 df
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# CELL ********************
+
+dt = DeltaTable(
+    "abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/a1e15297-7fc9-41fa-89b4-b72ba14ab3c4/Tables/insider_transactions",
+    storage_options={
+        "bearer_token": token,
+        "use_fabric_endpoint": "true"
+    }
+)
+
+df = dt.to_pandas()
+df.head()
 
 # METADATA ********************
 
