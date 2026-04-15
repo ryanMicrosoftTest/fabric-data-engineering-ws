@@ -1,0 +1,18 @@
+# Example: Wildcard role — read access to ALL tables, no RLS/CLS.
+# Useful for admin or data engineering roles.
+
+version: "1.0"
+state: present
+
+role:
+  name: DataEngineerFullRead
+  metadata:
+    description: "Full read access to all tables — for data engineering team"
+    owner: "admin@MngEnvMCAP372892.onmicrosoft.com"
+    created_by: "rharrington"
+    tags: [engineering, full-access]
+
+  tables:
+    - path: "*"
+      # columns omitted = all columns
+      # row_filter omitted = all rows

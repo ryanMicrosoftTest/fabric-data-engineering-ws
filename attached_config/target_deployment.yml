@@ -6,6 +6,7 @@ DEV:
     - DataPipeline
     - Notebook
     - Environment
+    - Lakehouse
 
 
 QA:

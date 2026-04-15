@@ -1,0 +1,241 @@
+{
+    "name": "onelake_security_role_pl",
+    "objectId": "99069a78-326d-4d3a-ac00-cce8b8d0be09",
+    "properties": {
+        "activities": [
+            {
+                "name": "Role Creation",
+                "type": "TridentNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.01:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "notebookId": "102e2a78-152e-41d7-886e-73a15c837c8f",
+                    "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+                    "parameters": {
+                        "target_workspace_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.target_workspace_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "target_lakehouse_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.target_lakehouse_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "yaml_directory": {
+                            "value": {
+                                "value": "@pipeline().parameters.yaml_role_definitions_path",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kv_uri": {
+                            "value": {
+                                "value": "@pipeline().parameters.kv_uri",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "client_id_secret": {
+                            "value": {
+                                "value": "@pipeline().parameters.client_id_secret",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "tenant_id_secret": {
+                            "value": {
+                                "value": "@pipeline().parameters.tenant_id_secret",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "client_secret_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.client_secret_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "validate_first": {
+                            "value": {
+                                "value": "@pipeline().parameters.validate_first",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "audit_sql_server": {
+                            "value": {
+                                "value": "@pipeline().parameters.audit_sql_server",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "audit_sql_database": {
+                            "value": {
+                                "value": "@pipeline().parameters.audit_sql_database",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "User Mapping",
+                "type": "TridentNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "Role Creation",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.01:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "notebookId": "1856cdca-4d1a-42af-9e91-796a79006bfc",
+                    "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+                    "parameters": {
+                        "target_workspace_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.target_workspace_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "target_lakehouse_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.target_lakehouse_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "tenant_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.tenant_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "yaml_directory": {
+                            "value": {
+                                "value": "@pipeline().parameters.yaml_role_mappings_path",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kv_uri": {
+                            "value": {
+                                "value": "@pipeline().parameters.kv_uri",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "client_id_secret": {
+                            "value": {
+                                "value": "@pipeline().parameters.client_id_secret",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "tenant_id_secret": {
+                            "value": {
+                                "value": "@pipeline().parameters.tenant_id_secret",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "client_secret_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.client_secret_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "audit_sql_server": {
+                            "value": {
+                                "value": "@pipeline().parameters.audit_sql_server",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "audit_sql_database": {
+                            "value": {
+                                "value": "@pipeline().parameters.audit_sql_database",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "target_workspace_id": {
+                "type": "string",
+                "defaultValue": "a8cbda3d-903e-4154-97d9-9a91c95abb42"
+            },
+            "target_lakehouse_id": {
+                "type": "string",
+                "defaultValue": "4f8ce569-6f36-4069-81a8-b1c2187b5494"
+            },
+            "tenant_id": {
+                "type": "string",
+                "defaultValue": "35acf02c-4b87-4ae6-9221-ff5cafd430b4"
+            },
+            "yaml_role_definitions_path": {
+                "type": "string",
+                "defaultValue": "abfss://9db9447e-fecc-4c22-8b9b-3ceed9e5925c@onelake.dfs.fabric.microsoft.com/045f7d55-2ef1-4b4c-b462-acec26f30904/Files/role-definitions"
+            },
+            "yaml_role_mappings_path": {
+                "type": "string",
+                "defaultValue": "abfss://9db9447e-fecc-4c22-8b9b-3ceed9e5925c@onelake.dfs.fabric.microsoft.com/045f7d55-2ef1-4b4c-b462-acec26f30904/Files/role-mappings"
+            },
+            "kv_uri": {
+                "type": "string",
+                "defaultValue": "https://kvfabricprodeus2rh.vault.azure.net/"
+            },
+            "client_id_secret": {
+                "type": "string",
+                "defaultValue": "fuam-spn-client-id"
+            },
+            "tenant_id_secret": {
+                "type": "string",
+                "defaultValue": "fuam-spn-tenant-id"
+            },
+            "client_secret_name": {
+                "type": "string",
+                "defaultValue": "fuam-spn-secret"
+            },
+            "validate_first": {
+                "type": "string",
+                "defaultValue": "true"
+            },
+            "audit_sql_server": {
+                "type": "string",
+                "defaultValue": "ftykynmhjpteverb75ok7vbqwq-pzclthom7yrezc43htxntzmslq.database.fabric.microsoft.com"
+            },
+            "audit_sql_database": {
+                "type": "string",
+                "defaultValue": "onelake-audit-sql-database-940f2eb5-5640-4f63-89f0-05083e7bf107"
+            }
+        }
+    }
+}

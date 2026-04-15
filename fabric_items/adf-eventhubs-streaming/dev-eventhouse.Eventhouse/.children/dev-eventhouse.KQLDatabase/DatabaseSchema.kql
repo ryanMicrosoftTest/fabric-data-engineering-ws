@@ -12,3 +12,9 @@
 .create-merge table adf_schema_7rl9yh (records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
 .create-merge table adf_schema_1ltnscp (records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
 .create-merge table adf_schema_od5vx (records:dynamic, EventProcessedUtcTime:datetime, PartitionId:long, EventEnqueuedUtcTime:datetime) 
+.create-or-alter function with (folder = "utils", docstring = "note", skipvalidation = "true") ConvertToEastern(utcTime:datetime) {
+    let y = toint(datetime_part('year', utcTime));
+    let dstStart = make_datetime(y, 3, 8); 
+    let dstEnd = make_datetime(y, 11, 01);
+    dstEnd
+}

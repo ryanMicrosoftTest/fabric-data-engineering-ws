@@ -1,0 +1,320 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings"
+            },
+            "storeSettings": {
+              "type": "LakehouseReadSettings",
+              "recursive": true,
+              "enablePartitionDiscovery": false
+            }
+          },
+          "datasetSettings": {
+            "type": "DelimitedText",
+            "typeProperties": {
+              "location": {
+                "type": "LakehouseLocation",
+                "fileName": "hc_tables.txt"
+              },
+              "columnDelimiter": ",",
+              "quoteChar": "\"",
+              "escapeChar": "\\",
+              "firstRowAsHeader": false
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "hc_lakehouse",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "6fcf1a51-d33c-9614-459f-9bbadbf98102",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Files"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup Tables",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "batchCount": 50,
+          "items": {
+            "value": "@activity('Lookup Tables').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Switch",
+              "typeProperties": {
+                "on": {
+                  "value": "@trim(item().Prop_1)",
+                  "type": "Expression"
+                },
+                "cases": [
+                  {
+                    "value": "small_as_1_10",
+                    "activities": [
+                      {
+                        "type": "TridentNotebook",
+                        "typeProperties": {
+                          "notebookId": "c63308f6-1b19-b965-4997-ebc479f6e28f",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "parameters": {
+                            "table_name": {
+                              "value": {
+                                "value": "@trim(item().Prop_0)",
+                                "type": "Expression"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "sessionTag": {
+                            "value": "@trim(item().Prop_1)",
+                            "type": "Expression"
+                          }
+                        },
+                        "externalReferences": {
+                          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                        },
+                        "policy": {
+                          "timeout": "0.12:00:00",
+                          "retry": 0,
+                          "retryIntervalInSeconds": 30,
+                          "secureInput": false,
+                          "secureOutput": false
+                        },
+                        "name": "Small Notebook Process",
+                        "dependsOn": []
+                      }
+                    ]
+                  },
+                  {
+                    "value": "medium_as_1_7",
+                    "activities": [
+                      {
+                        "type": "TridentNotebook",
+                        "typeProperties": {
+                          "notebookId": "96856791-0a6f-92d7-46f3-ffac86bc18d6",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "parameters": {
+                            "table_name": {
+                              "value": {
+                                "value": "@trim(item().Prop_0)",
+                                "type": "Expression"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "sessionTag": {
+                            "value": "@trim(item().Prop_1)",
+                            "type": "Expression"
+                          }
+                        },
+                        "externalReferences": {
+                          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                        },
+                        "policy": {
+                          "timeout": "0.12:00:00",
+                          "retry": 0,
+                          "retryIntervalInSeconds": 30,
+                          "secureInput": false,
+                          "secureOutput": false
+                        },
+                        "name": "Process Medium Notebook",
+                        "dependsOn": []
+                      }
+                    ]
+                  },
+                  {
+                    "value": "large_as_1_4",
+                    "activities": [
+                      {
+                        "type": "TridentNotebook",
+                        "typeProperties": {
+                          "notebookId": "d438b800-a048-9d40-4b61-7b79c596548b",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "parameters": {
+                            "table_name": {
+                              "value": {
+                                "value": "@trim(item().Prop_0)",
+                                "type": "Expression"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "sessionTag": {
+                            "value": "@trim(item().Prop_1)",
+                            "type": "Expression"
+                          }
+                        },
+                        "externalReferences": {
+                          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                        },
+                        "policy": {
+                          "timeout": "0.12:00:00",
+                          "retry": 0,
+                          "retryIntervalInSeconds": 30,
+                          "secureInput": false,
+                          "secureOutput": false
+                        },
+                        "name": "Process Large Notebook",
+                        "dependsOn": []
+                      }
+                    ]
+                  },
+                  {
+                    "value": "xlarge_as_1_3",
+                    "activities": [
+                      {
+                        "type": "TridentNotebook",
+                        "typeProperties": {
+                          "notebookId": "05173431-9075-b606-493b-d1bd55c51340",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "parameters": {
+                            "table_name": {
+                              "value": {
+                                "value": "@trim(item().Prop_0)",
+                                "type": "Expression"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "sessionTag": {
+                            "value": "@trim(item().Prop_1)",
+                            "type": "Expression"
+                          }
+                        },
+                        "externalReferences": {
+                          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                        },
+                        "policy": {
+                          "timeout": "0.12:00:00",
+                          "retry": 0,
+                          "retryIntervalInSeconds": 30,
+                          "secureInput": false,
+                          "secureOutput": false
+                        },
+                        "name": "Notebook XLarge",
+                        "dependsOn": []
+                      }
+                    ]
+                  },
+                  {
+                    "value": "xxlarge-as-1-2",
+                    "activities": [
+                      {
+                        "type": "TridentNotebook",
+                        "typeProperties": {
+                          "notebookId": "faa30366-234f-9f87-456b-a2689358dcba",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "parameters": {
+                            "table_name": {
+                              "value": {
+                                "value": "@trim(item().Prop_0)",
+                                "type": "Expression"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "sessionTag": {
+                            "value": "@trim(item().Prop_1)",
+                            "type": "Expression"
+                          }
+                        },
+                        "externalReferences": {
+                          "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                        },
+                        "policy": {
+                          "timeout": "0.12:00:00",
+                          "retry": 0,
+                          "retryIntervalInSeconds": 30,
+                          "secureInput": false,
+                          "secureOutput": false
+                        },
+                        "name": "Process XXLarge",
+                        "dependsOn": []
+                      }
+                    ]
+                  }
+                ],
+                "defaultActivities": [
+                  {
+                    "type": "TridentNotebook",
+                    "typeProperties": {
+                      "notebookId": "cd4ca471-9e4d-9565-44c0-809b1da52dbc",
+                      "workspaceId": "00000000-0000-0000-0000-000000000000",
+                      "parameters": {
+                        "table_name": {
+                          "value": {
+                            "value": "@trim(item().Prop_0)",
+                            "type": "Expression"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "sessionTag": {
+                        "value": "@trim(item().Prop_1)",
+                        "type": "Expression"
+                      }
+                    },
+                    "externalReferences": {
+                      "connection": "518d3922-1cb3-4e5a-8d21-a141dd591b56"
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Run Small Notebook",
+                    "dependsOn": []
+                  }
+                ]
+              },
+              "name": "Route to Notebook",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "ForEach Table",
+        "dependsOn": [
+          {
+            "activity": "Lookup Tables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "variables": {
+      "env_var": {
+        "type": "String"
+      },
+      "table_name": {
+        "type": "String"
+      }
+    }
+  }
+}

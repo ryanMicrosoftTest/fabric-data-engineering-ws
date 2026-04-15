@@ -1,0 +1,72 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00",
+            "datasetSettings": {
+              "type": "AzureSqlTable",
+              "typeProperties": {
+                "schema": "dbo",
+                "table": "claims_transactions",
+                "database": "healthDB"
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "abae0a69-1bff-4cf5-be93-22b1ba37e04e"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "Append",
+            "applyVOrder": false,
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "table": "claims_transactions"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "sql_health_db_lh",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "e9332ccb-5a16-92e0-45d0-4fd30cf2430d",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy data",
+        "dependsOn": []
+      }
+    ]
+  }
+}

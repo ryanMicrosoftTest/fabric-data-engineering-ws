@@ -1,0 +1,14 @@
+# Example: Map individual users to the NeurologyReadRole.
+# This file is AUTHORITATIVE — it defines the complete member list.
+# Users removed from this file will be removed from the role.
+
+version: "1.0"
+
+mapping:
+  role_name: NeurologyReadRole
+
+  members:
+    entra_members:
+      - object_id: "662b14b6-a936-46b0-bde0-9f4d759dc46e"
+        display_name: "Dr. Antionette Klerkx"
+        object_type: User

@@ -1,0 +1,4 @@
+dependencies:
+   - pip:
+     - onelake-security==0.2.0
+     - --index-url 472fe7a1-c6d3-4f4f-b2b5-f8bcaf988310

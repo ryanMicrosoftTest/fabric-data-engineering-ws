@@ -23,7 +23,7 @@
 # CELL ********************
 
 table_df = spark.sql("SELECT * FROM shortcut_lh.airline_parquet LIMIT 1000")
-display(df)
+display(table_df)
 
 # METADATA ********************
 
@@ -35,7 +35,7 @@ display(df)
 # CELL ********************
 
 files_df = spark.read.parquet("Files/airline/part-00000-tid-7551988471792275449-78d7b4a1-0dcf-425c-b3bf-d4b5ec98976f-128-1.c000.snappy.parquet")
-display(df)
+display(files_df)
 
 # METADATA ********************
 

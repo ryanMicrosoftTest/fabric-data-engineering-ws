@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "network_degugging_nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "6a57ee23-a944-a29c-41e1-c89cfd7cda60"
+  }
+}
