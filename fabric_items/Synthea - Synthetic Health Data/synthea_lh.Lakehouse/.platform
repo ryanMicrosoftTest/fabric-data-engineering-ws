@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "synthea_lh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e2ed641b-4ea3-b0be-42ed-ec6f699d2e49"
+  }
+}

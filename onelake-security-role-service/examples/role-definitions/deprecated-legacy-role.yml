@@ -1,0 +1,11 @@
+# Example: Delete a role that is no longer needed.
+# Set state to "absent" — the service will remove this role from the lakehouse.
+
+version: "1.0"
+state: absent
+
+role:
+  name: DeprecatedLegacyRole
+  metadata:
+    description: "This role was replaced by GastroenterologyRole — scheduled for removal"
+    owner: "admin@MngEnvMCAP372892.onmicrosoft.com"

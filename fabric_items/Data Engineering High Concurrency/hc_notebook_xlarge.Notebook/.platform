@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "hc_notebook_xlarge"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "05173431-9075-b606-493b-d1bd55c51340"
+  }
+}

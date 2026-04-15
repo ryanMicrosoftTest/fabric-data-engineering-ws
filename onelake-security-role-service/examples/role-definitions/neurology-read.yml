@@ -1,0 +1,19 @@
+# Example: Role granting Neurology department read access to doctor_table
+# with RLS (only Neurology rows) and full column access.
+
+version: "1.0"
+state: present
+
+role:
+  name: NeurologyReadRole
+  metadata:
+    description: "Read access to doctor_table filtered to Neurology department only"
+    owner: "admin@MngEnvMCAP372892.onmicrosoft.com"
+    created_by: "rharrington"
+    tags: [healthcare, neurology, rls]
+
+  tables:
+    - path: /Tables/doctor_table
+      columns:
+        names: ["*"]
+      row_filter: "SELECT * FROM doctor_table WHERE department = 'Neurology'"

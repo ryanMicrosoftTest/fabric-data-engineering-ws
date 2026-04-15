@@ -6,7 +6,18 @@
 # META   "kernel_info": {
 # META     "name": "synapse_pyspark"
 # META   },
-# META   "dependencies": {}
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "0386880f-c134-41be-923c-00150c5fbafe",
+# META       "default_lakehouse_name": "onelake_security_lh_with_schemas",
+# META       "default_lakehouse_workspace_id": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "0386880f-c134-41be-923c-00150c5fbafe"
+# META         }
+# META       ]
+# META     }
+# META   }
 # META }
 
 # MARKDOWN ********************
@@ -54,7 +65,7 @@ tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
 
 workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
-lakehouse_id = '4f8ce569-6f36-4069-81a8-b1c2187b5494'                   # standalone lakehouse
+lakehouse_id = '0386880f-c134-41be-923c-00150c5fbafe'                   # standalone lakehouse
 
 tenant_id = '35acf02c-4b87-4ae6-9221-ff5cafd430b4'
 
@@ -550,12 +561,15 @@ display(doctor_table_df)
  'description': 'lakehouse to test onelake security V2',
  'workspaceId': 'a8cbda3d-903e-4154-97d9-9a91c95abb42'}
 """
-display(doctor_table_df)
+# display(doctor_table_df)
+
+# Create the schema first (if it doesn't exist)
+spark.sql("CREATE SCHEMA IF NOT EXISTS health_dbo")
 
 try:
-    doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_table')
-except:
-    print('ERROR')
+    doctor_table_df.write.format('delta').mode('overwrite').saveAsTable('health_dbo.doctor_table')
+except Exception as e:
+    print(f'ERROR: {e}')
 
 
 # METADATA ********************

@@ -1,0 +1,17 @@
+# Example: Map a service principal to a role.
+# Useful for automated pipelines that need scoped data access.
+
+version: "1.0"
+
+mapping:
+  role_name: DataEngineerFullRead
+
+  members:
+    entra_members:
+      - object_id: "2d39b1f1-eb16-47a1-b42b-52fba01e087a"
+        display_name: "fabric-data-engineer-spn"
+        object_type: ServicePrincipal
+
+      - object_id: "e714ee1d-9e57-44e2-874a-2a5759b28f34"
+        display_name: "data-engineer"
+        object_type: User

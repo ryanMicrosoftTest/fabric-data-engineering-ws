@@ -1,0 +1,22 @@
+{
+  "queryset": {
+    "version": "1.0.0",
+    "dataSources": [
+      {
+        "id": "c55886eb-56e5-46ed-b140-0f35f497ce0c",
+        "clusterUri": "https://trd-bku48q5mk78dwpwfyt.z1.kusto.fabric.microsoft.com",
+        "type": "Fabric",
+        "databaseItemId": "e065c541-9c3e-4965-888b-f0be0e1968ab",
+        "databaseItemName": "dev-eventhouse"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "7293dbfd-c317-4fcb-b814-056284b70bcb",
+        "content": "\n.create-or-alter function with (\n    docstring = 'note',\n    folder    = 'utils'\n)\nConvertToEastern(utcTime:datetime)\n{\n    let y = toint(datetime_part('year', utcTime));\n    let dstStart = make_datetime(y, 3, 8); \n    let dstEnd = make_datetime(y, 11, 01);\n    dstEnd\n}\n",
+        "title": "Tab",
+        "dataSourceId": "c55886eb-56e5-46ed-b140-0f35f497ce0c"
+      }
+    ]
+  }
+}

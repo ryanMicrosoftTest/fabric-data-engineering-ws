@@ -1,0 +1,106 @@
+# OneLake Security Role Service — YAML Schema Reference
+# ======================================================
+#
+# This document defines the two YAML formats used by the OneLake Security
+# Role Service to manage data access roles on Fabric Lakehouses.
+#
+# Architecture:
+#   role-definitions/*.yml  →  Role Creation Notebook  →  Fabric API (PUT dataAccessRoles)
+#   role-mappings/*.yml     →  User Mapping Notebook   →  Fabric API (PUT dataAccessRoles)
+#
+# Design Principles:
+#   - One file = one role (clear ownership, easy Git review)
+#   - Human-friendly YAML (service translates to API format)
+#   - Target (workspace/lakehouse) is a pipeline parameter, NOT in YAML
+#   - Each mapping file is authoritative (the file IS the complete member list)
+#   - tenant_id is a pipeline parameter, not per-member
+#   - Explicit deletion via state: absent (not implicit via missing file)
+#   - Idempotent — safe to apply repeatedly
+
+
+# ============================================================
+# ROLE DEFINITION SCHEMA
+# ============================================================
+#
+# File location: Files/role-definitions/<role-name>.yml
+# Naming convention: lowercase-hyphenated role name (e.g., neurology-read.yml)
+#
+# One file per role. Defines:
+#   - What tables the role can access (permissions)
+#   - Which columns are visible per table (CLS)
+#   - Which rows are visible per table (RLS)
+
+# --- BEGIN SCHEMA ---
+
+version: "1.0"                    # Schema version (for forward compatibility)
+
+state: present                    # "present" = create/update role
+                                  # "absent"  = delete role if it exists
+
+role:
+  name: ""                        # REQUIRED. Role name (must be unique per lakehouse).
+                                  # Used as the key for upsert matching.
+                                  # Convention: PascalCase (e.g., NeurologyReadRole)
+
+  metadata:                       # OPTIONAL. Not sent to API — used for documentation and audit.
+    description: ""               # Human-readable purpose of this role
+    owner: ""                     # Contact email or team name
+    created_by: ""                # Who authored this file
+    tags: []                      # Arbitrary tags for categorization
+
+  # --- Permissions: What tables can this role access? ---
+  tables:
+    - path: ""                    # REQUIRED. OneLake table path. Supported formats:
+                                  #   "*"                          — all tables in the lakehouse
+                                  #   "/Tables/<table>"            — specific table (non-schema)
+                                  #   "/Tables/<schema>/<table>"   — specific table in a schema
+                                  #   "/Tables/<schema>/*"         — all tables in a schema
+                                  # Add multiple table entries for multi-table roles.
+
+      # --- Column-Level Security (CLS) ---
+      # Omit this section entirely to grant access to ALL columns
+      columns:
+        names: []                 # List of column names to permit.
+                                  # Use ["*"] to permit all columns (same as omitting this section).
+                                  # Example: ["patient_id", "name", "diagnosis"]
+
+      # --- Row-Level Security (RLS) ---
+      # Omit this section entirely to grant access to ALL rows
+      row_filter: ""              # T-SQL predicate as a SELECT statement.
+                                  # Must reference the table from `path` above.
+                                  # Example: "SELECT * FROM doctor_table WHERE department = 'Neurology'"
+                                  # Supports dynamic RLS via T-SQL functions.
+                                  # Set to null or omit for no row filtering.
+
+# --- END SCHEMA ---
+
+
+# ============================================================
+# USER-ROLE MAPPING SCHEMA
+# ============================================================
+#
+# File location: Files/role-mappings/<role-name>-users.yml
+# Naming convention: <role-name>-users.yml (e.g., neurology-read-users.yml)
+#
+# One file per role. This file is AUTHORITATIVE — it defines the complete
+# member list for the role. Users NOT in this file will be removed from
+# the role on the next reconciliation run.
+#
+# The role must already be defined in a role-definition YAML.
+
+# --- BEGIN SCHEMA ---
+
+version: "1.0"                    # Schema version
+
+mapping:
+  role_name: ""                   # REQUIRED. Must match a role.name in role-definitions.
+                                  # Used to find the role for member updates.
+
+  members:
+    # --- Microsoft Entra ID Members (Users, Groups, and Service Principals) ---
+    entra_members:
+      - object_id: ""             # REQUIRED. Entra object ID (GUID)
+        display_name: ""          # OPTIONAL. For readability only — not sent to API
+        object_type: ""           # REQUIRED. One of: User, Group, ServicePrincipal, Application
+
+# --- END SCHEMA ---

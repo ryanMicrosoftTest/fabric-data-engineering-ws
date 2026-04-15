@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "ingest_claims_transactions_tbl_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3062a54b-3c05-9158-4b85-642978b607cc"
+  }
+}

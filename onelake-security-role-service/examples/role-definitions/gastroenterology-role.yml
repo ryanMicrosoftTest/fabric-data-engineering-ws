@@ -1,0 +1,25 @@
+# Example: Role with both RLS and CLS across multiple tables.
+# Gastroenterology doctors can see doctor_table (filtered to their dept)
+# and patient_records (limited columns, filtered to their patients).
+
+version: "1.0"
+state: present
+
+role:
+  name: GastroenterologyRole
+  metadata:
+    description: "Gastro department — filtered access to doctor and patient tables"
+    owner: "security-team@contoso.com"
+    created_by: "rharrington"
+    tags: [healthcare, gastroenterology, rls, cls]
+
+  tables:
+    - path: /Tables/doctor_table
+      columns:
+        names: ["*"]
+      row_filter: "SELECT * FROM doctor_table WHERE department = 'Gastroenterology'"
+
+    - path: /Tables/patient_records
+      columns:
+        names: [patient_id, first_name, last_name, diagnosis_code, visit_date]
+      row_filter: "SELECT * FROM patient_records WHERE attending_dept = 'Gastroenterology'"
