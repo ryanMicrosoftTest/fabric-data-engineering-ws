@@ -187,10 +187,6 @@ stages:
             displayName: 'Publish wheel to DEV feed'
             workingDirectory: $(workingDirectory)
 
-          - download: current
-            artifact: python_dist
-            displayName: 'Download built wheel for QA publish'
-
           - task: TwineAuthenticate@1
             inputs:
               artifactFeed: '$(qaArtifactFeed)'
@@ -201,5 +197,6 @@ stages:
                 --repository onelake-security-qa \
                 --config-file $(PYPIRC_PATH) \
                 --skip-existing \
-                $(Pipeline.Workspace)/python_dist/*.whl
+                dist/*.whl
             displayName: 'Republish same wheel to QA feed'
+            workingDirectory: $(workingDirectory)
