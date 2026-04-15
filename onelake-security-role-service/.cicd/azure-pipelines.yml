@@ -1,7 +1,7 @@
 # OneLake Security Role Service — CI/CD Pipeline
 # ================================================
 # Pipeline A: tests, builds, and publishes the onelake-security package.
-# Publishes the wheel to DEV and QA feeds and emits metadata for Pipeline B.
+# Publishes the wheel to Azure Artifacts and emits metadata for Pipeline B.
 
 trigger:
   branches:
@@ -34,8 +34,7 @@ pool:
 variables:
   pythonVersion: '3.11'
   workingDirectory: 'onelake-security-role-service'
-  devArtifactFeed: 'Fabric/onelake-security-dev'
-  qaArtifactFeed: 'Fabric/onelake-security-qa'
+  artifactFeed: 'Fabric/onelake-security-feed'
 
 stages:
   - stage: Test
@@ -89,7 +88,7 @@ stages:
     condition: succeeded()
     jobs:
       - job: PublishWheel
-        displayName: 'Build wheel → DEV & QA feeds'
+        displayName: 'Build wheel → Azure Artifacts feed'
         steps:
           - task: UsePythonVersion@0
             inputs:
@@ -188,26 +187,13 @@ stages:
 
           - task: TwineAuthenticate@1
             inputs:
-              artifactFeed: '$(devArtifactFeed)'
-            displayName: 'Authenticate DEV feed'
+              artifactFeed: '$(artifactFeed)'
+            displayName: 'Authenticate with Azure Artifacts'
 
           - script: |
               python -m twine upload \
-                --repository onelake-security-dev \
+                --repository onelake-security-feed \
                 --config-file $(PYPIRC_PATH) \
                 dist/*.whl
-            displayName: 'Publish wheel to DEV feed'
-            workingDirectory: $(workingDirectory)
-
-          - task: TwineAuthenticate@1
-            inputs:
-              artifactFeed: '$(qaArtifactFeed)'
-            displayName: 'Authenticate QA feed'
-
-          - script: |
-              python -m twine upload \
-                --repository onelake-security-qa \
-                --config-file $(PYPIRC_PATH) \
-                dist/*.whl
-            displayName: 'Republish same wheel to QA feed'
+            displayName: 'Publish wheel to feed'
             workingDirectory: $(workingDirectory)
