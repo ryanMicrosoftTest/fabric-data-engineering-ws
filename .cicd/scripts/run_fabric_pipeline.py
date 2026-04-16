@@ -70,17 +70,35 @@ def find_pipeline_item(workspace_id, pipeline_name, token):
 
 
 def run_pipeline(workspace_id, item_id, token):
-    """Start an on-demand pipeline job and return the job instance ID."""
-    url = f"{FABRIC_API}/workspaces/{workspace_id}/items/{item_id}/jobs/instances?jobType=Pipeline"
+    """Start an on-demand pipeline job and return the job status URL."""
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
     }
-    resp = requests.post(url, headers=headers, json={}, timeout=120)
+
+    item_url = f"{FABRIC_API}/workspaces/{workspace_id}/items/{item_id}"
+    item_resp = requests.get(item_url, headers=headers, timeout=60)
+    item_resp.raise_for_status()
+    item_body = item_resp.json()
+    pipeline_name = item_body.get("displayName")
+    if not pipeline_name:
+        raise RuntimeError(
+            f"Pipeline item {item_id} in workspace {workspace_id} did not include a displayName"
+        )
+
+    url = f"{FABRIC_API}/workspaces/{workspace_id}/items/{item_id}/jobs/instances?jobType=Pipeline"
+    payload = {"executionData": {"pipelineName": pipeline_name}}
+    resp = requests.post(url, headers=headers, json=payload, timeout=120)
     resp.raise_for_status()
 
     # The Location header contains the URL to poll for status
-    location = resp.headers.get("Location", "")
+    location = resp.headers.get("Location", "").strip()
+    if not location:
+        response_text = resp.text.strip()
+        raise RuntimeError(
+            "Pipeline job started but response did not include a Location header for polling. "
+            f"Status: {resp.status_code}. Response body: {response_text}"
+        )
     logger.info("Pipeline job started. Location: %s", location)
     logger.info("Response status: %s", resp.status_code)
     return location
