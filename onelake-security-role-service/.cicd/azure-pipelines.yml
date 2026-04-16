@@ -32,7 +32,7 @@ parameters:
   - name: triggerDeployment
     displayName: 'Trigger Fabric deployment (Pipeline B) after publish'
     type: boolean
-    default: false
+    default: true
   - name: deploymentEnvironment
     displayName: 'Deployment Environment (only used when triggerDeployment is true)'
     type: string
