@@ -80,25 +80,11 @@ stages:
 
     # Patch the Fabric Environment with exact package version and feed connection
     - script: |
-        if [ "$(targetEnvironment)" = "DEV" ]; then
-          FEED_VAR_NAME="DEV_FEED_CONNECTION_ID"
-          FEED_ID="$(DEV_FEED_CONNECTION_ID)"
-        elif [ "$(targetEnvironment)" = "QA" ]; then
-          FEED_VAR_NAME="QA_FEED_CONNECTION_ID"
-          FEED_ID="$(QA_FEED_CONNECTION_ID)"
-        elif [ "$(targetEnvironment)" = "PROD" ]; then
-          FEED_VAR_NAME="PROD_FEED_CONNECTION_ID"
-          FEED_ID="$(PROD_FEED_CONNECTION_ID)"
-        else
-          echo "ERROR: unexpected targetEnvironment '$(targetEnvironment)'"
+        if [ -z "$(FEED_CONNECTION_ID)" ]; then
+          echo "ERROR: pipeline variable 'FEED_CONNECTION_ID' is empty or not set"
           exit 1
         fi
-        if [ -z "$FEED_ID" ]; then
-          echo "ERROR: required pipeline variable '$FEED_VAR_NAME' is empty or not set for targetEnvironment '$(targetEnvironment)'"
-          exit 1
-        fi
-        echo "Using feed connection ID from pipeline variable '$FEED_VAR_NAME'"
-        export FEED_CONNECTION_ID="$FEED_ID"
+        export FEED_CONNECTION_ID="$(FEED_CONNECTION_ID)"
         export PACKAGE_METADATA_FILE="$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json"
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/patch_onelake_env.py
       displayName: 'Patch onelake_security_utils environment.yml'
