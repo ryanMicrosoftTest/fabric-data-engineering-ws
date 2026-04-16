@@ -161,18 +161,6 @@ stages:
       condition: always()
       displayName: 'Publish error log artifact'
 
-    # Environment readiness gate — environments with libraries can take 20+ minutes
-    - script: |
-        if [ -n "$(environmentReadinessWaitSeconds)" ]; then
-          WAIT_SECONDS="$(environmentReadinessWaitSeconds)"
-        else
-          WAIT_SECONDS=300
-        fi
-        echo "Waiting for Fabric Environment publish to be ready for ${WAIT_SECONDS} seconds..."
-        sleep "${WAIT_SECONDS}"
-        echo "Readiness wait completed."
-      displayName: 'Environment readiness gate (configurable wait)'
-
     # Run the validation Fabric pipeline and poll for success
     - script: |
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
