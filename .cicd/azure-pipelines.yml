@@ -41,6 +41,8 @@ parameters:
 variables:
   - name: targetEnvironment
     value: ${{ parameters.environment }}
+  - name: FEED_CONNECTION_ID
+    value: '472fe7a1-c6d3-4f4f-b2b5-f8bcaf988310'
 
 stages:
 - stage: DeployFabricItems
