@@ -24,7 +24,6 @@ resources:
             - feature/*
             - release/*
             - copilot/*
-            - copilot/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -76,21 +75,29 @@ stages:
 
     # Install pyyaml early — needed by patch_onelake_env.py
     - script: |
-        pip install pyyaml
+        python -m pip install pyyaml
       displayName: 'Install pyyaml for environment patch'
 
     # Patch the Fabric Environment with exact package version and feed connection
     - script: |
         if [ "$(targetEnvironment)" = "DEV" ]; then
+          FEED_VAR_NAME="DEV_FEED_CONNECTION_ID"
           FEED_ID="$(DEV_FEED_CONNECTION_ID)"
         elif [ "$(targetEnvironment)" = "QA" ]; then
+          FEED_VAR_NAME="QA_FEED_CONNECTION_ID"
           FEED_ID="$(QA_FEED_CONNECTION_ID)"
         elif [ "$(targetEnvironment)" = "PROD" ]; then
+          FEED_VAR_NAME="PROD_FEED_CONNECTION_ID"
           FEED_ID="$(PROD_FEED_CONNECTION_ID)"
         else
           echo "ERROR: unexpected targetEnvironment '$(targetEnvironment)'"
           exit 1
         fi
+        if [ -z "$FEED_ID" ]; then
+          echo "ERROR: required pipeline variable '$FEED_VAR_NAME' is empty or not set for targetEnvironment '$(targetEnvironment)'"
+          exit 1
+        fi
+        echo "Using feed connection ID from pipeline variable '$FEED_VAR_NAME'"
         export FEED_CONNECTION_ID="$FEED_ID"
         export PACKAGE_METADATA_FILE="$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json"
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/patch_onelake_env.py
@@ -168,10 +175,15 @@ stages:
 
     # Environment readiness gate — environments with libraries can take 20+ minutes
     - script: |
-        echo "Waiting for Fabric Environment publish to be ready..."
-        sleep 300
+        if [ -n "$(environmentReadinessWaitSeconds)" ]; then
+          WAIT_SECONDS="$(environmentReadinessWaitSeconds)"
+        else
+          WAIT_SECONDS=300
+        fi
+        echo "Waiting for Fabric Environment publish to be ready for ${WAIT_SECONDS} seconds..."
+        sleep "${WAIT_SECONDS}"
         echo "Readiness wait completed."
-      displayName: 'Environment readiness gate (5 min wait)'
+      displayName: 'Environment readiness gate (configurable wait)'
 
     # Run the validation Fabric pipeline and poll for success
     - script: |
