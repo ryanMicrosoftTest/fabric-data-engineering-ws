@@ -16,7 +16,7 @@ resources:
     ref: main
   pipelines:
     - pipeline: onelakeSecurityPkg
-      source: ryanMicrosoftTest.fabric-data-engineering-ws.onelake-security-role-test-ci   # Azure DevOps name of Pipeline A
+      source: ryanMicrosoftTest.fabric-data-engineering-ws.onelake-security-role-test-cicd   # Azure DevOps name of Pipeline A
       trigger:
         branches:
           include:
@@ -80,7 +80,7 @@ stages:
         python -m pip install pyyaml
       displayName: 'Install pyyaml for environment patch'
 
-    # Patch the Fabric Environment with exact package version and feed connection
+    # Patch the Fabric Environment with exact package version and fabric connection
     - script: |
         if [ -z "$(FEED_CONNECTION_ID)" ]; then
           echo "ERROR: pipeline variable 'FEED_CONNECTION_ID' is empty or not set"
@@ -163,26 +163,20 @@ stages:
 
     # Run the validation Fabric pipeline and poll for success
     - script: |
+        WORKSPACE_ID=$(python -c "
+        import yaml
+        with open('$(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml') as f:
+            cfg = yaml.safe_load(f)
+        print(cfg['$(targetEnvironment)']['target_workspace_id'])
+        ")
+        echo "Resolved workspace ID for $(targetEnvironment): $WORKSPACE_ID"
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
-          --workspace-id "$(DEV_WORKSPACE_ID)" \
+          --workspace-id "$WORKSPACE_ID" \
           --pipeline-name "onelake_security_role_pl" \
           --poll-interval 30 \
           --timeout 3600
-      condition: eq(variables['targetEnvironment'], 'DEV')
-      displayName: 'Run and validate onelake_security_role_pl (DEV)'
-      env:
-        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
-        AZURE_TENANT_ID: $(tenant-id-secret)
-        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
-
-    - script: |
-        python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
-          --workspace-id "$(QA_WORKSPACE_ID)" \
-          --pipeline-name "onelake_security_role_pl" \
-          --poll-interval 30 \
-          --timeout 3600
-      condition: eq(variables['targetEnvironment'], 'QA')
-      displayName: 'Run and validate onelake_security_role_pl (QA)'
+      condition: in(variables['targetEnvironment'], 'DEV', 'QA')
+      displayName: 'Run and validate onelake_security_role_pl ($(targetEnvironment))'
       env:
         AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
         AZURE_TENANT_ID: $(tenant-id-secret)

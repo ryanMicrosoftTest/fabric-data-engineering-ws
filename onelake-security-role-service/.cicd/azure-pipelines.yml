@@ -28,6 +28,20 @@ pr:
       - 'attached_config/**'
       - '.cicd/**'
 
+parameters:
+  - name: triggerDeployment
+    displayName: 'Trigger Fabric deployment (Pipeline B) after publish'
+    type: boolean
+    default: false
+  - name: deploymentEnvironment
+    displayName: 'Deployment Environment (only used when triggerDeployment is true)'
+    type: string
+    default: 'DEV'
+    values:
+      - 'DEV'
+      - 'QA'
+      - 'PROD'
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -197,3 +211,38 @@ stages:
                 dist/*.whl
             displayName: 'Publish wheel to feed'
             workingDirectory: $(workingDirectory)
+
+  - stage: TriggerDeployment
+    displayName: 'Trigger Fabric Deployment (Pipeline B)'
+    dependsOn: Publish
+    condition: and(succeeded(), eq('${{ parameters.triggerDeployment }}', 'true'))
+    jobs:
+      - job: TriggerPipelineB
+        displayName: 'Queue Pipeline B'
+        steps:
+          - bash: |
+              set -euo pipefail
+
+              # Pipeline B definition ID — update if the pipeline is recreated
+              PIPELINE_B_ID=$(az pipelines show \
+                --name "ryanMicrosoftTest.fabric-data-engineering-ws.fabric_items_cicd" \
+                --org "$(System.CollectionUri)" \
+                --project "$(System.TeamProject)" \
+                --query "id" -o tsv 2>/dev/null || echo "")
+
+              if [ -z "$PIPELINE_B_ID" ]; then
+                echo "##[error]Could not find Pipeline B. Verify the pipeline name."
+                exit 1
+              fi
+
+              echo "Triggering Pipeline B (ID: $PIPELINE_B_ID) for environment: ${{ parameters.deploymentEnvironment }}"
+
+              az pipelines run \
+                --id "$PIPELINE_B_ID" \
+                --org "$(System.CollectionUri)" \
+                --project "$(System.TeamProject)" \
+                --branch "$(Build.SourceBranch)" \
+                --parameters "environment=${{ parameters.deploymentEnvironment }}"
+            displayName: 'Trigger Pipeline B via Azure CLI'
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
