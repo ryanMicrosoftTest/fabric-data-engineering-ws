@@ -16,7 +16,7 @@ resources:
     ref: main
   pipelines:
     - pipeline: onelakeSecurityPkg
-      source: onelake-security-role-service-ci   # Azure DevOps name of Pipeline A
+      source: ryanMicrosoftTest.fabric-data-engineering-ws.onelake-security-role-test-ci   # Azure DevOps name of Pipeline A
       trigger:
         branches:
           include:
