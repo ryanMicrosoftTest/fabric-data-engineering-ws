@@ -37,18 +37,35 @@ def main():
 
     doc = yaml.safe_load(env_file.read_text(encoding="utf-8"))
 
+    package_updated = False
+    index_url_updated = False
+
     for dep in doc.get("dependencies", []):
         if isinstance(dep, dict) and "pip" in dep:
             updated = []
             for entry in dep["pip"]:
                 if isinstance(entry, str) and entry.startswith("onelake-security"):
                     updated.append(f"onelake-security=={package_version}")
+                    package_updated = True
                 elif isinstance(entry, str) and entry.startswith("--index-url"):
                     updated.append(f"--index-url {feed_connection_id}")
+                    index_url_updated = True
                 else:
                     updated.append(entry)
             dep["pip"] = updated
 
+    missing_entries = []
+    if not package_updated:
+        missing_entries.append("onelake-security")
+    if not index_url_updated:
+        missing_entries.append("--index-url")
+
+    if missing_entries:
+        print(
+            "ERROR: expected pip entries not found in environment.yml: "
+            + ", ".join(missing_entries)
+        )
+        sys.exit(1)
     env_file.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
     print(f"Updated environment.yml -> onelake-security=={package_version}")
     print(f"Updated environment.yml -> --index-url {feed_connection_id}")
