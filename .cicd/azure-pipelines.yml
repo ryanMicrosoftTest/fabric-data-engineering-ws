@@ -164,13 +164,12 @@ stages:
 
     # Run the validation Fabric pipeline and poll for success
     - script: |
-        WORKSPACE_ID=$(python - <<'PY'
-import yaml
-with open('$(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['$(targetEnvironment)']['target_workspace_id'])
-PY
-        )
+        WORKSPACE_ID=$(python -c "
+        import yaml
+        with open('$(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml') as f:
+            cfg = yaml.safe_load(f)
+        print(cfg['$(targetEnvironment)']['target_workspace_id'])
+        ")
         echo "Resolved workspace ID for $(targetEnvironment): $WORKSPACE_ID"
         python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
           --workspace-id "$WORKSPACE_ID" \
