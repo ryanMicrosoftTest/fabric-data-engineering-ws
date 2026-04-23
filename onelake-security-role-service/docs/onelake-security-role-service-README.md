@@ -44,6 +44,38 @@ This service splits the problem into two YAML-driven workflows backed by a share
 └──────────────────────────────────────────────────────────┘
 ```
 
+## Package Overview
+![Overview](images/onelake_security_library_overview.png)
+
+
+![API_Client](images/api_client_module.png)
+
+
+![Audit Module](images/audit_module_overview.png)
+
+
+![File Tracker Module](images/file_tracker_module_overview.png)
+
+
+![Models Module](images/models_module_overview.png)
+
+
+![Role Definition Reconciler Module](images/role_definition_reconciler_module_overview.png)
+
+
+![Role Membership Reconciler Module](images/role_membership_reconciler_module_overview.png)
+
+
+![Translators Module](images/translators_module_overview.png)
+
+
+![Workflow Service Module](images/workflow_service_module_overview.png)
+
+
+![Yaml Parser Module](images/yaml_parser_module_overview.png)
+
+
+
 ### Key Design Decisions
 
 | Decision | Choice | Rationale |
