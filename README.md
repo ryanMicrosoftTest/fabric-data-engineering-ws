@@ -442,6 +442,12 @@ create alerts and perform analytics.
 
 
 
+### OneLake Security Role Service
+
+YAML-driven management of OneLake data access roles for Microsoft Fabric lakehouses. Role definitions and user-to-role mappings are authored as declarative YAML files, checked into Git, and applied to lakehouses on a schedule by two thin Fabric notebooks that wrap a shared Python library (`onelake_security`). The library handles parsing, validation, translation to the Fabric REST API shape, ETag-based concurrency, idempotent reconciliation, and audit logging — so role structure (RLS / CLS / table scope) and role membership are managed independently, are version-controlled, and are safe to re-run daily without side effects.
+
+See the full design, module breakdown, and operational guidance: [onelake-security-role-service/docs/onelake-security-role-service-README.md](onelake-security-role-service/docs/onelake-security-role-service-README.md)
+
 
 
 
