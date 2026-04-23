@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataAgent",
+    "displayName": "clinical_data_agent",
+    "description": "Answers questions about patient encounters, diagnosis, procedures, medications, and lab results from the clinical lakehouse.  Use for any question about patients, visits, ICD/CPT codes or clinical outcomes"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a07019d4-fe26-a736-4743-5f868f795401"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataAgent",
+    "displayName": "mlv_data_agent",
+    "description": "This is an agent designed to answer questions related to agent orders"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8dc67598-af6e-8b43-44f4-81644d930663"
+  }
+}

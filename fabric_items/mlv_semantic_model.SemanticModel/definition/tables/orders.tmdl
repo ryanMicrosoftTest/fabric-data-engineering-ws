@@ -1,0 +1,77 @@
+table orders
+	lineageTag: 64c856a1-0875-4096-8ba4-3c2a959f9fad
+	sourceLineageTag: [dbo].[orders]
+
+	column Order_ID
+		dataType: string
+		lineageTag: 2c4f01ed-1eaf-4949-ae51-b18b84b05a80
+		sourceLineageTag: Order_ID
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order_Date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ee4d5b3b-dc5d-4da2-83c8-6791346cb0fc
+		sourceLineageTag: Order_Date
+		summarizeBy: none
+		sourceColumn: Order_Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Shipping_Date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4decd45f-fe2f-40d1-aaeb-356b3b1a259e
+		sourceLineageTag: Shipping_Date
+		summarizeBy: none
+		sourceColumn: Shipping_Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aging
+		dataType: int64
+		formatString: 0
+		lineageTag: 9238b76b-48dd-453e-9867-660abb79b9db
+		sourceLineageTag: Aging
+		summarizeBy: sum
+		sourceColumn: Aging
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ship_Mode
+		dataType: string
+		lineageTag: db94137c-f8da-447a-8ea0-6cd66e502c1f
+		sourceLineageTag: Ship_Mode
+		summarizeBy: none
+		sourceColumn: Ship_Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Category
+		dataType: string
+		lineageTag: 15812803-d193-496e-8c68-cc720dfc3c4a
+		sourceLineageTag: Product_Category
+		summarizeBy: none
+		sourceColumn: Product_Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 98629ef4-c768-4727-beff-12b9b773fed7
+		sourceLineageTag: Product
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	partition orders = entity
+		mode: directLake
+		source
+			entityName: orders
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "UserDataFunction",
+    "displayName": "hao_clinical_notes_udf"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "db92f6d6-2874-b778-45dd-e53280d0c14a"
+  }
+}

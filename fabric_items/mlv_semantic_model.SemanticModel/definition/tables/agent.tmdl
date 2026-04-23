@@ -1,0 +1,56 @@
+table agent
+	lineageTag: 179c51ef-76d5-48c8-a873-7afaa44241d1
+	sourceLineageTag: [dbo].[agent]
+
+	column Agent_ID
+		dataType: string
+		lineageTag: 3a95d489-29ce-40d8-ac10-abcecb914a90
+		sourceLineageTag: Agent_ID
+		summarizeBy: none
+		sourceColumn: Agent_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Agent_Name
+		dataType: string
+		lineageTag: a7434c78-c837-48f1-8801-a1427db53d15
+		sourceLineageTag: Agent_Name
+		summarizeBy: none
+		sourceColumn: Agent_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 0444bf54-04e9-40a1-8cad-457377524340
+		sourceLineageTag: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 5d4fd12a-5de8-4b5a-8ff4-fad62496331e
+		sourceLineageTag: State
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: c55ba3b5-6036-4a52-99d5-86268aee995b
+		sourceLineageTag: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	partition agent = entity
+		mode: directLake
+		source
+			entityName: agent
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+
