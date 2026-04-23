@@ -1,0 +1,201 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/dataSource/1.0.0/schema.json",
+  "artifactId": "0c5fbafe-0015-923c-41be-c1340386880f",
+  "workspaceId": "00000000-0000-0000-0000-000000000000",
+  "dataSourceInstructions": null,
+  "displayName": "onelake_security_lh_with_schemas",
+  "type": "lakehouse_tables",
+  "userDescription": null,
+  "metadata": {},
+  "elements": [
+    {
+      "id": "646b9120-cd9a-4f97-b16f-17cf922cbbd2",
+      "is_selected": false,
+      "display_name": "Schemas",
+      "type": "schema_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "b3c1b53a-0dc9-4a7b-85b8-f36e58ea5eb8",
+          "is_selected": false,
+          "display_name": "dbo",
+          "type": "lakehouse_tables.schema",
+          "description": null,
+          "children": [
+            {
+              "id": "20912a80-cf3a-4aec-a9ba-32911cba8934",
+              "is_selected": false,
+              "display_name": "Functions",
+              "type": "function_grouping",
+              "description": null,
+              "children": [
+                {
+                  "id": "9d24c4e8-aeb1-46ac-9e19-a35637d30e66",
+                  "is_selected": false,
+                  "display_name": "Table-valued Functions",
+                  "type": "table_valued_function_grouping",
+                  "description": null,
+                  "children": [
+                    {
+                      "id": "6dc70256-3669-4f0b-8be6-8d730bf75a4a",
+                      "is_selected": false,
+                      "display_name": "ols_predicate_640706170",
+                      "type": "lakehouse_tables.function",
+                      "description": null,
+                      "children": [
+                        {
+                          "id": "c9a5eb8c-e7fb-4b10-a818-fa83db4c1ab4",
+                          "is_selected": true,
+                          "display_name": "@659fd22a3a742405d916bfb3e24f5034",
+                          "type": "function.parameter",
+                          "data_type": "varchar",
+                          "description": null,
+                          "children": []
+                        },
+                        {
+                          "id": "d6c20d17-585d-4ed9-bd29-1a55d0151fdf",
+                          "is_selected": true,
+                          "display_name": "policyResult",
+                          "type": "function.returnValue",
+                          "data_type": "",
+                          "description": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "cc87a924-9695-4c2b-b9cf-9d7b7112d055",
+                      "is_selected": false,
+                      "display_name": "SHELL_PREDICATE",
+                      "type": "lakehouse_tables.function",
+                      "description": null,
+                      "children": [
+                        {
+                          "id": "7c3be4d1-e646-4d7a-ba12-5caef2ee4aa6",
+                          "is_selected": true,
+                          "display_name": "policyResult",
+                          "type": "function.returnValue",
+                          "data_type": "",
+                          "description": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4132779a-f591-4634-b61f-27c11924b686",
+          "is_selected": false,
+          "display_name": "health_dbo",
+          "type": "lakehouse_tables.schema",
+          "description": null,
+          "children": [
+            {
+              "id": "271937f8-0b5a-4dcf-a171-725e6526d33b",
+              "is_selected": false,
+              "display_name": "Tables",
+              "type": "table_grouping",
+              "description": null,
+              "children": [
+                {
+                  "id": "bd7284df-041e-4a88-93ce-25e4ce867a9d",
+                  "is_selected": true,
+                  "display_name": "clinical_notes",
+                  "type": "lakehouse_tables.table",
+                  "description": null,
+                  "children": [
+                    {
+                      "id": "53524298-bbd8-45fe-b3a6-d68c03577a9f",
+                      "is_selected": true,
+                      "display_name": "memo_content",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "5b49de2a-60c6-4621-bf46-29ab9158d87b",
+                      "is_selected": true,
+                      "display_name": "note_date",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "date",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "3f470667-fdb7-42de-bfc5-e5c51c22d227",
+                      "is_selected": true,
+                      "display_name": "note_id",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "f2a2e4fe-3a03-4c51-bc33-06868b532fe2",
+                      "is_selected": true,
+                      "display_name": "note_type",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "6934f1bb-627b-45e9-b319-7ad4e9043b9d",
+                      "is_selected": true,
+                      "display_name": "patient_id",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "f9695703-5920-42d9-a1f6-c561555626a9",
+                  "is_selected": true,
+                  "display_name": "doctor_table",
+                  "type": "lakehouse_tables.table",
+                  "description": null,
+                  "children": [
+                    {
+                      "id": "7fbb06f0-01ad-473a-bb95-f0155905a343",
+                      "is_selected": true,
+                      "display_name": "department",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "2c05ca03-2385-4b70-aebd-7463803d6431",
+                      "is_selected": true,
+                      "display_name": "doctor",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    },
+                    {
+                      "id": "750bcf75-f28a-44ce-afb3-78434b8763f2",
+                      "is_selected": true,
+                      "display_name": "memo_content",
+                      "type": "lakehouse_tables.column",
+                      "data_type": "varchar",
+                      "description": null,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

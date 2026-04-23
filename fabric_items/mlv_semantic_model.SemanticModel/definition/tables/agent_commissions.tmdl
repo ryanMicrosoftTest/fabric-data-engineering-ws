@@ -1,0 +1,40 @@
+table agent_commissions
+	lineageTag: 53f39b62-87f1-4395-b1cc-bfdbf940f8ce
+	sourceLineageTag: [dbo].[agent_commissions]
+
+	column Agent_ID
+		dataType: string
+		lineageTag: 9209e3b7-9a35-4a50-a900-7f9edee40a20
+		sourceLineageTag: Agent_ID
+		summarizeBy: none
+		sourceColumn: Agent_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Category
+		dataType: string
+		lineageTag: 247fea98-2cf1-4809-8795-1be25851569d
+		sourceLineageTag: Product_Category
+		summarizeBy: none
+		sourceColumn: Product_Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Commission_Percentage
+		dataType: double
+		lineageTag: 85a6030d-6aa8-4207-a2de-306b30f41ed7
+		sourceLineageTag: Commission_Percentage
+		summarizeBy: sum
+		sourceColumn: Commission_Percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition agent_commissions = entity
+		mode: directLake
+		source
+			entityName: agent_commissions
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+

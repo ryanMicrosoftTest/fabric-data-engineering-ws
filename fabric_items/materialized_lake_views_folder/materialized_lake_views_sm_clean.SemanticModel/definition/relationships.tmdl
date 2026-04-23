@@ -1,0 +1,8 @@
+relationship c4ab9802-ec9e-914f-32f2-66b6d02123fd
+	fromColumn: order_fact.Order_Date
+	toColumn: dim_date.Date
+
+relationship f4254ea9-585d-86b8-311d-cec7f5e576bf
+	fromColumn: agent.Agent_ID
+	toColumn: order_fact.Agent_ID
+
