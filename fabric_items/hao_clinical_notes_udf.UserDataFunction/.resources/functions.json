@@ -1,0 +1,109 @@
+{
+  "runtime": "PYTHON",
+  "functionsMetadata": [
+    {
+      "name": "get_patients_by_id",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        },
+        {
+          "name": "lh",
+          "type": "FabricItem",
+          "direction": "In",
+          "alias": "onelakeSecurity",
+          "subType": "FabricLakehouseClient",
+          "itemType": null,
+          "audienceType": null
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "dict",
+        "fabricFunctionParameters": []
+      }
+    },
+    {
+      "name": "get_clinical_notes_by_patient_id",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        },
+        {
+          "name": "lh",
+          "type": "FabricItem",
+          "direction": "In",
+          "alias": "onelakeSecurity",
+          "subType": "FabricLakehouseClient",
+          "itemType": null,
+          "audienceType": null
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "list",
+        "fabricFunctionParameters": [
+          {
+            "name": "patientId",
+            "dataType": "str",
+            "hasDefaultValue": false,
+            "defaultValue": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_clinical_note_by_patient_id",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        },
+        {
+          "name": "lh",
+          "type": "FabricItem",
+          "direction": "In",
+          "alias": "onelakeSecurity",
+          "subType": "FabricLakehouseClient",
+          "itemType": null,
+          "audienceType": null
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "dict",
+        "fabricFunctionParameters": [
+          {
+            "name": "noteId",
+            "dataType": "str",
+            "hasDefaultValue": false,
+            "defaultValue": null
+          }
+        ]
+      }
+    }
+  ]
+}

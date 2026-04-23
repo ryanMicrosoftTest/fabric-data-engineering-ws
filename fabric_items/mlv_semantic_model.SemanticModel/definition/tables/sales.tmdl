@@ -1,0 +1,98 @@
+table sales
+	lineageTag: acd19f7e-b590-4e4d-819b-7f79667db53f
+	sourceLineageTag: [dbo].[sales]
+
+	column Order_ID
+		dataType: string
+		lineageTag: bffed7d1-b84c-4e38-b830-35408a77806e
+		sourceLineageTag: Order_ID
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Agent_ID
+		dataType: string
+		lineageTag: 2dd15b53-6d3d-4320-bd67-44837cee6a46
+		sourceLineageTag: Agent_ID
+		summarizeBy: none
+		sourceColumn: Agent_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: int64
+		formatString: 0
+		lineageTag: 26294b74-c3ab-4f2b-93cd-fdc3e163b0b7
+		sourceLineageTag: Sales
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: dc065cdd-dfab-498f-b15e-d3593a482800
+		sourceLineageTag: Quantity
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount
+		dataType: int64
+		formatString: 0
+		lineageTag: 98bfa504-17f7-466c-8b93-0bc84037282c
+		sourceLineageTag: Discount
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: int64
+		formatString: 0
+		lineageTag: e7800f5c-eb2e-4fcd-b837-b4caf9c3c07c
+		sourceLineageTag: Profit
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+	column Shipping_Cost
+		dataType: double
+		lineageTag: 74872e5c-b263-4c1c-88d9-9dc3d91364dc
+		sourceLineageTag: Shipping_Cost
+		summarizeBy: sum
+		sourceColumn: Shipping_Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Order_Priority
+		dataType: string
+		lineageTag: d95f3cb2-717c-404e-998d-946200143033
+		sourceLineageTag: Order_Priority
+		summarizeBy: none
+		sourceColumn: Order_Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_ID
+		dataType: string
+		lineageTag: 41d73570-4939-4cb7-acb2-259eaeabd8ad
+		sourceLineageTag: Customer_ID
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales = entity
+		mode: directLake
+		source
+			entityName: sales
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+

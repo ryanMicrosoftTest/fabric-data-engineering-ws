@@ -1,27 +1,39 @@
-trigger:
-  branches:
-    include:
-      - main  
-      - release/*
-      - feature/**
+# Fabric Deployment Pipeline (Pipeline B)
+# ==========================================
+# Triggered only by Pipeline A completion. Deploys all fabric_items to the
+# target workspace, patches the Environment with the exact package version,
+# then validates by running the onelake_security_role_pl pipeline.
 
-# Add resources section to define external repositories
+trigger: none
+pr: none
+
 resources:
   repositories:
   - repository: fabric-cicd-demo
     type: github
-    endpoint: RyanMicrosoftContosoUniversity  # This should be your GitHub service connection name
+    endpoint: RyanMicrosoftContosoUniversity
     name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
     ref: main
+  pipelines:
+    - pipeline: onelakeSecurityPkg
+      source: ryanMicrosoftTest.fabric-data-engineering-ws.onelake-security-role-test-cicd   # Azure DevOps name of Pipeline A
+      trigger:
+        branches:
+          include:
+            - main
+            - feature/*
+            - release/*
+            - copilot/*
+            - copilot/*
 
 pool:
-  vmImage: 'ubuntu-latest'  
+  vmImage: 'ubuntu-latest'
 
 parameters:
   - name: environment
     displayName: Deployment Environment
     type: string
-    default: 'DEV'
+    default: 'QA'
     values:
       - 'DEV'
       - 'QA'
@@ -30,62 +42,86 @@ parameters:
 variables:
   - name: targetEnvironment
     value: ${{ parameters.environment }}
+  - name: FEED_CONNECTION_ID
+    value: '472fe7a1-c6d3-4f4f-b2b5-f8bcaf988310'
 
 stages:
 - stage: DeployFabricItems
   displayName: 'Deploy Fabric Items'
   jobs:
-  - job: AuthenticateAndDeploy
-    displayName: 'Authenticate and Deploy'
+  - job: PatchAndDeploy
+    displayName: 'Patch Environment, Deploy & Validate'
     timeoutInMinutes: 360
     steps:
     # Checkout the current repository
-    - checkout: self  
+    - checkout: self
       fetchDepth: 1
-      path: s/current-repo  # Optional: specify a subdirectory
+      path: s/current-repo
       displayName: 'Checkout current repository'
 
     # Checkout the external repository
     - checkout: fabric-cicd-demo
       fetchDepth: 1
-      path: s/fabric-cicd-demo  # Optional: specify a subdirectory
+      path: s/fabric-cicd-demo
       displayName: 'Checkout fabric-cicd-demo repository'
 
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.11' 
+        versionSpec: '3.11'
         addToPath: true
       displayName: 'Set up Python'
+
+    # Download metadata from Pipeline A
+    - download: onelakeSecurityPkg
+      artifact: package_metadata
+      displayName: 'Download package metadata from Pipeline A'
+
+    # Install pyyaml early — needed by patch_onelake_env.py
+    - script: |
+        python -m pip install pyyaml
+      displayName: 'Install pyyaml for environment patch'
+
+    # Patch the Fabric Environment with exact package version and fabric connection
+    - script: |
+        if [ -z "$(FEED_CONNECTION_ID)" ]; then
+          echo "ERROR: pipeline variable 'FEED_CONNECTION_ID' is empty or not set"
+          exit 1
+        fi
+        export FEED_CONNECTION_ID="$(FEED_CONNECTION_ID)"
+        export PACKAGE_METADATA_FILE="$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json"
+        python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/patch_onelake_env.py
+      displayName: 'Patch onelake_security_utils environment.yml'
+      workingDirectory: $(Build.SourcesDirectory)/current-repo
 
     # ...existing code...
     - task: AzureKeyVault@2
       condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
       inputs:
-        azureSubscription: 'fabric-sc'  
-        KeyVaultName: '$(KeyVaultNameNonProd)'  
+        azureSubscription: 'fabric-sc'
+        KeyVaultName: '$(KeyVaultNameNonProd)'
         SecretsFilter: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
       displayName: 'Get Key Vault Secrets (DEV/QA)'
 
     - task: AzureKeyVault@2
       condition: eq(variables['targetEnvironment'], 'PROD')
       inputs:
-        azureSubscription: 'fabric-sc-prod'  
-        KeyVaultName: '$(KeyVaultNameProd)'  
+        azureSubscription: 'fabric-sc-prod'
+        KeyVaultName: '$(KeyVaultNameProd)'
         SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
       displayName: 'Get Key Vault Secrets (PROD)'
 
     - script: |
         python -m pip install --upgrade pip
         pip install -r $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt
+        pip install pyyaml requests msal
       displayName: 'Install dependencies'
 
-    # Example of using files from the external repository
+    # Show repository contents
     - script: |
         echo "Current repo directory:"
         ls -la $(Build.SourcesDirectory)/current-repo
         echo "External repo directory:"
         ls -la $(Build.SourcesDirectory)/fabric-cicd-demo
-        # You can now access files from both repositories
       displayName: 'Show repository contents'
 
     - script: |
@@ -117,7 +153,7 @@ stages:
         AZURE_CLIENT_SECRET: $(fabric-prod-secret)
         FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
       displayName: 'Run authentication and deployment script (PROD)'
-    
+
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/current-repo/fabric_cicd.error.log'
@@ -125,3 +161,24 @@ stages:
         publishLocation: 'Container'
       condition: always()
       displayName: 'Publish error log artifact'
+
+    # Run the validation Fabric pipeline and poll for success
+    - script: |
+        WORKSPACE_ID=$(python -c "
+        import yaml
+        with open('$(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml') as f:
+            cfg = yaml.safe_load(f)
+        print(cfg['$(targetEnvironment)']['target_workspace_id'])
+        ")
+        echo "Resolved workspace ID for $(targetEnvironment): $WORKSPACE_ID"
+        python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
+          --workspace-id "$WORKSPACE_ID" \
+          --pipeline-name "onelake_security_role_pl" \
+          --poll-interval 30 \
+          --timeout 3600
+      condition: in(variables['targetEnvironment'], 'DEV', 'QA')
+      displayName: 'Run and validate onelake_security_role_pl ($(targetEnvironment))'
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)

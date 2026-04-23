@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "create_addl_relationships_mlv"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8b5831e1-612d-a3d3-423d-af753273b4b4"
+  }
+}

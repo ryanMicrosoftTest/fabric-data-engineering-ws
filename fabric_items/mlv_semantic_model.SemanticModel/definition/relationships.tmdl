@@ -1,0 +1,20 @@
+relationship e2869912-1d3e-093d-a7f9-1ca9628a9faa
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: orders.Order_ID
+	toColumn: sales.Order_ID
+
+relationship 6f36527c-817d-01d1-28fb-7a9867c57241
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: orders.Order_ID
+	toColumn: location.Order_ID
+
+relationship aa2d3aa7-4bc4-be0c-95e7-07ec4b5040cc
+	fromColumn: sales.Agent_ID
+	toColumn: agent.Agent_ID
+
+relationship 58f06046-4b53-d8b0-c8fa-601d8327c364
+	fromColumn: agent_commissions.Agent_ID
+	toColumn: agent.Agent_ID
+
