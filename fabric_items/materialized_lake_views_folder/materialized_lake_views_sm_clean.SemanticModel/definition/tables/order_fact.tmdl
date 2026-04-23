@@ -1,0 +1,212 @@
+table order_fact
+	lineageTag: 8338ca8b-776d-48bb-92ef-29ef9e9d3f22
+	sourceLineageTag: [dbo].[order_fact]
+
+	column Order_ID
+		dataType: string
+		lineageTag: e8cf5c32-b99d-4b6a-8bee-45bcc4371ae8
+		sourceLineageTag: Order_ID
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Agent_ID
+		dataType: string
+		lineageTag: b9b38c8a-83e3-40e0-aefd-8eb7d3042818
+		sourceLineageTag: Agent_ID
+		summarizeBy: none
+		sourceColumn: Agent_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Category
+		dataType: string
+		lineageTag: 0a0b5d3b-229a-4ab0-b3df-e7b93b3bfe76
+		sourceLineageTag: Product_Category
+		summarizeBy: none
+		sourceColumn: Product_Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 826243a7-612d-411b-85f7-2bd998e2c5ee
+		sourceLineageTag: Product
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order_Date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 592025fc-aa06-44bc-876f-99a1df10e23b
+		sourceLineageTag: Order_Date
+		summarizeBy: none
+		sourceColumn: Order_Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Shipping_Date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3d55d9b7-f89c-44b7-83ae-a31183480df9
+		sourceLineageTag: Shipping_Date
+		summarizeBy: none
+		sourceColumn: Shipping_Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: int64
+		formatString: 0
+		lineageTag: bef542f3-ca84-478c-a867-02acfa800a28
+		sourceLineageTag: Sales
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 18d44ba8-f2a3-449f-b4be-dc8fa800f604
+		sourceLineageTag: Quantity
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount
+		dataType: int64
+		formatString: 0
+		lineageTag: 7826630b-0a90-43b0-a175-1c9001356f31
+		sourceLineageTag: Discount
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: int64
+		formatString: 0
+		lineageTag: 2e691303-d67e-416c-8e22-149889b8da78
+		sourceLineageTag: Profit
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+	column Shipping_Cost
+		dataType: double
+		lineageTag: c66c7145-7e6f-4b04-b68d-7f40aa950870
+		sourceLineageTag: Shipping_Cost
+		summarizeBy: sum
+		sourceColumn: Shipping_Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Customer_ID
+		dataType: string
+		lineageTag: 66e6baa3-6456-443c-a7fe-108ba084ccec
+		sourceLineageTag: Customer_ID
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 6c10678c-f3bb-4f67-b111-df0e26b77914
+		sourceLineageTag: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: e2de1324-4029-4313-ab23-80f3f0876c18
+		sourceLineageTag: State
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 8d0c7ee7-4abf-4149-bacc-78d74fe6cba7
+		sourceLineageTag: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 317fb192-d850-41d9-aa98-6e4cf9031012
+		sourceLineageTag: Region
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 2306a539-3d82-4d83-99f6-5228b75e8b04
+		sourceLineageTag: Segment
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Name
+		dataType: string
+		lineageTag: 79c85dc0-daf0-4053-980b-4ee6a0a485b9
+		sourceLineageTag: Customer_Name
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Commission_Percentage
+		dataType: double
+		lineageTag: 02cf61f0-3cf1-44cd-9c6f-a7230c9619cc
+		sourceLineageTag: Commission_Percentage
+		summarizeBy: sum
+		sourceColumn: Commission_Percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Commission_Amount
+		dataType: double
+		lineageTag: 7e606080-ceb4-4a01-8673-2d0a9f528e11
+		sourceLineageTag: Commission_Amount
+		summarizeBy: sum
+		sourceColumn: Commission_Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column agent_id_product_category_key
+		dataType: string
+		lineageTag: ec090ca4-09bd-4d5e-856f-82ce8bb02e9f
+		sourceLineageTag: agent_id_product_category_key
+		summarizeBy: none
+		sourceColumn: agent_id_product_category_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition order_fact = entity
+		mode: directLake
+		source
+			entityName: order_fact
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+

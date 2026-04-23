@@ -1,0 +1,84 @@
+table location
+	lineageTag: 8a1f244f-ca95-4a95-8ce0-75347f39dd4e
+	sourceLineageTag: [dbo].[location]
+
+	column Order_ID
+		dataType: string
+		lineageTag: 9e8b0602-df51-4e31-b37a-3c142040801d
+		sourceLineageTag: Order_ID
+		summarizeBy: none
+		sourceColumn: Order_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: a7e570d8-2832-47cd-8952-ee93405a58d8
+		sourceLineageTag: Location_ID
+		summarizeBy: count
+		sourceColumn: Location_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f125a7a2-d6c5-4baa-b542-098444d89ad8
+		sourceLineageTag: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: b22d662a-eae7-4768-80fe-b855f89e5e07
+		sourceLineageTag: State
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: d74645f8-eab0-4a1f-8710-b7197b31b1fd
+		sourceLineageTag: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: b08bd81a-7396-4d80-97cf-6d0e2acabd36
+		sourceLineageTag: Region
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 572039ae-cab4-4760-8a28-f291f31bb415
+		sourceLineageTag: Segment
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Name
+		dataType: string
+		lineageTag: e0039c66-b924-48f5-bd54-3279f41dd6f9
+		sourceLineageTag: Customer_Name
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition location = entity
+		mode: directLake
+		source
+			entityName: location
+			schemaName: dbo
+			expressionSource: 'DirectLake - materialized_lake_views_lakehouse'
+

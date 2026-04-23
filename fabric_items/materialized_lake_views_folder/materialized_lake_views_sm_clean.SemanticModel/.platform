@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "materialized_lake_views_sm_clean"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "6b0a8690-2f4f-af87-4ae9-f9cf601ef555"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
+  "fewShots": [
+    {
+      "id": "abf039e1-936b-49a4-b187-12097ed01b7a",
+      "question": "What were our total sales?",
+      "query": "SELECT SUM(Sales) AS Total_Sales\r\n FROM order_fact;"
+    },
+    {
+      "id": "288653be-c3d3-40d0-8b1f-cfea20d55e92",
+      "question": "Show me sales by year.",
+      "query": "SELECT d.Year, SUM(f.Sales) AS Total_Sales\r\n FROM order_fact f\r\n JOIN dim_date d ON d.Date = f.Order_Date\r\n GROUP BY d.Year\r\n ORDER BY d.Year;"
+    },
+    {
+      "id": "e86864de-02a7-40ce-9843-ecd205e4c4d0",
+      "question": "Who are the top 10 agents by total sales?",
+      "query": "SELECT TOP (10) a.Agent_Name, SUM(f.Sales) AS Total_Sales\r\n FROM order_fact f\r\n JOIN agent a ON a.Agent_ID = f.Agent_ID\r\n GROUP BY a.Agent_Name\r\n ORDER BY Total_Sales DESC;"
+    },
+    {
+      "id": "21f1a25c-9198-4ead-931b-4565dfd7029a",
+      "question": "What are sales by region?",
+      "query": "SELECT Region,\r\n        SUM(Sales)  AS Total_Sales,\r\n        SUM(Profit) AS Total_Profit\r\n FROM order_fact\r\n GROUP BY Region\r\n ORDER BY Total_Sales DESC;"
+    },
+    {
+      "id": "71abd2a2-e938-43d5-b7e5-87a3ca26e871",
+      "question": "What's the profit margin by product category?",
+      "query": "SELECT Product_Category,\r\n        SUM(Sales)  AS Sales,\r\n        SUM(Profit) AS Profit,\r\n        CAST(SUM(Profit) * 100.0 / NULLIF(SUM(Sales), 0) AS DECIMAL(10,2)) AS Profit_Margin_Pct\r\n FROM order_fact\r\n GROUP BY Product_Category\r\n ORDER BY Profit_Margin_Pct DESC;"
+    },
+    {
+      "id": "3dd00d3f-798c-47c8-b4ee-18bac62bd6d7",
+      "question": "How much commission has each agent earned?",
+      "query": "SELECT a.Agent_Name,\r\n        SUM(f.Commission_Amount) AS Total_Commission\r\n FROM order_fact f\r\n JOIN agent a ON a.Agent_ID = f.Agent_ID\r\n GROUP BY a.Agent_Name\r\n ORDER BY Total_Commission DESC;"
+    },
+    {
+      "id": "3536b656-eb69-4088-b2a6-759a15ee223b",
+      "question": "What's the year-over-year sales change?",
+      "query": "WITH yearly AS (\r\n     SELECT d.Year, SUM(f.Sales) AS Sales\r\n     FROM order_fact f\r\n     JOIN dim_date d ON d.Date = f.Order_Date\r\n     GROUP BY d.Year\r\n )\r\n SELECT  c.Year,\r\n         c.Sales            AS Current_Year_Sales,\r\n         p.Sales            AS Prior_Year_Sales,\r\n         CAST((c.Sales - p.Sales) * 100.0 / NULLIF(p.Sales, 0) AS DECIMAL(10,2)) AS YoY_Pct\r\n FROM yearly c\r\n LEFT JOIN yearly p ON p.Year = c.Year - 1\r\n ORDER BY c.Year;"
+    },
+    {
+      "id": "b3616554-2479-404d-9c77-daf491ac9bd5",
+      "question": "What were Electronics sales in 2024?",
+      "query": "SELECT SUM(f.Sales) AS Electronics_2024_Sales\r\n FROM order_fact f\r\n JOIN dim_date d ON d.Date = f.Order_Date\r\n WHERE f.Product_Category = 'Electronics'\r\n   AND d.Year = 2024;"
+    },
+    {
+      "id": "0e0d7e9d-95f5-46bf-8c60-195265bf523b",
+      "question": "How many unique orders and customers do we have?",
+      "query": "SELECT COUNT(DISTINCT Order_ID)    AS Distinct_Orders,\r\n        COUNT(DISTINCT Customer_ID) AS Distinct_Customers\r\n FROM order_fact;"
+    },
+    {
+      "id": "8b7a9824-8944-47e1-a4a1-0ad7e0d45472",
+      "question": "Show me sales by region across years.",
+      "query": "SELECT f.Region, d.Year, SUM(f.Sales) AS Sales\r\n FROM order_fact f\r\n JOIN dim_date d ON d.Date = f.Order_Date\r\n GROUP BY f.Region, d.Year\r\n ORDER BY f.Region, d.Year;"
+    },
+    {
+      "id": "df356087-e437-4233-8f6c-938330da8a9a",
+      "question": "What's the average discount on orders that lost money vs. orders that made money?",
+      "query": "SELECT CASE WHEN Profit > 0 THEN 'Profitable' ELSE 'Unprofitable' END AS Outcome,\r\n        AVG(CAST(Discount AS DECIMAL(10,2))) AS Avg_Discount,\r\n        COUNT(*)                              AS Order_Lines\r\n FROM order_fact\r\n GROUP BY CASE WHEN Profit > 0 THEN 'Profitable' ELSE 'Unprofitable' END;"
+    },
+    {
+      "id": "84272866-e0e7-419e-948d-51b15522508c",
+      "question": "Who is the top-selling agent in the West region?",
+      "query": "SELECT TOP (1) a.Agent_Name, SUM(f.Sales) AS Sales\r\n FROM order_fact f\r\n JOIN agent a ON a.Agent_ID = f.Agent_ID\r\n WHERE f.Region = 'West'\r\n GROUP BY a.Agent_Name\r\n ORDER BY Sales DESC;"
+    }
+  ]
+}

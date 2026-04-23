@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "ncei_daily_summaries_ingestion",
+    "description": "NCEI Daily Summaries ingestion (from ncei_ingestion/service.py)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "eb4cdac4-6fd4-8287-4bb5-8b27e2621570"
+  }
+}
