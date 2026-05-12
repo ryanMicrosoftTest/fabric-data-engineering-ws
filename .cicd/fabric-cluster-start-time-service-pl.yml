@@ -195,9 +195,13 @@ stages:
         - checkout: self
           fetchDepth: 1
 
-        - task: TerraformInstaller@1
-          inputs:
-            terraformVersion: 'latest'
+        - bash: |
+            set -euo pipefail
+            TF_VERSION="${TF_VERSION:-1.9.8}"
+            curl -fsSL -o /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+            unzip -o /tmp/terraform.zip -d /tmp/terraform-bin
+            sudo mv /tmp/terraform-bin/terraform /usr/local/bin/terraform
+            terraform version
           displayName: 'Install Terraform'
 
         - task: AzureCLI@2
