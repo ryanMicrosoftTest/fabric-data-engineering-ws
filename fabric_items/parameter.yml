@@ -73,9 +73,20 @@ find_replace:
       item_name: "Load Customer Data"
 
     # 'Load Customer Data' - sink DataWarehouse 'WorldWideImporters' workspaceId
-    # (Source Lakehouse workspaceId is the all-zero placeholder GUID and resolves to the
-    # current workspace at runtime, so it does not need a find_replace entry.)
     - find_value: a8cbda3d-903e-4154-97d9-9a91c95abb42
+      replace_value:
+        DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
+        QA: 2ae91835-ea46-482c-8656-14362495e197
+        PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
+    # 'Load Customer Data' - source Lakehouse 'new_wwi_lakehouse' workspaceId
+    # The local file has the all-zero placeholder GUID. Fabric's updateDefinition
+    # API rejects all-zeros on linked services for an existing pipeline; it must
+    # be the actual target workspace GUID. Scoped to this DataPipeline only so
+    # other items that legitimately use the all-zero placeholder are unaffected.
+    - find_value: "00000000-0000-0000-0000-000000000000"
       replace_value:
         DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
         QA: 2ae91835-ea46-482c-8656-14362495e197
