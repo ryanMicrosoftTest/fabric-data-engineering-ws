@@ -60,6 +60,10 @@ parameters:
     displayName: Skip Warehouse (sqlpackage) stage
     type: boolean
     default: false
+  - name: runDeployStages
+    displayName: Force deploy stages to run on feature/* branches (manual full run)
+    type: boolean
+    default: false
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -188,7 +192,10 @@ stages:
     and(
       succeeded(),
       ne('${{ parameters.skipInfra }}', 'True'),
-      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
     )
   jobs:
     - job: terraformJob
@@ -246,7 +253,10 @@ stages:
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
       ne('${{ parameters.skipWarehouse }}', 'True'),
-      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
     )
   jobs:
     - job: Sqlpackage
@@ -309,7 +319,10 @@ stages:
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
       in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped'),
-      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
     )
   jobs:
     - job: PublishFunc
@@ -360,7 +373,14 @@ stages:
   dependsOn:
     - InfraDeploy
     - FunctionDeploy
-  condition: and(succeeded('FunctionDeploy'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')))
+  condition: |
+    and(
+      succeeded('FunctionDeploy'),
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
+    )
   jobs:
     - job: HealthCheck
       displayName: 'GET /api/health'
