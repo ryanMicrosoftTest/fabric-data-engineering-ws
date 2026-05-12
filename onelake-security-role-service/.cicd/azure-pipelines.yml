@@ -4,6 +4,7 @@
 # Publishes the wheel to Azure Artifacts and emits metadata for Pipeline B.
 
 trigger:
+  batch: true
   branches:
     include:
       - main
