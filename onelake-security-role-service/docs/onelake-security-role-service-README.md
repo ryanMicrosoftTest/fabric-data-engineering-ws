@@ -94,7 +94,7 @@ This service splits the problem into two YAML-driven workflows backed by a share
 ```
 onelake-security-role-service/
 ├── .cicd/
-│   └── azure-pipelines.yml          # CI/CD: test → build → publish to Azure Artifacts
+│   └── onelake-security-role-service-cicd.yml  # CI/CD: test → build → publish to Azure Artifacts
 ├── src/
 │   └── onelake_security/            # Installable Python package (the shared utils library)
 │       ├── __init__.py
@@ -248,7 +248,7 @@ python -m build --wheel
 
 ## CI/CD Pipeline
 
-The Azure DevOps pipeline (`.cicd/azure-pipelines.yml`) has two stages:
+The Azure DevOps pipeline (`.cicd/onelake-security-role-service-cicd.yml`) has two stages:
 
 ### Stage 1: Test (every push/PR)
 - Installs dependencies from `requirements.txt`

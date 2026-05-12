@@ -77,7 +77,7 @@ variables:
     value: '$(Build.SourcesDirectory)/fabric-cluster-start-time-service/iac/warehouse'
   - name: envLower
     value: $[ lower(variables['targetEnvironment']) ]
-  # Conditional service connection / KV pattern — mirrors .cicd/azure-pipelines.yml
+  # Conditional service connection / KV pattern — mirrors .cicd/fabric-items-cicd.yml
   - ${{ if eq(parameters.environment, 'PROD') }}:
     - name: azureServiceConnection
       value: 'fabric-sc-prod'

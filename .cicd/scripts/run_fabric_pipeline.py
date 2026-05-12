@@ -1,6 +1,6 @@
 """Run a Fabric Data Pipeline by name and poll until it reaches a terminal status.
 
-Usage (from Pipeline B):
+Usage (from fabric-items-deployment-pipeline):
     python run_fabric_pipeline.py \
         --workspace-id <GUID> \
         --pipeline-name onelake_security_role_pl \
