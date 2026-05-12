@@ -24,3 +24,9 @@ onelake-security-role-service\.pytest_cache
 build/
 dist/
 *.egg-info/
+on-prem-to-fabric-wh/.env
+fabric-cluster-start-time-service/func.excalidraw
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup

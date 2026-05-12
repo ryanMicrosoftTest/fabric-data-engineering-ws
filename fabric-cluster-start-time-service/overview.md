@@ -163,3 +163,89 @@ Notes / caveats:
 - Some fields (notably `livy_session_id`, the Livy state-log, and per-statement timings) are exposed under the Spark/Livy monitoring surface, which is in active development. Expect to use both the Fabric Spark Monitoring REST endpoints and a direct Livy session query, and snapshot raw responses in Bronze so you can re-derive Silver/Gold if the schema shifts.
 - Always prefer values *snapshotted on the job instance* (config-as-run) over current values from the notebook/environment/pool APIs when the run is historical — notebooks, envs, and pools change.
 - For the `environment_versions_dim`, the `libraries[]` snapshot comes from Environments API → `…/libraries` (published) at the time the version was first observed; capture once per `(environment_id, environment_published_version)` and never overwrite.
+
+# Storage architecture
+
+## Compute / collector
+Azure Function (Python, timer trigger + HTTP trigger for ad-hoc runs). Keeps the collector in an independent failure domain from Fabric so it doesn't pollute its own cold-start metrics.
+
+## Persistence: one Fabric Warehouse
+A single Fabric Warehouse holds everything. All sources land in their own `raw` table before being merged into curated facts/dims. Schemas separate concerns:
+
+| Schema | Purpose |
+|---|---|
+| `raw` | Landing tables — one per source API. Append-only. Raw JSON payload + parsed columns. |
+| `dbo` | Curated fact + dim tables that Power BI queries. |
+| `meta` | Collector bookkeeping — watermarks, run logs, errors. |
+
+Rationale for one warehouse (not multiple): single audience and purpose, cross-table joins stay trivial, one Managed Identity grant, one Power BI semantic model, and the volume is far below any threshold that would justify splitting.
+
+## Tables
+
+### `raw.*` — one per source API
+
+Every `raw.*` table includes `ingested_at_utc`, `collector_run_id`, and a `raw_payload nvarchar(max)` column holding the original JSON, alongside parsed columns. Append-only.
+
+| Table | Grain | Source API | Notes |
+|---|---|---|---|
+| `raw.job_instance` | 1 row per notebook job instance | Job Instance API | Driver of the whole pipeline — everything else is keyed off `jobInstanceId` discovered here. |
+| `raw.spark_application` | 1 row per Spark app | Spark Monitoring | Holds `spark_total/queued/running_duration`. |
+| `raw.livy_session` | 1 row per Livy session | Livy Sessions API | Session state-log JSON parsed for `t_session_provision`, `t_environment_install`. |
+| `raw.livy_statement` | 1 row per statement | Livy Statements API | Needed for `t_first_statement_dispatch`. Optional in v1 — derive from session-only if deferred. |
+| `raw.notebook_definition` | 1 row per (notebook, observed_at) | Notebook Def API | Snapshot of `.platform` JSON — env_id, pool, lakehouses at observation time. |
+| `raw.notebook_item` | 1 row per notebook | Items API | Slow-changing — re-poll on a longer cadence. |
+| `raw.workspace` | 1 row per workspace | Workspaces API | Slow-changing. Fold `capacity_id` / `capacity_sku` here. |
+| `raw.environment` | 1 row per (env, observed_at) | Environments API | Captures `publishedVersion` over time. |
+| `raw.environment_library` | 1 row per (env, version, library) | Environments API `…/libraries` | Library snapshot. Capture once per `(environment_id, environment_published_version)` and never re-pull. |
+| `raw.spark_pool` | 1 row per pool | Spark Pools API | Slow-changing. |
+
+### `dbo.*` — curated model
+
+**Essential (v1):**
+
+| Table | Grain | Purpose |
+|---|---|---|
+| `dbo.notebook_run_facts` | 1 row per notebook job instance | Headline fact table. PK = `run_id`. Denormalizes notebook/workspace/pool name in for v1 simplicity. MERGE target. |
+| `dbo.environment_versions_dim` | 1 row per (env_id, version) | Library snapshot — joined to facts on `(environment_id, environment_published_version)`. |
+
+**Optional (add when reports demand them):**
+
+| Table | When to add |
+|---|---|
+| `dbo.notebook_dim` | When you want notebook display names to live in one place (handles renames cleanly). |
+| `dbo.workspace_dim` | Same reasoning, plus capacity binding history. |
+| `dbo.spark_pool_dim` | When you want pool config history (node-size changes over time). |
+| `dbo.notebook_run_statement_facts` | When you want statement-level latency reporting (drilldown beyond `bootstrap_seconds`). |
+
+For v1, denormalize names into the fact table; promote to dims only when the pain shows up.
+
+### `meta.*` — collector operations
+
+| Table | Purpose |
+|---|---|
+| `meta.collection_watermark` | Per-(workspace, source) high-water mark. Function reads at start, writes at end. Drives `$filter=startTimeUtc gt …` for incremental Job Instance pulls. |
+| `meta.collection_run_log` | One row per Function invocation — `run_id`, started/ended_at, status, rows landed per source, rows merged, error summary. |
+| `meta.collection_error_log` | One row per failed API call — workspace, endpoint, status code, error body. Triage without trawling Function logs. |
+
+### Table count
+
+| Schema | Essential | Optional |
+|---|---|---|
+| `raw` | 9 | +1 (`raw.livy_statement`) |
+| `dbo` | 2 | +4 (3 dims + statement fact) |
+| `meta` | 3 | 0 |
+| **Total** | **14** | **+5** |
+
+## MERGE keys
+
+- `dbo.notebook_run_facts` — MERGE on `run_id`. Idempotent: re-running the collector for the same window is safe.
+- `dbo.environment_versions_dim` — MERGE on `(environment_id, environment_published_version)`. Also idempotent.
+
+## Design notes
+
+- **Two flavors of `raw` tables**:
+  - *Per-event* (`job_instance`, `spark_application`, `livy_session`, `livy_statement`) — append-only, grow forever.
+  - *Slow-changing reference* (`notebook_item`, `workspace`, `environment`, `spark_pool`) — for v1, snapshot every collection run with `observed_at`. Storage is cheap; "diff vs last known" can come later if needed.
+- **`raw.environment_library` is special** — capture once per `(environment_id, environment_published_version)` and never re-pull. Saves a lot of API calls.
+- **Function → Warehouse write path**: `pyodbc` against the Warehouse SQL endpoint with an Entra token from the Function's Managed Identity. Bulk insert into `raw.*`, then `EXEC` a stored proc that MERGEs raw → curated.
+- **Power BI** consumes the curated `dbo.*` tables via the Warehouse's SQL analytics endpoint (Direct Lake on the auto-generated semantic model). No mirror, no refresh.
