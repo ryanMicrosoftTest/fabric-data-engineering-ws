@@ -1,15 +1,15 @@
 """Activity: fetch notebook definitions via LRO."""
+
 from __future__ import annotations
 
 import asyncio
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.notebook_definition"
 KEY_COLUMNS = ["workspace_id", "notebook_id"]
@@ -46,7 +46,7 @@ async def collect_notebook_definitions(payload: dict) -> dict:
                     *[_fetch_one(client, wid, nid, sem) for nid in notebook_ids],
                     return_exceptions=False,
                 )
-            for nid, definition in zip(notebook_ids, results):
+            for nid, definition in zip(notebook_ids, results, strict=True):
                 if definition is None:
                     continue
                 rows.append(build_row(definition, {"workspace_id": wid, "notebook_id": nid}, cri))

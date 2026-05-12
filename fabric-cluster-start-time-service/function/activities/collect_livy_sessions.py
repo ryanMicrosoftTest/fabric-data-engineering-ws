@@ -1,24 +1,22 @@
 """Activity: collect livy session detail for each session id."""
+
 from __future__ import annotations
 
 import asyncio
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.livy_session"
 KEY_COLUMNS = ["workspace_id", "livy_session_id"]
 _CONCURRENCY = 4
 
 
-async def _fetch_one(
-    client: FabricClient, wid: str, livy_id: str, sem: asyncio.Semaphore
-) -> dict | None:
+async def _fetch_one(client: FabricClient, wid: str, livy_id: str, sem: asyncio.Semaphore) -> dict | None:
     async with sem:
         try:
             return await client.get(f"/v1/workspaces/{wid}/spark/livySessions/{livy_id}")
@@ -43,10 +41,8 @@ async def collect_livy_sessions(payload: dict) -> dict:
         if livy_ids:
             sem = asyncio.Semaphore(_CONCURRENCY)
             async with FabricClient(settings, credential) as client:
-                results = await asyncio.gather(
-                    *[_fetch_one(client, wid, lid, sem) for lid in livy_ids]
-                )
-            for lid, session in zip(livy_ids, results):
+                results = await asyncio.gather(*[_fetch_one(client, wid, lid, sem) for lid in livy_ids])
+            for lid, session in zip(livy_ids, results, strict=True):
                 if session is None:
                     continue
                 rows.append(build_row(session, {"workspace_id": wid, "livy_session_id": lid}, cri))

@@ -1,4 +1,5 @@
 """Tests for collector_orchestrator."""
+
 from __future__ import annotations
 
 import pytest
@@ -108,10 +109,7 @@ def test_to_watermark_defaults_to_current_utc_datetime(mock_durable_context, pat
 
     _drive(gen)
 
-    workspace_calls = [
-        c for c in ctx.call_sub_orchestrator.call_args_list
-        if c.args[0] == "workspace_sub_orchestrator"
-    ]
+    workspace_calls = [c for c in ctx.call_sub_orchestrator.call_args_list if c.args[0] == "workspace_sub_orchestrator"]
     expected_iso = ctx.current_utc_datetime.isoformat()
     for c in workspace_calls:
         payload = c.args[1]
@@ -129,9 +127,6 @@ def test_instance_id_includes_workspace(mock_durable_context, patched_settings):
     gen = collector_orchestrator(ctx)
     _drive(gen)
 
-    workspace_calls = [
-        c for c in ctx.call_sub_orchestrator.call_args_list
-        if c.args[0] == "workspace_sub_orchestrator"
-    ]
+    workspace_calls = [c for c in ctx.call_sub_orchestrator.call_args_list if c.args[0] == "workspace_sub_orchestrator"]
     assert workspace_calls[0].kwargs.get("instance_id") == "run-iid-ws-ws-A"
     assert workspace_calls[1].kwargs.get("instance_id") == "run-iid-ws-ws-B"

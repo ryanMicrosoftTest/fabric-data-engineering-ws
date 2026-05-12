@@ -1,6 +1,6 @@
 import asyncio
 import time
-from typing import Any, AsyncIterator
+from collections.abc import AsyncIterator
 
 import httpx
 

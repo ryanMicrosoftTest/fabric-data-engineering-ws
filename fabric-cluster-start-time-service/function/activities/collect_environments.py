@@ -1,14 +1,14 @@
 """Activity: collect environments and their staging libraries."""
+
 from __future__ import annotations
 
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 ENV_TABLE = "raw.environment"
 ENV_KEYS = ["workspace_id", "environment_id"]
@@ -38,9 +38,7 @@ async def collect_environments(payload: dict) -> dict:
                 env_rows.append(build_row(item, {"workspace_id": wid, "environment_id": eid}, cri))
             for eid in env_ids:
                 try:
-                    libs = await client.get(
-                        f"/v1/workspaces/{wid}/environments/{eid}/staging/libraries"
-                    )
+                    libs = await client.get(f"/v1/workspaces/{wid}/environments/{eid}/staging/libraries")
                 except FabricApiError as e:
                     if e.status_code == 404:
                         libs = {}

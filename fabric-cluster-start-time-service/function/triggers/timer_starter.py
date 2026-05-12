@@ -10,7 +10,7 @@ from shared.logging_setup import configure_logging
 @app.function_name(name="timer_starter")
 @app.timer_trigger(schedule="0 0 10 * * *", arg_name="myTimer", run_on_startup=False, use_monitor=True)
 @app.durable_client_input(client_name="client")
-async def timer_starter(myTimer: func.TimerRequest, client: df.DurableOrchestrationClient) -> None:
+async def timer_starter(myTimer: func.TimerRequest, client: df.DurableOrchestrationClient) -> None:  # noqa: N803
     today = datetime.utcnow().strftime("%Y%m%d")
     instance_id = f"daily-collector-{today}"
     logger = configure_logging(collector_run_id=instance_id)

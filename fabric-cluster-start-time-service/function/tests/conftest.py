@@ -3,6 +3,7 @@
 NOTE: We patch sys.modules for pyodbc BEFORE any import of warehouse_writer so
 unit tests can run on machines without ODBC drivers installed.
 """
+
 from __future__ import annotations
 
 import sys
@@ -23,13 +24,16 @@ class _FakeApp:
     def function_name(self, *_a, **_kw):
         def deco(fn):
             return fn
+
         return deco
 
     def __getattr__(self, _name):
         def deco_factory(*_args, **_kwargs):
             def deco(fn):
                 return fn
+
             return deco
+
         return deco_factory
 
 

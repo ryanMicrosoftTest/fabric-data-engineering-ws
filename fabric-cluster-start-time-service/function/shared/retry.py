@@ -2,12 +2,12 @@ import logging
 
 import httpx
 from tenacity import (
+    before_sleep_log,
     retry,
     retry_if_exception_type,
     retry_if_result,
     stop_after_attempt,
     wait_exponential_jitter,
-    before_sleep_log,
 )
 
 _FABRIC_RETRY_STATUS = {408, 429, 500, 502, 503, 504}

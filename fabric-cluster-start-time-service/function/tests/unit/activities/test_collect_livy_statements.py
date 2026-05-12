@@ -24,9 +24,11 @@ def _payload(**extra):
 def patched(mock_settings):
     from activities import collect_livy_statements as mod
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), patch.object(
-        mod, "get_credential", return_value=object()
-    ), patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist:
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "get_credential", return_value=object()),
+        patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist,
+    ):
         yield mod, persist
 
 
@@ -37,9 +39,7 @@ async def test_happy_path_one_row_per_statement(patched):
         "/v1/workspaces/ws-A/spark/livySessions/livy-1/statements": {
             "statements": [{"id": 0, "code": "1"}, {"id": 1, "code": "2"}]
         },
-        "/v1/workspaces/ws-A/spark/livySessions/livy-2/statements": {
-            "statements": [{"id": 0, "code": "x"}]
-        },
+        "/v1/workspaces/ws-A/spark/livySessions/livy-2/statements": {"statements": [{"id": 0, "code": "x"}]},
     }
     client = make_fabric_client_mock(get_responses=responses)
     with patch.object(mod, "FabricClient", side_effect=fabric_client_factory(client)):

@@ -1,4 +1,5 @@
 """Shared helpers for activity functions."""
+
 from __future__ import annotations
 
 import asyncio
@@ -40,9 +41,7 @@ async def persist_raw(
     rows: list[dict],
     collector_run_id: str,
 ) -> int:
-    return await asyncio.to_thread(
-        _persist_sync, settings, credential, table, key_columns, rows, collector_run_id
-    )
+    return await asyncio.to_thread(_persist_sync, settings, credential, table, key_columns, rows, collector_run_id)
 
 
 def build_row(payload: dict, key_values: dict, collector_run_id: str) -> dict:

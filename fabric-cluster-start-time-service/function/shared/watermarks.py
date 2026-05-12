@@ -37,8 +37,7 @@ def update_watermark(
     cur = writer._cursor()  # noqa: SLF001
     if workspace_id is None:
         cur.execute(
-            f"UPDATE {_TABLE} SET last_run_at = ?, collector_run_id = ? "
-            f"WHERE source = ? AND workspace_id IS NULL",
+            f"UPDATE {_TABLE} SET last_run_at = ?, collector_run_id = ? " f"WHERE source = ? AND workspace_id IS NULL",
             [last_run_at, collector_run_id, source],
         )
         if (cur.rowcount or 0) == 0:
@@ -49,13 +48,11 @@ def update_watermark(
             )
     else:
         cur.execute(
-            f"UPDATE {_TABLE} SET last_run_at = ?, collector_run_id = ? "
-            f"WHERE source = ? AND workspace_id = ?",
+            f"UPDATE {_TABLE} SET last_run_at = ?, collector_run_id = ? " f"WHERE source = ? AND workspace_id = ?",
             [last_run_at, collector_run_id, source, workspace_id],
         )
         if (cur.rowcount or 0) == 0:
             cur.execute(
-                f"INSERT INTO {_TABLE} (source, workspace_id, last_run_at, collector_run_id) "
-                f"VALUES (?, ?, ?, ?)",
+                f"INSERT INTO {_TABLE} (source, workspace_id, last_run_at, collector_run_id) " f"VALUES (?, ?, ?, ?)",
                 [source, workspace_id, last_run_at, collector_run_id],
             )

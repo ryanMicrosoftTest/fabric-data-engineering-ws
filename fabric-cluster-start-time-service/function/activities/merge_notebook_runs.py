@@ -24,9 +24,7 @@ def merge_notebook_runs(payload: dict) -> dict:
     credential = _get_credential(settings)
     try:
         with WarehouseWriter(settings, credential) as wh:
-            rowcount = wh.execute_proc(
-                "dbo.usp_merge_notebook_runs", {"collector_run_id": cri}
-            )
+            rowcount = wh.execute_proc("dbo.usp_merge_notebook_runs", {"collector_run_id": cri})
         duration_ms = int((datetime.now(timezone.utc) - started).total_seconds() * 1000)
         logger.info(
             "merge_notebook_runs complete",

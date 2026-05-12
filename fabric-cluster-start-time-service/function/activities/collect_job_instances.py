@@ -1,15 +1,15 @@
 """Activity: collect job instances for each notebook."""
+
 from __future__ import annotations
 
 import asyncio
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.job_instance"
 KEY_COLUMNS = ["workspace_id", "item_id", "job_instance_id"]
@@ -37,9 +37,7 @@ async def _fetch_for_notebook(
 ) -> list[dict]:
     async with sem:
         items: list[dict] = []
-        async for inst in client.get_paged(
-            f"/v1/workspaces/{wid}/items/{nid}/jobs/instances", params=params
-        ):
+        async for inst in client.get_paged(f"/v1/workspaces/{wid}/items/{nid}/jobs/instances", params=params):
             items.append(inst)
         return items
 
@@ -67,7 +65,7 @@ async def collect_job_instances(payload: dict) -> dict:
                 results = await asyncio.gather(
                     *[_fetch_for_notebook(client, wid, nid, params, sem) for nid in notebook_ids]
                 )
-            for nid, instances in zip(notebook_ids, results):
+            for nid, instances in zip(notebook_ids, results, strict=True):
                 for inst in instances:
                     jid = inst.get("id") or inst.get("jobInstanceId")
                     if not jid:

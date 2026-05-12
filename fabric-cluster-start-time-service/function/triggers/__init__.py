@@ -1,1 +1,1 @@
-from . import timer_starter, http_starter, health_check  # noqa: F401
+from . import health_check, http_starter, timer_starter  # noqa: F401

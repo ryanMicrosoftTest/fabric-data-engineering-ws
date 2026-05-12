@@ -9,11 +9,13 @@ import pytest
 def patched_module(mock_settings, mock_warehouse_writer):
     from activities import update_watermarks as mod
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), \
-         patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer) as wh_cls, \
-         patch.object(mod, "DefaultAzureCredential") as default_cred, \
-         patch.object(mod, "ManagedIdentityCredential") as mi_cred, \
-         patch.object(mod, "update_watermark") as upd:
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer) as wh_cls,
+        patch.object(mod, "DefaultAzureCredential") as default_cred,
+        patch.object(mod, "ManagedIdentityCredential") as mi_cred,
+        patch.object(mod, "update_watermark") as upd,
+    ):
         yield mod, wh_cls, default_cred, mi_cred, mock_warehouse_writer, upd
 
 
@@ -83,11 +85,13 @@ def test_credential_uses_managed_identity_when_client_id_set(mock_settings, mock
 
     mock_settings.mi_client_id = "client-mi"
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), \
-         patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer), \
-         patch.object(mod, "DefaultAzureCredential") as default_cred, \
-         patch.object(mod, "ManagedIdentityCredential") as mi_cred, \
-         patch.object(mod, "update_watermark"):
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer),
+        patch.object(mod, "DefaultAzureCredential") as default_cred,
+        patch.object(mod, "ManagedIdentityCredential") as mi_cred,
+        patch.object(mod, "update_watermark"),
+    ):
         mod.update_watermarks({"collector_run_id": "run-5"})
 
     mi_cred.assert_called_once_with(client_id="client-mi")
@@ -99,11 +103,13 @@ def test_credential_uses_default_when_no_client_id(mock_settings, mock_warehouse
 
     mock_settings.mi_client_id = None
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), \
-         patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer), \
-         patch.object(mod, "DefaultAzureCredential") as default_cred, \
-         patch.object(mod, "ManagedIdentityCredential") as mi_cred, \
-         patch.object(mod, "update_watermark"):
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "WarehouseWriter", return_value=mock_warehouse_writer),
+        patch.object(mod, "DefaultAzureCredential") as default_cred,
+        patch.object(mod, "ManagedIdentityCredential") as mi_cred,
+        patch.object(mod, "update_watermark"),
+    ):
         mod.update_watermarks({"collector_run_id": "run-6"})
 
     default_cred.assert_called_once_with()

@@ -41,9 +41,7 @@ def collector_orchestrator(context: df.DurableOrchestrationContext):
     ]
     results = yield context.task_all(tasks)
 
-    yield context.call_sub_orchestrator(
-        "merge_orchestrator", {"collector_run_id": collector_run_id}
-    )
+    yield context.call_sub_orchestrator("merge_orchestrator", {"collector_run_id": collector_run_id})
 
     return {"workspaces_processed": len(results), "merge_complete": True}
 

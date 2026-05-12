@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Any, MutableMapping
+from collections.abc import MutableMapping
+from typing import Any
 
 _AZURE_MONITOR_CONFIGURED = False
 

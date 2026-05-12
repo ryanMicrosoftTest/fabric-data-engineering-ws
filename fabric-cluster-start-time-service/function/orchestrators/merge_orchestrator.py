@@ -21,6 +21,4 @@ def merge_orchestrator(context: df.DurableOrchestrationContext):
     }
 
 
-app.function_name(name="merge_orchestrator")(
-    app.orchestration_trigger(context_name="context")(merge_orchestrator)
-)
+app.function_name(name="merge_orchestrator")(app.orchestration_trigger(context_name="context")(merge_orchestrator))

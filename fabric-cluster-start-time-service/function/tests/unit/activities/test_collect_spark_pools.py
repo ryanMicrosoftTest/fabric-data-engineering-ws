@@ -8,7 +8,6 @@ from shared.fabric_client import FabricApiError
 
 from ._helpers import fabric_client_factory, make_fabric_client_mock  # type: ignore[import-not-found]
 
-
 PAYLOAD = {
     "collector_run_id": "run-1",
     "workspace_id": "ws-A",
@@ -20,9 +19,11 @@ PAYLOAD = {
 def patched(mock_settings):
     from activities import collect_spark_pools as mod
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), patch.object(
-        mod, "get_credential", return_value=object()
-    ), patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist:
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "get_credential", return_value=object()),
+        patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist,
+    ):
         yield mod, persist
 
 

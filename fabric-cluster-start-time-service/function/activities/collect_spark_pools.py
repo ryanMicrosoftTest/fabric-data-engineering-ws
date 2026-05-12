@@ -1,14 +1,14 @@
 """Activity: collect spark pools and workspace default settings."""
+
 from __future__ import annotations
 
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.spark_pool"
 KEY_COLUMNS = ["workspace_id", "pool_id"]
@@ -34,9 +34,7 @@ async def collect_spark_pools(payload: dict) -> dict:
                 rows.append(build_row(payload_with_type, {"workspace_id": wid, "pool_id": pid}, cri))
             settings_obj = await client.get(f"/v1/workspaces/{wid}/spark/settings")
             ws_payload = {**settings_obj, "pool_type": "workspace_default"}
-            rows.append(
-                build_row(ws_payload, {"workspace_id": wid, "pool_id": "workspace_default"}, cri)
-            )
+            rows.append(build_row(ws_payload, {"workspace_id": wid, "pool_id": "workspace_default"}, cri))
         rows_written = await persist_raw(settings, credential, TABLE, KEY_COLUMNS, rows, cri)
         duration_ms = int((time.monotonic() - started) * 1000)
         log.info("collect_spark_pools ok wid=%s rows=%s", wid, rows_written)

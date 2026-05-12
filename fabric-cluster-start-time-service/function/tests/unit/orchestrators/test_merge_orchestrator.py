@@ -1,4 +1,5 @@
 """Tests for merge_orchestrator."""
+
 from __future__ import annotations
 
 from orchestrators.merge_orchestrator import merge_orchestrator

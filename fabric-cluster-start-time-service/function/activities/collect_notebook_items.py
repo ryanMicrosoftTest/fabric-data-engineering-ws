@@ -1,14 +1,14 @@
 """Activity: list notebook items in a workspace."""
+
 from __future__ import annotations
 
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.notebook_item"
 KEY_COLUMNS = ["workspace_id", "notebook_id"]

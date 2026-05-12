@@ -64,9 +64,7 @@ def test_get_credential_uses_managed_identity_when_client_id(mock_settings):
     from activities import _common as mod
 
     mock_settings.mi_client_id = "client-xyz"
-    with patch.object(mod, "ManagedIdentityCredential") as mi, patch.object(
-        mod, "DefaultAzureCredential"
-    ) as default:
+    with patch.object(mod, "ManagedIdentityCredential") as mi, patch.object(mod, "DefaultAzureCredential") as default:
         mod.get_credential(mock_settings)
     mi.assert_called_once_with(client_id="client-xyz")
     default.assert_not_called()
@@ -76,9 +74,7 @@ def test_get_credential_uses_default_otherwise(mock_settings):
     from activities import _common as mod
 
     mock_settings.mi_client_id = None
-    with patch.object(mod, "ManagedIdentityCredential") as mi, patch.object(
-        mod, "DefaultAzureCredential"
-    ) as default:
+    with patch.object(mod, "ManagedIdentityCredential") as mi, patch.object(mod, "DefaultAzureCredential") as default:
         mod.get_credential(mock_settings)
     default.assert_called_once_with()
     mi.assert_not_called()

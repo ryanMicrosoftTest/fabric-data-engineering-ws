@@ -1,14 +1,14 @@
 """Activity: collect spark applications for a workspace."""
+
 from __future__ import annotations
 
 import time
 
+from activities._common import build_row, get_credential, persist_raw
 from function_app import app
 from shared.config import get_settings
 from shared.fabric_client import FabricApiError, FabricClient
 from shared.logging_setup import configure_logging
-
-from activities._common import build_row, get_credential, persist_raw
 
 TABLE = "raw.spark_application"
 KEY_COLUMNS = ["workspace_id", "application_id"]
@@ -30,14 +30,8 @@ async def collect_spark_applications(payload: dict) -> dict:
             params = {"$filter": f"submittedDateTime ge {from_wm}"}
         rows: list[dict] = []
         async with FabricClient(settings, credential) as client:
-            async for item in client.get_paged(
-                f"/v1/workspaces/{wid}/spark/applications", params=params
-            ):
-                aid = (
-                    item.get("id")
-                    or item.get("applicationId")
-                    or item.get("livyId")
-                )
+            async for item in client.get_paged(f"/v1/workspaces/{wid}/spark/applications", params=params):
+                aid = item.get("id") or item.get("applicationId") or item.get("livyId")
                 if not aid:
                     continue
                 rows.append(build_row(item, {"workspace_id": wid, "application_id": aid}, cri))

@@ -21,7 +21,5 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
                 body["warehouse"] = "ok" if wh.ping() else "fail"
         except Exception as e:  # noqa: BLE001
             body["warehouse"] = f"error: {type(e).__name__}"
-            return func.HttpResponse(
-                json.dumps(body), status_code=503, mimetype="application/json"
-            )
+            return func.HttpResponse(json.dumps(body), status_code=503, mimetype="application/json")
     return func.HttpResponse(json.dumps(body), status_code=200, mimetype="application/json")

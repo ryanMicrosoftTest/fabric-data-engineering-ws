@@ -24,9 +24,11 @@ def _payload(**extra):
 def patched(mock_settings):
     from activities import collect_livy_sessions as mod
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), patch.object(
-        mod, "get_credential", return_value=object()
-    ), patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist:
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "get_credential", return_value=object()),
+        patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist,
+    ):
         yield mod, persist
 
 

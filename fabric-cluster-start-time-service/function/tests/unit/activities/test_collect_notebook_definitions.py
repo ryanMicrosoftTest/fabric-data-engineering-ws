@@ -24,9 +24,11 @@ def _payload(**extra):
 def patched(mock_settings):
     from activities import collect_notebook_definitions as mod
 
-    with patch.object(mod, "get_settings", return_value=mock_settings), patch.object(
-        mod, "get_credential", return_value=object()
-    ), patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist:
+    with (
+        patch.object(mod, "get_settings", return_value=mock_settings),
+        patch.object(mod, "get_credential", return_value=object()),
+        patch.object(mod, "persist_raw", new=AsyncMock(return_value=3)) as persist,
+    ):
         yield mod, persist
 
 
@@ -34,8 +36,7 @@ def patched(mock_settings):
 async def test_happy_path_calls_lro_for_each_notebook(patched):
     mod, persist = patched
     responses = {
-        f"/v1/workspaces/ws-A/notebooks/{n}/getDefinition?format=ipynb": {"definition": n}
-        for n in ("n1", "n2", "n3")
+        f"/v1/workspaces/ws-A/notebooks/{n}/getDefinition?format=ipynb": {"definition": n} for n in ("n1", "n2", "n3")
     }
     client = make_fabric_client_mock(post_lro_responses=responses)
     with patch.object(mod, "FabricClient", side_effect=fabric_client_factory(client)):
