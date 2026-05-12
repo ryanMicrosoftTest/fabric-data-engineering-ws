@@ -29,6 +29,7 @@ trigger:
       - main
       - release/*
       - copilot/*
+      - feature/*
   paths:
     include:
       - fabric-cluster-start-time-service/**
@@ -181,7 +182,12 @@ stages:
 - stage: InfraDeploy
   displayName: 'Infra (Terraform)'
   dependsOn: Validate
-  condition: and(succeeded(), ne('${{ parameters.skipInfra }}', 'True'))
+  condition: |
+    and(
+      succeeded(),
+      ne('${{ parameters.skipInfra }}', 'True'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
+    )
   jobs:
     - job: terraformJob
       displayName: 'terraform apply'
@@ -233,7 +239,8 @@ stages:
   condition: |
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
-      ne('${{ parameters.skipWarehouse }}', 'True')
+      ne('${{ parameters.skipWarehouse }}', 'True'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
     )
   jobs:
     - job: Sqlpackage
@@ -295,7 +302,8 @@ stages:
   condition: |
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
-      in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped')
+      in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
     )
   jobs:
     - job: PublishFunc
@@ -346,7 +354,7 @@ stages:
   dependsOn:
     - InfraDeploy
     - FunctionDeploy
-  condition: succeeded('FunctionDeploy')
+  condition: and(succeeded('FunctionDeploy'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')))
   jobs:
     - job: HealthCheck
       displayName: 'GET /api/health'
