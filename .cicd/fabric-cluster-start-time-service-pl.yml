@@ -29,6 +29,7 @@ trigger:
       - main
       - release/*
       - copilot/*
+      - feature/*
   paths:
     include:
       - fabric-cluster-start-time-service/**
@@ -181,7 +182,12 @@ stages:
 - stage: InfraDeploy
   displayName: 'Infra (Terraform)'
   dependsOn: Validate
-  condition: and(succeeded(), ne('${{ parameters.skipInfra }}', 'True'))
+  condition: |
+    and(
+      succeeded(),
+      ne('${{ parameters.skipInfra }}', 'True'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
+    )
   jobs:
     - job: terraformJob
       displayName: 'terraform apply'
@@ -189,9 +195,13 @@ stages:
         - checkout: self
           fetchDepth: 1
 
-        - task: TerraformInstaller@1
-          inputs:
-            terraformVersion: 'latest'
+        - bash: |
+            set -euo pipefail
+            TF_VERSION="${TF_VERSION:-1.9.8}"
+            curl -fsSL -o /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+            unzip -o /tmp/terraform.zip -d /tmp/terraform-bin
+            sudo mv /tmp/terraform-bin/terraform /usr/local/bin/terraform
+            terraform version
           displayName: 'Install Terraform'
 
         - task: AzureCLI@2
@@ -233,7 +243,8 @@ stages:
   condition: |
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
-      ne('${{ parameters.skipWarehouse }}', 'True')
+      ne('${{ parameters.skipWarehouse }}', 'True'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
     )
   jobs:
     - job: Sqlpackage
@@ -295,7 +306,8 @@ stages:
   condition: |
     and(
       in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
-      in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped')
+      in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped'),
+      not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'))
     )
   jobs:
     - job: PublishFunc
@@ -346,7 +358,7 @@ stages:
   dependsOn:
     - InfraDeploy
     - FunctionDeploy
-  condition: succeeded('FunctionDeploy')
+  condition: and(succeeded('FunctionDeploy'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')))
   jobs:
     - job: HealthCheck
       displayName: 'GET /api/health'

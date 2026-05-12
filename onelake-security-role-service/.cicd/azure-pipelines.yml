@@ -15,7 +15,8 @@ trigger:
       - 'onelake-security-role-service/**'
       - 'fabric_items/**'
       - 'attached_config/**'
-      - '.cicd/**'
+      - '.cicd/azure-pipelines.yml'
+      - '.cicd/scripts/**'
 
 pr:
   branches:
@@ -26,7 +27,8 @@ pr:
       - 'onelake-security-role-service/**'
       - 'fabric_items/**'
       - 'attached_config/**'
-      - '.cicd/**'
+      - '.cicd/azure-pipelines.yml'
+      - '.cicd/scripts/**'
 
 parameters:
   - name: triggerDeployment
