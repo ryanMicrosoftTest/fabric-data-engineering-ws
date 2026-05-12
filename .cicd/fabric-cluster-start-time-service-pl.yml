@@ -243,7 +243,8 @@ stages:
                 -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
                 -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
                 -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
-                -backend-config="key=fabric-cluster-start-time-service/$(envLower).tfstate"
+                -backend-config="key=fabric-cluster-start-time-service/$(envLower).tfstate" \
+                -backend-config="use_azuread_auth=true"
 
               terraform plan -var-file=envs/$(envLower).tfvars -out=tfplan
               terraform apply -auto-approve tfplan
