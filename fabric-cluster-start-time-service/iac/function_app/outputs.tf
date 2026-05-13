@@ -1,11 +1,11 @@
 output "function_app_name" {
-  description = "Name of the Linux Function App."
-  value       = azurerm_linux_function_app.this.name
+  description = "Name of the Function App."
+  value       = azurerm_function_app_flex_consumption.this.name
 }
 
 output "function_app_default_hostname" {
   description = "Default hostname of the Function App."
-  value       = azurerm_linux_function_app.this.default_hostname
+  value       = azurerm_function_app_flex_consumption.this.default_hostname
 }
 
 output "resource_group_name" {

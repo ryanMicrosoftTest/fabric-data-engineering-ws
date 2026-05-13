@@ -81,16 +81,63 @@ resource "azurerm_service_plan" "this" {
 }
 
 ############################################
-# Linux Function App (Python 3.11)
+# Role assignments on the storage account
 ############################################
-resource "azurerm_linux_function_app" "this" {
+data "azurerm_client_config" "current" {}
+
+# SPN running terraform needs data-plane access to create the deploy container
+# (because shared_access_key_enabled = false forces AAD auth).
+resource "azurerm_role_assignment" "spn_storage_blob_data_owner" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "azurerm_role_assignment" "storage_blob_data_owner" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_user_assigned_identity.this.principal_id
+}
+
+resource "azurerm_role_assignment" "storage_queue_data_contributor" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.this.principal_id
+}
+
+resource "azurerm_role_assignment" "storage_table_data_contributor" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.this.principal_id
+}
+
+############################################
+# Deployment container for Flex Consumption
+############################################
+resource "azurerm_storage_container" "deploy" {
+  name                  = "deploy"
+  storage_account_name  = azurerm_storage_account.this.name
+  container_access_type = "private"
+
+  depends_on = [azurerm_role_assignment.spn_storage_blob_data_owner]
+}
+
+############################################
+# Function App (Flex Consumption, Python 3.11)
+############################################
+resource "azurerm_function_app_flex_consumption" "this" {
   name                = local.function_app_name
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   service_plan_id     = azurerm_service_plan.this.id
 
-  storage_account_name          = azurerm_storage_account.this.name
-  storage_uses_managed_identity = true
+  storage_container_type            = "blobContainer"
+  storage_container_endpoint        = "${azurerm_storage_account.this.primary_blob_endpoint}${azurerm_storage_container.deploy.name}"
+  storage_authentication_type       = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.this.id
+
+  runtime_name    = "python"
+  runtime_version = "3.11"
 
   https_only = true
 
@@ -101,15 +148,9 @@ resource "azurerm_linux_function_app" "this" {
 
   site_config {
     application_insights_connection_string = azurerm_application_insights.this.connection_string
-
-    application_stack {
-      python_version = "3.11"
-    }
   }
 
   app_settings = {
-    FUNCTIONS_WORKER_RUNTIME              = "python"
-    FUNCTIONS_EXTENSION_VERSION           = "~4"
     WEBSITE_TIME_ZONE                     = "America/New_York"
     APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.this.connection_string
 
@@ -127,27 +168,6 @@ resource "azurerm_linux_function_app" "this" {
   }
 
   tags = var.tags
-}
-
-############################################
-# Role assignments on the storage account for the Managed Identity
-############################################
-resource "azurerm_role_assignment" "storage_blob_data_owner" {
-  scope                = azurerm_storage_account.this.id
-  role_definition_name = "Storage Blob Data Owner"
-  principal_id         = azurerm_user_assigned_identity.this.principal_id
-}
-
-resource "azurerm_role_assignment" "storage_queue_data_contributor" {
-  scope                = azurerm_storage_account.this.id
-  role_definition_name = "Storage Queue Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.this.principal_id
-}
-
-resource "azurerm_role_assignment" "storage_table_data_contributor" {
-  scope                = azurerm_storage_account.this.id
-  role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.this.principal_id
 }
 
 ############################################
