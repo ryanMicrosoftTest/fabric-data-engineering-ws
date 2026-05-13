@@ -416,6 +416,7 @@ stages:
       displayName: 'func azure functionapp publish'
       variables:
         functionAppName: $[ stageDependencies.InfraDeploy.terraformJob.outputs['tfApply.functionAppName'] ]
+        resourceGroupName: $[ stageDependencies.InfraDeploy.terraformJob.outputs['tfApply.resourceGroupName'] ]
       steps:
         - checkout: self
           fetchDepth: 1
@@ -435,6 +436,34 @@ stages:
             set -euo pipefail
             npm i -g azure-functions-core-tools@4 --unsafe-perm true
           displayName: 'Install Azure Functions Core Tools v4'
+
+        - task: AzureCLI@2
+          displayName: 'Strip platform-injected shared-key storage settings'
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+              if [ -z "${FUNCTION_APP_NAME:-}" ]; then
+                echo "ERROR: functionAppName is empty — InfraDeploy output not propagated."
+                exit 1
+              fi
+              # The Flex Consumption resource provider auto-injects
+              # AzureWebJobsStorage and DEPLOYMENT_STORAGE_CONNECTION_STRING
+              # as connection strings with an EMPTY AccountKey (because the
+              # storage account has shared_access_key_enabled = false). Those
+              # take precedence over the identity-based AzureWebJobsStorage__*
+              # settings and cause the host to fail with 403 AuthenticationFailed.
+              # Remove them so identity-based auth is used.
+              echo "Removing platform-injected shared-key storage settings on $FUNCTION_APP_NAME"
+              az functionapp config appsettings delete \
+                --name "$FUNCTION_APP_NAME" \
+                --resource-group "$(resourceGroupName)" \
+                --setting-names AzureWebJobsStorage DEPLOYMENT_STORAGE_CONNECTION_STRING \
+                --output none
+          env:
+            FUNCTION_APP_NAME: $(functionAppName)
 
         - task: AzureCLI@2
           displayName: 'Publish Function App (remote build)'
