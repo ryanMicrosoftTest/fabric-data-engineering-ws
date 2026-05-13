@@ -292,6 +292,65 @@ stages:
           displayName: 'Build sqlproj -> dacpac'
 
         - task: AzureCLI@2
+          displayName: 'Ensure Fabric capacity is active (resume if paused)'
+          name: capacityResume
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+
+              CAP_NAME='$(FabricCapacityName)'
+              CAP_RG='$(FabricCapacityResourceGroup)'
+
+              if [ -z "${CAP_NAME}" ] || [ -z "${CAP_RG}" ]; then
+                echo "ERROR: pipeline variables FabricCapacityName and FabricCapacityResourceGroup must be set."
+                exit 1
+              fi
+
+              STATE=$(az resource show \
+                --resource-type Microsoft.Fabric/capacities \
+                --name "$CAP_NAME" \
+                --resource-group "$CAP_RG" \
+                --query properties.state -o tsv)
+              echo "Fabric capacity '$CAP_NAME' current state: $STATE"
+
+              if [ "$STATE" = "Active" ]; then
+                echo "Capacity is already active; will NOT pause it after deployment."
+                echo "##vso[task.setvariable variable=wasPaused;isOutput=true]false"
+              else
+                echo "Capacity is '$STATE' — resuming…"
+                az resource invoke-action \
+                  --action resume \
+                  --resource-type Microsoft.Fabric/capacities \
+                  --name "$CAP_NAME" \
+                  --resource-group "$CAP_RG"
+
+                # Wait until Active (timeout 5 min)
+                for i in $(seq 1 30); do
+                  STATE=$(az resource show \
+                    --resource-type Microsoft.Fabric/capacities \
+                    --name "$CAP_NAME" \
+                    --resource-group "$CAP_RG" \
+                    --query properties.state -o tsv)
+                  echo "  poll $i: state=$STATE"
+                  if [ "$STATE" = "Active" ]; then break; fi
+                  sleep 10
+                done
+
+                if [ "$STATE" != "Active" ]; then
+                  echo "ERROR: capacity did not reach Active state within timeout."
+                  exit 1
+                fi
+
+                # Brief settle so the SQL endpoint is reachable
+                sleep 15
+                echo "##vso[task.setvariable variable=wasPaused;isOutput=true]true"
+              fi
+            addSpnToEnvironment: true
+
+        - task: AzureCLI@2
           displayName: 'sqlpackage publish to Fabric Warehouse'
           inputs:
             azureSubscription: '$(azureServiceConnection)'
@@ -316,6 +375,25 @@ stages:
                 /TargetDatabaseName:"fabric_telemetry_wh" \
                 /AccessToken:"$TOKEN" \
                 /p:IncludeCompositeObjects=True
+            addSpnToEnvironment: true
+
+        - task: AzureCLI@2
+          displayName: 'Re-pause Fabric capacity (only if we resumed it)'
+          condition: and(always(), eq(variables['capacityResume.wasPaused'], 'true'))
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+              CAP_NAME='$(FabricCapacityName)'
+              CAP_RG='$(FabricCapacityResourceGroup)'
+              echo "Suspending Fabric capacity '$CAP_NAME' (was paused before this run)…"
+              az resource invoke-action \
+                --action suspend \
+                --resource-type Microsoft.Fabric/capacities \
+                --name "$CAP_NAME" \
+                --resource-group "$CAP_RG"
             addSpnToEnvironment: true
 
 # ---------------------------------------------------------------------------
