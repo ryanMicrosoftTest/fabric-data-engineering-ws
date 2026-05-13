@@ -9,7 +9,7 @@ durable orchestrators, and activities).
 
 | Path | Purpose |
 |---|---|
-| `function/` | Azure Functions Python v2 app (Python 3.11) — all 18 functions |
+| `function/` | Azure Functions Python v2 app (Python 3.13) — all 18 functions |
 | `iac/function_app/` | Terraform for the Function App + dependencies (per-env tfvars in `envs/`) |
 | `iac/warehouse/FabricTelemetryWarehouse.sqlproj` | Microsoft.Build.Sql 2.1.0 schema project for the Fabric Warehouse |
 

@@ -1,7 +1,7 @@
 # Fabric Cluster Start-time Service — Function App IaC
 
 Terraform module that provisions the Azure resources hosting the Fabric Cluster
-Start-time Performance Function App (Python 3.11 on Linux Flex Consumption).
+Start-time Performance Function App (Python 3.13 on Linux Flex Consumption).
 
 ## Resources provisioned
 
@@ -11,7 +11,7 @@ Start-time Performance Function App (Python 3.11 on Linux Flex Consumption).
 - Log Analytics Workspace (PerGB2018, 30-day retention)
 - Application Insights (workspace-based)
 - Linux Service Plan (Flex Consumption, `FC1`)
-- Linux Function App (Python 3.11)
+- Linux Function App (Python 3.13)
 - Storage role assignments for the MI:
   - Storage Blob Data Owner
   - Storage Queue Data Contributor

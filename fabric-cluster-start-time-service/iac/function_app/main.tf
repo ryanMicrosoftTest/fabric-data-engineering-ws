@@ -123,7 +123,7 @@ resource "azurerm_storage_container" "deploy" {
 }
 
 ############################################
-# Function App (Flex Consumption, Python 3.11)
+# Function App (Flex Consumption, Python 3.13)
 ############################################
 resource "azurerm_function_app_flex_consumption" "this" {
   name                = local.function_app_name
@@ -137,7 +137,7 @@ resource "azurerm_function_app_flex_consumption" "this" {
   storage_user_assigned_identity_id = azurerm_user_assigned_identity.this.id
 
   runtime_name    = "python"
-  runtime_version = "3.11"
+  runtime_version = "3.13"
 
   https_only = true
 

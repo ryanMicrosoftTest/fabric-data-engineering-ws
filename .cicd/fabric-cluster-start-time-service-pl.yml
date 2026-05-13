@@ -72,7 +72,7 @@ variables:
   - name: targetEnvironment
     value: ${{ parameters.environment }}
   - name: pythonVersion
-    value: '3.11'
+    value: '3.13'
   - name: funcRoot
     value: '$(Build.SourcesDirectory)/fabric-cluster-start-time-service/function'
   - name: tfRoot
