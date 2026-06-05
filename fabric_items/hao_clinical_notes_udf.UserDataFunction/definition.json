@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/userDataFunction/definition/1.1.0/schema.json",
+  "runtime": "PYTHON",
+  "connectedDataSources": [
+    {
+      "alias": "onelakeSecurity",
+      "artifactId": "0c5fbafe-0015-923c-41be-c1340386880f",
+      "artifactType": "Lakehouse",
+      "workspaceId": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "functions": [
+    {
+      "name": "get_clinical_note_by_patient_id",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    },
+    {
+      "name": "get_clinical_notes_by_patient_id",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    },
+    {
+      "name": "get_patients_by_id",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    }
+  ],
+  "libraries": {
+    "public": [
+      {
+        "name": "fabric-user-data-functions",
+        "type": "PYPI",
+        "version": "1.0"
+      }
+    ],
+    "private": []
+  }
+}

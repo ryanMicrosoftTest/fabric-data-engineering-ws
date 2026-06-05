@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "emp_student_model_report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2f3df072-61bb-b77a-45bc-e1ca2e6fc466"
+  }
+}

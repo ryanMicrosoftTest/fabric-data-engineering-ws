@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Eventhouse",
+    "displayName": "adf-eh-new",
+    "description": "adf-eh-new"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1328f9d4-bea2-aea8-4fdf-31b2654eee16"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "lakehouse-warehouse-backups-nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a13e8cb6-4f27-bd75-437c-d980d85c6a26"
+  }
+}

@@ -4,20 +4,10 @@ DEV:
   repo_directory: fabric_items
   items_in_scope:
     - DataPipeline
-    - Report
-    - SemanticModel
-    - Lakehouse
-    - VariableLibrary
-    - CopyJob
-    - Eventhouse
-    - KQLDatabase
-    - KQLQueryset
-    - Reflex
-    - Eventstream
-    - SQLDatabase
-    - KQLDashboard
-    - Dataflow
     - Notebook
+    - Environment
+    - Lakehouse
+
 
 QA:
   target_workspace_name: devops-test
@@ -25,6 +15,8 @@ QA:
   repo_directory: fabric_items
   items_in_scope:
     - DataPipeline
+    - Notebook
+    - Environment
     - Report
     - SemanticModel
     - Lakehouse
@@ -46,17 +38,12 @@ PROD:
   repo_directory: fabric_items
   items_in_scope:
     - DataPipeline
+    - Notebook
+    - Environment
     - Report
     - SemanticModel
     - Lakehouse
     - VariableLibrary
-    - CopyJob
-    - Eventhouse
-    - KQLDatabase
-    - KQLQueryset
-    - Reflex
-    - Eventstream
-    - SQLDatabase
-    - KQLDashboard
+    - Warehouse
     - Dataflow
     - Notebook

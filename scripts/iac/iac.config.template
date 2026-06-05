@@ -1,0 +1,14 @@
+# ============================================================
+# IAC Configuration File - Credentials & Resource Settings
+# Copy this file to iac.config and fill in your values.
+# iac.config is gitignored and will not be committed.
+# ============================================================
+
+# SQL Server Admin Credentials
+SQL_ADMIN_LOGIN="sqladmin"
+SQL_ADMIN_PASSWORD="<YOUR_ADMIN_PASSWORD>"
+
+# Reader Account Password Suffix
+# Reader passwords are generated as: Read<NN>_<SUFFIX>
+# e.g. with suffix "MySecret!" -> reader01 password = "Read01_MySecret!"
+READER_PASSWORD_SUFFIX="<YOUR_SUFFIX>"

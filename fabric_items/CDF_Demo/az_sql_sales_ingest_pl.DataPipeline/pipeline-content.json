@@ -1,0 +1,409 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00",
+            "datasetSettings": {
+              "type": "AzureSqlTable",
+              "typeProperties": {
+                "schema": "dbo",
+                "table": "Customers",
+                "database": "FabricLabDB"
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "d691aef3-fca0-46d8-b79b-eb09b3a4e3cc"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "Append",
+            "applyVOrder": true,
+            "partitionOption": "None",
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "schema": "",
+                "table": "Customers"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "sales_bronze_lh",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "d1ec35f1-88ef-9757-4526-1a08e92e9c99",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "CustomerKey",
+                  "type": "Int32",
+                  "physicalType": "int"
+                },
+                "sink": {
+                  "name": "CustomerKey",
+                  "physicalType": "integer"
+                }
+              },
+              {
+                "source": {
+                  "name": "GeographyKey",
+                  "type": "Int32",
+                  "physicalType": "int"
+                },
+                "sink": {
+                  "name": "GeographyKey",
+                  "physicalType": "integer"
+                }
+              },
+              {
+                "source": {
+                  "name": "CustomerLabel",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "100"
+                },
+                "sink": {
+                  "name": "CustomerLabel",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Title",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "8"
+                },
+                "sink": {
+                  "name": "Title",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "FirstName",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "50"
+                },
+                "sink": {
+                  "name": "FirstName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "MiddleName",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "50"
+                },
+                "sink": {
+                  "name": "MiddleName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "LastName",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "50"
+                },
+                "sink": {
+                  "name": "LastName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "NameStyle",
+                  "type": "Boolean",
+                  "physicalType": "bit"
+                },
+                "sink": {
+                  "name": "NameStyle",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "BirthDate",
+                  "type": "Date",
+                  "physicalType": "date"
+                },
+                "sink": {
+                  "name": "BirthDate",
+                  "physicalType": "date"
+                }
+              },
+              {
+                "source": {
+                  "name": "MaritalStatus",
+                  "type": "String",
+                  "physicalType": "nchar",
+                  "length": "1"
+                },
+                "sink": {
+                  "name": "MaritalStatus",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Suffix",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "10"
+                },
+                "sink": {
+                  "name": "Suffix",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Gender",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "1"
+                },
+                "sink": {
+                  "name": "Gender",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "EmailAddress",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "50"
+                },
+                "sink": {
+                  "name": "EmailAddress",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "YearlyIncome",
+                  "type": "Decimal",
+                  "physicalType": "money",
+                  "scale": 4,
+                  "precision": 19
+                },
+                "sink": {
+                  "name": "YearlyIncome",
+                  "physicalType": "decimal",
+                  "scale": 4,
+                  "precision": 19
+                }
+              },
+              {
+                "source": {
+                  "name": "TotalChildren",
+                  "type": "Byte",
+                  "physicalType": "tinyint"
+                },
+                "sink": {
+                  "name": "TotalChildren",
+                  "physicalType": "short"
+                }
+              },
+              {
+                "source": {
+                  "name": "NumberChildrenAtHome",
+                  "type": "Byte",
+                  "physicalType": "tinyint"
+                },
+                "sink": {
+                  "name": "NumberChildrenAtHome",
+                  "physicalType": "short"
+                }
+              },
+              {
+                "source": {
+                  "name": "Education",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "40"
+                },
+                "sink": {
+                  "name": "Education",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Occupation",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "100"
+                },
+                "sink": {
+                  "name": "Occupation",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "HouseOwnerFlag",
+                  "type": "String",
+                  "physicalType": "nchar",
+                  "length": "1"
+                },
+                "sink": {
+                  "name": "HouseOwnerFlag",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "NumberCarsOwned",
+                  "type": "Byte",
+                  "physicalType": "tinyint"
+                },
+                "sink": {
+                  "name": "NumberCarsOwned",
+                  "physicalType": "short"
+                }
+              },
+              {
+                "source": {
+                  "name": "AddressLine1",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "120"
+                },
+                "sink": {
+                  "name": "AddressLine1",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "AddressLine2",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "120"
+                },
+                "sink": {
+                  "name": "AddressLine2",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "Phone",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "20"
+                },
+                "sink": {
+                  "name": "Phone",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "DateFirstPurchase",
+                  "type": "Date",
+                  "physicalType": "date"
+                },
+                "sink": {
+                  "name": "DateFirstPurchase",
+                  "physicalType": "date"
+                }
+              },
+              {
+                "source": {
+                  "name": "CustomerType",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "15"
+                },
+                "sink": {
+                  "name": "CustomerType",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "CompanyName",
+                  "type": "String",
+                  "physicalType": "nvarchar",
+                  "length": "100"
+                },
+                "sink": {
+                  "name": "CompanyName",
+                  "physicalType": "string"
+                }
+              }
+            ],
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy Customers",
+        "dependsOn": [
+          {
+            "activity": "Copy Sales",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "InvokeCopyJob",
+        "typeProperties": {
+          "copyJobId": "8e4a3023-ba66-ba73-4264-5c68cc68d9c7",
+          "workspaceId": "00000000-0000-0000-0000-000000000000"
+        },
+        "externalReferences": {
+          "connection": "02ca5933-7ecc-4793-9540-d300abbaf595"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy Sales",
+        "dependsOn": []
+      }
+    ]
+  }
+}

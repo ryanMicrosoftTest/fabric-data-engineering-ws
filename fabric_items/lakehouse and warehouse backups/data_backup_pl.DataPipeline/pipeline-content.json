@@ -2,57 +2,45 @@
   "properties": {
     "activities": [
       {
-        "name": "Lookup Control Table",
         "type": "Lookup",
-        "dependsOn": [],
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureOutput": false,
-          "secureInput": false
-        },
         "typeProperties": {
           "source": {
             "type": "LakehouseTableSource"
           },
-          "firstRowOnly": false,
           "datasetSettings": {
-            "annotations": [],
-            "connectionSettings": {
-              "name": "backup_metadata_lh",
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "table": "shortcut_table"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "metadata_lh",
               "properties": {
-                "annotations": [],
                 "type": "Lakehouse",
                 "typeProperties": {
-                  "workspaceId": "673fd5a8-d5f7-49fb-a47b-ee4449fc567f",
-                  "artifactId": "3b7c97d3-1589-43b8-84c7-c21c4c7cd5ae",
+                  "artifactId": "69233f72-a67a-9ab7-4fa9-01774bd2cd19",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
                   "rootFolder": "Tables"
                 },
-                "externalReferences": {
-                  "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
-                }
+                "annotations": []
               }
             },
-            "type": "LakehouseTable",
-            "schema": [],
-            "typeProperties": {
-              "table": "backup_control_tbl"
-            }
-          }
-        }
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup Control Table",
+        "dependsOn": []
       },
       {
-        "name": "For Each record in control table",
         "type": "ForEach",
-        "dependsOn": [
-          {
-            "activity": "Lookup Control Table",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
         "typeProperties": {
           "items": {
             "value": "@activity('Lookup Control Table').output.value",
@@ -60,16 +48,7 @@
           },
           "activities": [
             {
-              "name": "Backup Data",
               "type": "Copy",
-              "dependsOn": [],
-              "policy": {
-                "timeout": "0.12:00:00",
-                "retry": 0,
-                "retryIntervalInSeconds": 30,
-                "secureOutput": false,
-                "secureInput": false
-              },
               "typeProperties": {
                 "source": {
                   "type": "LakehouseTableSource",
@@ -83,65 +62,64 @@
                     }
                   ],
                   "datasetSettings": {
-                    "annotations": [],
-                    "connectionSettings": {
-                      "name": "0bd89544_0701_41c0_b99d_cd1e5919d6fc",
-                      "properties": {
-                        "annotations": [],
-                        "type": "Lakehouse",
-                        "typeProperties": {
-                          "workspaceId": "@item().source_lh_workspace_id",
-                          "artifactId": "@item().source_lh_id",
-                          "rootFolder": "Tables"
-                        },
-                        "externalReferences": {
-                          "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
-                        }
-                      }
-                    },
                     "type": "LakehouseTable",
-                    "schema": [],
                     "typeProperties": {
                       "table": {
                         "value": "@item().table_name",
                         "type": "Expression"
                       }
-                    }
+                    },
+                    "schema": [],
+                    "connectionSettings": {
+                      "name": "694a57ad_389a_4cd7_9305_c4f97c3b4016",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "@item().source_lh_id",
+                          "workspaceId": "@item().source_lh_workspace_id",
+                          "rootFolder": "Tables"
+                        },
+                        "externalReferences": {
+                          "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
                   }
                 },
                 "sink": {
                   "type": "LakehouseTableSink",
                   "tableActionOption": "OverwriteSchema",
-                  "partitionOption": "None",
                   "applyVOrder": true,
+                  "partitionOption": "None",
                   "datasetSettings": {
-                    "annotations": [],
-                    "connectionSettings": {
-                      "name": "b1ee36ca_1dc9_431f_b4b6_01bd20d5af45",
-                      "properties": {
-                        "annotations": [],
-                        "type": "Lakehouse",
-                        "typeProperties": {
-                          "workspaceId": "@item().target_lh_workspace_id",
-                          "artifactId": "@item().target_lh_id",
-                          "rootFolder": "Tables"
-                        },
-                        "externalReferences": {
-                          "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
-                        }
-                      }
-                    },
                     "type": "LakehouseTable",
-                    "schema": [],
                     "typeProperties": {
                       "table": {
                         "value": "@item().table_name",
                         "type": "Expression"
                       }
-                    }
+                    },
+                    "schema": [],
+                    "connectionSettings": {
+                      "name": "98a1f627_930b_4ff3_a6dc_40077fd17548",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "@item().target_lh_id",
+                          "workspaceId": "@item().target_lh_workspace_id",
+                          "rootFolder": "Tables"
+                        },
+                        "externalReferences": {
+                          "connection": "332326e5-6ccb-473b-b4cf-6751de648cda"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
                   }
                 },
-                "enableStaging": false,
                 "translator": {
                   "type": "TabularTranslator",
                   "typeConversion": true,
@@ -149,11 +127,30 @@
                     "allowDataTruncation": true,
                     "treatBooleanAsNumber": false
                   }
-                }
-              }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Backup Data",
+              "dependsOn": []
             }
           ]
-        }
+        },
+        "name": "For Each record in control table",
+        "dependsOn": [
+          {
+            "activity": "Lookup Control Table",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
       }
     ]
   }

@@ -1,0 +1,20 @@
+# Example: Role with Column-Level Security (CLS)
+# Grants read access to patient_records but only exposes specific columns.
+# No row filter — all rows visible, but sensitive columns are hidden.
+
+version: "1.0"
+state: present
+
+role:
+  name: LimitedPatientViewRole
+  metadata:
+    description: "Restricted view of patient_records — no SSN, no financial data"
+    owner: "admin@MngEnvMCAP372892.onmicrosoft.com"
+    created_by: "rharrington"
+    tags: [healthcare, cls, phi-restricted]
+
+  tables:
+    - path: /Tables/patient_records
+      columns:
+        names: [patient_id, first_name, last_name, department, diagnosis_code]
+      # row_filter omitted = all rows visible

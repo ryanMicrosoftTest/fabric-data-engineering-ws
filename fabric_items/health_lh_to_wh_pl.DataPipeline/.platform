@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "health_lh_to_wh_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1907ef26-c655-b2ce-4cb1-55f47db9298f"
+  }
+}

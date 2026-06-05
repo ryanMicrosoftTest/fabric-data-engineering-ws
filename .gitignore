@@ -1,3 +1,26 @@
 local_only/*
 .venv_3.10/*
 config/*
+wip/*
+.venv/*
+.vscode/settings.json
+.stubs/
+.vfscache/
+.vfsmeta/
+.work-folder-info
+docs/spark-emitter-images/58db0c3b-49cb-4b63-95e7-7364b46e5281/*
+scripts/event-hubs
+scripts/iac/user-credentials.md
+scripts/iac/sql-logs.log
+scripts/iac/azure-sql.parameters.json
+scripts/iac/iac.config
+.vscode/launch.json
+__pycache__/
+*.pyc
+*.error.log
+onelake-security-role-service\.pytest_cache
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/

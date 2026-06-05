@@ -1,0 +1,123 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource",
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "table": "employee"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "health_silver_lh",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "d42c4909-8060-b3d0-41bd-f14f70e18f53",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "DataWarehouseSink",
+            "tableOption": "autoCreate",
+            "allowCopyCommand": true,
+            "copyCommandSettings": {},
+            "datasetSettings": {
+              "type": "DataWarehouseTable",
+              "typeProperties": {
+                "schema": "dbo",
+                "table": "employee"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "health_warehouse",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "a5106904-84f4-4729-bef1-90f6dcfb62d8",
+                    "endpoint": "ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "id",
+                  "type": "Int32",
+                  "physicalType": "integer"
+                },
+                "sink": {
+                  "name": "id",
+                  "physicalType": "int"
+                }
+              },
+              {
+                "source": {
+                  "name": "first_name",
+                  "type": "String",
+                  "physicalType": "string"
+                },
+                "sink": {
+                  "name": "first_name",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "last_name",
+                  "type": "String",
+                  "physicalType": "string"
+                },
+                "sink": {
+                  "name": "last_name",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "social_security_number",
+                  "type": "String",
+                  "physicalType": "string"
+                },
+                "sink": {
+                  "name": "social_security_number",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              }
+            ]
+          },
+          "enableStaging": true
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy_f3r",
+        "dependsOn": []
+      }
+    ]
+  }
+}

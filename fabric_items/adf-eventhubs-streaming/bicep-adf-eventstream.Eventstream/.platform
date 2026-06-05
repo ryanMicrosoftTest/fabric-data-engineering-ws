@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Eventstream",
+    "displayName": "bicep-adf-eventstream"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "6ecbd0d0-b457-8465-401e-bb97a6c3377e"
+  }
+}

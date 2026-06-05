@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "onelake_security_role_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b8d0be09-cce8-ac00-4d3a-326d99069a78"
+  }
+}

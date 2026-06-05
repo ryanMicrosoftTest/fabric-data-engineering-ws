@@ -1,0 +1,248 @@
+# OneLake Security Role Service — CI/CD Pipeline
+# ================================================
+# Pipeline A: tests, builds, and publishes the onelake-security package.
+# Publishes the wheel to Azure Artifacts and emits metadata for Pipeline B.
+
+trigger:
+  branches:
+    include:
+      - main
+      - feature/*
+      - release/*
+      - copilot/*
+  paths:
+    include:
+      - 'onelake-security-role-service/**'
+      - 'fabric_items/**'
+      - 'attached_config/**'
+      - '.cicd/**'
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 'onelake-security-role-service/**'
+      - 'fabric_items/**'
+      - 'attached_config/**'
+      - '.cicd/**'
+
+parameters:
+  - name: triggerDeployment
+    displayName: 'Trigger Fabric deployment (Pipeline B) after publish'
+    type: boolean
+    default: true
+  - name: deploymentEnvironment
+    displayName: 'Deployment Environment (only used when triggerDeployment is true)'
+    type: string
+    default: 'DEV'
+    values:
+      - 'DEV'
+      - 'QA'
+      - 'PROD'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.11'
+  workingDirectory: 'onelake-security-role-service'
+  artifactFeed: 'Fabric/onelake-security-feed'
+
+stages:
+  - stage: Test
+    displayName: 'Unit Tests'
+    jobs:
+      - job: RunTests
+        displayName: 'pytest'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python $(pythonVersion)'
+
+          - script: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+            displayName: 'Install dependencies'
+            workingDirectory: $(workingDirectory)
+
+          - script: |
+              python -m pytest tests/ \
+                --tb=short \
+                --junitxml=test-results/junit.xml \
+                --cov=onelake_security \
+                --cov-report=xml:test-results/coverage.xml \
+                --cov-report=term-missing \
+                -v
+            displayName: 'Run tests with coverage'
+            workingDirectory: $(workingDirectory)
+            env:
+              PYTHONPATH: src
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
+              testRunTitle: 'OneLake Security - Unit Tests'
+              failTaskOnFailedTests: true
+            displayName: 'Publish test results'
+
+          - task: PublishCodeCoverageResults@2
+            condition: always()
+            inputs:
+              summaryFileLocation: '$(workingDirectory)/test-results/coverage.xml'
+            displayName: 'Publish code coverage'
+
+  - stage: Publish
+    displayName: 'Build & Publish Package'
+    dependsOn: Test
+    condition: succeeded()
+    jobs:
+      - job: PublishWheel
+        displayName: 'Build wheel → Azure Artifacts feed'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python $(pythonVersion)'
+
+          - bash: |
+              set -euo pipefail
+
+              # Read base version from pyproject.toml (single source of truth)
+              BASE_VERSION=$(python -c "
+              import re, sys; from pathlib import Path
+              text = Path('$(workingDirectory)/pyproject.toml').read_text()
+              m = re.search(r'version\s*=\s*\"([^\"]+)\"', text)
+              if not m:
+                  print('ERROR: version not found in pyproject.toml', file=sys.stderr)
+                  sys.exit(1)
+              print(m.group(1))
+              ")
+              echo "Base version from pyproject.toml: $BASE_VERSION"
+
+              BRANCH="$(Build.SourceBranch)"
+
+              if [[ "$BRANCH" == "refs/heads/main" ]]; then
+                PACKAGE_VERSION="$BASE_VERSION"
+              elif [[ "$BRANCH" == "refs/heads/release/"* ]]; then
+                PACKAGE_VERSION="${BASE_VERSION}rc$(Build.BuildId)"
+              else
+                PACKAGE_VERSION="${BASE_VERSION}.dev$(Build.BuildId)"
+              fi
+
+              export PACKAGE_VERSION
+
+              python - <<'PY'
+              import os, re
+              from pathlib import Path
+
+              path = Path("$(workingDirectory)/pyproject.toml")
+              text = path.read_text(encoding="utf-8")
+              version = os.environ["PACKAGE_VERSION"]
+              text = re.sub(r'version = "[^"]+"', f'version = "{version}"', text, count=1)
+              path.write_text(text, encoding="utf-8")
+              print(f"Stamped package version: {version}")
+              PY
+
+              mkdir -p "$(Build.ArtifactStagingDirectory)/package-metadata"
+              cat > "$(Build.ArtifactStagingDirectory)/package-metadata/package-metadata.json" <<JSON
+              {
+                "packageName": "onelake-security",
+                "packageVersion": "${PACKAGE_VERSION}",
+                "sourceBranch": "$(Build.SourceBranch)",
+                "sourceVersion": "$(Build.SourceVersion)"
+              }
+              JSON
+
+              echo "##vso[task.setvariable variable=PACKAGE_VERSION]${PACKAGE_VERSION}"
+            displayName: 'Compute and stamp package version'
+
+          - script: |
+              python -m pip install --upgrade pip build twine
+            displayName: 'Install build tools'
+
+          - script: |
+              python -m build --wheel
+            displayName: 'Build .whl'
+            workingDirectory: $(workingDirectory)
+
+          - bash: |
+              set -euo pipefail
+              WHL_FILE=$(ls $(workingDirectory)/dist/*.whl | head -1)
+              WHL_FILENAME=$(basename "$WHL_FILE")
+              echo "##vso[task.setvariable variable=WHEEL_FILENAME]${WHL_FILENAME}"
+
+              # Export for the embedded Python in this same step
+              export WHEEL_FILENAME="${WHL_FILENAME}"
+
+              # Append wheel filename to metadata
+              python - <<'PY'
+              import json, os
+              from pathlib import Path
+
+              meta_path = Path("$(Build.ArtifactStagingDirectory)/package-metadata/package-metadata.json")
+              meta = json.loads(meta_path.read_text(encoding="utf-8"))
+              meta["wheelFilename"] = os.environ.get("WHEEL_FILENAME", "")
+              meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+              PY
+            displayName: 'Record wheel filename in metadata'
+
+          - publish: $(workingDirectory)/dist
+            artifact: python_dist
+            displayName: 'Publish wheel as build artifact'
+
+          - publish: $(Build.ArtifactStagingDirectory)/package-metadata
+            artifact: package_metadata
+            displayName: 'Publish package metadata artifact'
+
+          - task: TwineAuthenticate@1
+            inputs:
+              artifactFeed: '$(artifactFeed)'
+            displayName: 'Authenticate with Azure Artifacts'
+
+          - script: |
+              python -m twine upload \
+                --repository onelake-security-feed \
+                --config-file $(PYPIRC_PATH) \
+                dist/*.whl
+            displayName: 'Publish wheel to feed'
+            workingDirectory: $(workingDirectory)
+
+  - stage: TriggerDeployment
+    displayName: 'Trigger Fabric Deployment (Pipeline B)'
+    dependsOn: Publish
+    condition: and(succeeded(), eq('${{ parameters.triggerDeployment }}', 'true'))
+    jobs:
+      - job: TriggerPipelineB
+        displayName: 'Queue Pipeline B'
+        steps:
+          - bash: |
+              set -euo pipefail
+
+              # Pipeline B definition ID — update if the pipeline is recreated
+              PIPELINE_B_ID=$(az pipelines show \
+                --name "ryanMicrosoftTest.fabric-data-engineering-ws.fabric_items_cicd" \
+                --org "$(System.CollectionUri)" \
+                --project "$(System.TeamProject)" \
+                --query "id" -o tsv 2>/dev/null || echo "")
+
+              if [ -z "$PIPELINE_B_ID" ]; then
+                echo "##[error]Could not find Pipeline B. Verify the pipeline name."
+                exit 1
+              fi
+
+              echo "Triggering Pipeline B (ID: $PIPELINE_B_ID) for environment: ${{ parameters.deploymentEnvironment }}"
+
+              az pipelines run \
+                --id "$PIPELINE_B_ID" \
+                --org "$(System.CollectionUri)" \
+                --project "$(System.TeamProject)" \
+                --branch "$(Build.SourceBranch)" \
+                --parameters "environment=${{ parameters.deploymentEnvironment }}"
+            displayName: 'Trigger Pipeline B via Azure CLI'
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)

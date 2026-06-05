@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "shortcut_lh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "fd9358ba-1290-810e-4ad7-49e3eeee109a"
+  }
+}

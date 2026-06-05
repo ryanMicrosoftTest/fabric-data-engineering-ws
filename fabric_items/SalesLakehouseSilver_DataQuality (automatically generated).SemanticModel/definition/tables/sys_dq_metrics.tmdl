@@ -1,0 +1,191 @@
+table sys_dq_metrics
+
+	measure TotalRows = ```
+			
+			SUM(sys_dq_metrics[TotalRowsDropped]) + SUM(sys_dq_metrics[TotalRowsProcessed])
+			
+			```
+		formatString: 0
+
+	measure DroppedPercentage =
+			
+			DIVIDE(SUM(sys_dq_metrics[TotalRowsDropped]), SUM(sys_dq_metrics[TotalRowsProcessed]), 0)
+		formatString: 0.00%;-0.00%;0.00%
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure WrittenPercentage =
+			
+			DIVIDE([TotalRowsWritten], SUM(sys_dq_metrics[TotalRowsProcessed]), 0)
+		formatString: 0.00%;-0.00%;0.00%
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Rows Dropped (Last 1 week)' =
+			
+			CALCULATE(
+			    SUM(sys_dq_metrics[TotalRowsDropped]),
+			    sys_dq_metrics[RefreshDate] > TODAY() - 7 &&
+			    sys_dq_metrics[RefreshDate] <= TODAY()
+			)
+		formatString: 0
+
+	measure 'Total Rows Processed (Last 1 week)' = ```
+			
+			CALCULATE(
+			    SUM(sys_dq_metrics[TotalRowsProcessed]),
+			    FILTER(
+			        sys_dq_metrics,
+			        sys_dq_metrics[RefreshDate] > TODAY() - 7 &&
+			        sys_dq_metrics[RefreshDate] <= TODAY()
+			    )
+			)
+			
+			```
+		formatString: 0
+
+	measure 'Total Violations (Last 1 week)' =
+			
+			CALCULATE(
+			    SUM(ConstraintTable[ViolationCount]),
+			    FILTER(
+			        sys_dq_metrics,
+			        sys_dq_metrics[RefreshDate] > TODAY() - 7
+			            && sys_dq_metrics[RefreshDate] <= TODAY()
+			    )
+			)
+		formatString: 0
+
+	measure TotalRowsWritten = ```
+			
+			COALESCE(SUM(sys_dq_metrics[TotalRowsProcessed]), 0) - 
+			COALESCE(SUM(sys_dq_metrics[TotalRowsDropped]), 0)
+			```
+		formatString: 0
+
+	measure 'Total Rows Written (Last 1 week)' =
+			
+			CALCULATE(
+			    COALESCE(SUM(sys_dq_metrics[TotalRowsProcessed]), 0) -
+			    COALESCE(SUM(sys_dq_metrics[TotalRowsDropped]), 0),
+			    sys_dq_metrics[RefreshDate] > TODAY() - 7 &&
+			    sys_dq_metrics[RefreshDate] <= TODAY()
+			)
+		formatString: 0
+
+	column Namespace
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: Namespace
+
+		annotation SummarizationSetBy = Automatic
+
+	column MLVName
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: MLVName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MLVID
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: MLVID
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshPolicy
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: RefreshPolicy
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshDate
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: RefreshDate
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column RefreshTimestamp
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: RefreshTimestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column Message
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: Message
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalRowsProcessed
+		dataType: int64
+		formatString: 0
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: TotalRowsProcessed
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
+
+	column TotalRowsDropped
+		dataType: int64
+		formatString: 0
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: TotalRowsDropped
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
+
+	column TotalViolations
+		dataType: int64
+		formatString: 0
+		sourceProviderType: varchar(8000)
+		summarizeBy: sum
+		sourceColumn: TotalViolations
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column ViolationsPerConstraint
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: ViolationsPerConstraint
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sys_dq_metrics = m
+		mode: directQuery
+		source =
+				let
+				    Source = Sql.Database("ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com", "SalesLakehouseSilver"),
+				    dbo_sys_dq_metrics = Source{[Schema="dbo",Item="sys_dq_metrics"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dbo_sys_dq_metrics,{ {"RefreshDate", "RefreshDate"} })
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -32,7 +32,7 @@ cw_location = "20240426"
 
 # CELL ********************
 
-spark.conf.set("sprk.sql.parquet.vorder.enabled", "true")
+spark.conf.set("spark.sql.parquet.vorder.enabled", "true")
 spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
 spark.conf.set("spark.microsoft.delta.optimizeWrite.binSize", "1073741824")
 
@@ -45,9 +45,8 @@ spark.conf.set("spark.microsoft.delta.optimizeWrite.binSize", "1073741824")
 
 # CELL ********************
 
-from pyspark import *
 from pyspark.sql.window import Window
-from pyspark.sql.functions import *
+from pyspark.sql.functions import current_date
 from pyspark.sql import Row
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType, BooleanType, DateType
 from typing import List
@@ -77,7 +76,6 @@ spark.sql("""DROP TABLE IF EXISTS """ + cw_table)
 # CELL ********************
 
 # Add metadata loading_date column using current date
-from pyspark.sql.functions import current_date
 dataChanged2 = dataChanged.withColumn("loading_date", current_date().cast("string"))
 # Overwrite table
 dataChanged2.write.format("delta").mode("overwrite").save("abfss://aom_arrivals_team1@onelake.dfs.fabric.microsoft.com/Bronze.Lakehouse/Tables/" + cw_table)

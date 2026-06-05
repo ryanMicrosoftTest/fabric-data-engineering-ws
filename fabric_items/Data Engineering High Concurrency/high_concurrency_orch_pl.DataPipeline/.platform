@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "high_concurrency_orch_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3fa9e000-b1a6-91aa-4082-212f53fe167f"
+  }
+}

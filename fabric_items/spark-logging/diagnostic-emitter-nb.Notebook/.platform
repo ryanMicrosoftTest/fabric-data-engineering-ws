@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "diagnostic-emitter-nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1046cfc9-5eaf-9e5a-4f66-a61b08eb76df"
+  }
+}

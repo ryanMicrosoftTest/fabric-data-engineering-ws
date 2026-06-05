@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Eventstream",
+    "displayName": "eh-adf-schema-features-es"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "10d709ee-f09c-ae59-47fd-3ca4c4f02a60"
+  }
+}

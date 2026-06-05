@@ -1,0 +1,13 @@
+# Example: Map an Entra security group to a role.
+# All members of the security group inherit the role's permissions.
+
+version: "1.0"
+
+mapping:
+  role_name: GastroenterologyRole
+
+  members:
+    entra_members:
+      - object_id: "6338eaf2-5a87-4eb3-b23b-ea30d04de02a"
+        display_name: "Dr. Harley Muir"
+        object_type: User

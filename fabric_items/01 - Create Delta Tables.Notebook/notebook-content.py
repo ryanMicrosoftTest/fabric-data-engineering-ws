@@ -17,6 +17,14 @@
 # META           "id": "7d0dfe91-9b90-42c4-9424-07dbd443a54c"
 # META         }
 # META       ]
+# META     },
+# META     "event_stream": {
+# META       "known_event_streams": [
+# META         {
+# META           "artifact_id": "8f9baedb-6735-47b2-a0e7-400256b284a3",
+# META           "stream_id": "8f9baedb-6735-47b2-a0e7-400256b284a3"
+# META         }
+# META       ]
 # META     }
 # META   }
 # META }
@@ -101,6 +109,21 @@ for table in full_tables:
 
 # CELL ********************
 
+"""
+Parameters fed into notebook
+
+EventStream attached to notebook -->
+Write to EventStream 
+En
+"""
+
+
+"""
+Parameters fed into notebook
+
+EventStream attached to notebook
+Write to EventStream
+"""
 
 # METADATA ********************
 

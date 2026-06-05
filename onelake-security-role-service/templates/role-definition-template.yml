@@ -1,0 +1,47 @@
+# OneLake Security Role Definition Template
+# ===========================================
+# Copy this file to Files/role-definitions/<your-role-name>.yml
+# Fill in the values below and drop it in the lakehouse.
+# The daily pipeline will pick it up and create the role.
+#
+# See examples/ for complete working examples.
+#
+# Path formats supported:
+#   "*"                               — all tables in the lakehouse
+#   "/Tables/<table>"                 — specific table (non-schema lakehouse)
+#   "/Tables/<schema>/<table>"        — specific table in a schema
+#   "/Tables/<schema>/*"              — all tables in a schema
+#   ["/Tables/schema/t1", "/Tables/schema/t2"]  — multiple tables
+
+version: "1.0"
+state: present                    # "present" to create/update, "absent" to delete
+
+role:
+  name: ""                        # REQUIRED — unique role name (PascalCase)
+
+  metadata:
+    description: ""               # What does this role do?
+    owner: ""                     # Who owns this role? (email or team)
+    created_by: ""                # Who is requesting this role?
+    tags: []                      # Optional tags: [department, project, etc.]
+
+  tables:
+    # --- Option 1: Single table with RLS/CLS ---
+    - path: "/Tables/<table_name>"
+      columns:
+        names: []                 # Column names to permit, or ["*"] for all
+      row_filter: ""              # T-SQL SELECT for RLS, or omit for no filter
+
+    # --- Option 2: Schema-level access (all tables in a schema) ---
+    # - path: "/Tables/<schema_name>/*"
+    #   columns:
+    #     names: ["*"]
+
+    # --- Option 3: Multiple specific tables in a schema ---
+    # - path: "/Tables/gold_reporting/fact_sale"
+    #   columns:
+    #     names: ["*"]
+    # - path: "/Tables/gold_reporting/dim_customer"
+    #   columns:
+    #     names: [customer_id, name, region]
+    #   row_filter: "SELECT * FROM dim_customer WHERE region = 'West'"

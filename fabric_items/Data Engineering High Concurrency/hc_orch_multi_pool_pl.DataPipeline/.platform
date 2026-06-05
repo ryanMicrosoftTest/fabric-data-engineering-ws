@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "hc_orch_multi_pool_pl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e6ee3383-9c0d-9176-4168-d06410f1f4fa"
+  }
+}

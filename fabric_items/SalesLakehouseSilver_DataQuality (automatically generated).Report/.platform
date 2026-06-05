@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "SalesLakehouseSilver_DataQuality (automatically generated)",
+    "description": "Materialized Lake View Data Quality Report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f6b82b62-93f3-a9d8-4257-bb3ed6b242b3"
+  }
+}

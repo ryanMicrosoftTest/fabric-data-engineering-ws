@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/schedules/1.0.0/schema.json",
+  "schedules": [
+    {
+      "enabled": true,
+      "jobType": "Execute",
+      "configuration": {
+        "type": "Cron",
+        "startDateTime": "2025-12-17T13:15:56",
+        "endDateTime": "9999-01-01T05:00:00",
+        "localTimeZoneId": "Eastern Standard Time",
+        "interval": 1440
+      }
+    }
+  ]
+}

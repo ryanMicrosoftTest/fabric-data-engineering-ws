@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "KQLDatabase",
+    "displayName": "job-monitoring-eh",
+    "description": "job-monitoring-eh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "fb6e822d-45b5-b483-4d70-98fde441ae3c"
+  }
+}

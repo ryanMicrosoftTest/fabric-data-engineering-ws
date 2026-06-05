@@ -1,0 +1,4 @@
+relationship cf34d2a7-1dba-0c0c-f56a-672ed0bb75c3
+	fromColumn: doctor_memos_fact.doctor_id
+	toColumn: dim_doctor.id
+

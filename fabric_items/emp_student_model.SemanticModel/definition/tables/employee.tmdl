@@ -1,0 +1,54 @@
+table employee
+	lineageTag: 59dc42c9-16f3-4796-a92c-4339a1740781
+	sourceLineageTag: [dbo].[employee]
+
+	column id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 046f512f-6ca8-4a1b-adbd-7621020f6ba2
+		sourceLineageTag: id
+		summarizeBy: sum
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_name
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 8412dc89-0e2e-4d11-8b71-91219b4d8b38
+		sourceLineageTag: first_name
+		summarizeBy: none
+		sourceColumn: first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_name
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 57aa5abe-b387-4b33-94e6-d9cea9c09137
+		sourceLineageTag: last_name
+		summarizeBy: none
+		sourceColumn: last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column social_security_number
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 9a0e77f7-ccd8-4507-b4da-41da4d0c73d7
+		sourceLineageTag: social_security_number
+		summarizeBy: none
+		sourceColumn: social_security_number
+
+		annotation SummarizationSetBy = Automatic
+
+	partition employee = entity
+		mode: directLake
+		source
+			entityName: employee
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "spark_events_lh"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "51342f8f-f356-bbd0-4b3c-8b71a50882b5"
+  }
+}

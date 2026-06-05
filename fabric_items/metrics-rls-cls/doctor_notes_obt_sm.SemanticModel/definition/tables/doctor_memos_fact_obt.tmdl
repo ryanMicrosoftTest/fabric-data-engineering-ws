@@ -29,6 +29,15 @@ table doctor_memos_fact_obt
 
 		annotation SummarizationSetBy = Automatic
 
+	column department
+		dataType: string
+		lineageTag: 9debb2fe-7557-402e-9abb-3545895f2328
+		sourceLineageTag: department
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
 	partition doctor_memos_fact_obt = entity
 		mode: directLake
 		source

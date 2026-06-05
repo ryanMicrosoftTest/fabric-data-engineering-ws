@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "activities": [],
+    "parameters": {
+      "kv_name": {
+        "type": "string"
+      },
+      "secret_name": {
+        "type": "string"
+      },
+      "base_url": {
+        "type": "string"
+      },
+      "api": {
+        "type": "string"
+      },
+      "kv_args": {
+        "type": "string"
+      },
+      "trigger_time": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "totalTime": {
+        "type": "String"
+      },
+      "totalBytes": {
+        "type": "String"
+      },
+      "startTime": {
+        "type": "String"
+      },
+      "stopTime": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "fileName": {
+        "type": "String"
+      },
+      "pipelineRunID": {
+        "type": "String"
+      },
+      "runBy": {
+        "type": "String"
+      },
+      "pipelineStatus": {
+        "type": "String"
+      }
+    }
+  }
+}

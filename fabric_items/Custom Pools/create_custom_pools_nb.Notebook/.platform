@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "create_custom_pools_nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7044513c-2e11-afbd-4526-affbe8f3b8e4"
+  }
+}

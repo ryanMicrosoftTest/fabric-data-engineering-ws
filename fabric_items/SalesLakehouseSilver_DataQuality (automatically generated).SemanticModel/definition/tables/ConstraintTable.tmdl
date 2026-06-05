@@ -1,0 +1,118 @@
+table ConstraintTable
+
+	measure 'Total Violations (Last 7 Days Only)' = ```
+			
+			VAR Last7Days =
+			    FILTER(
+			        ConstraintTable,
+			        ConstraintTable[RefreshDate] > TODAY() - 7 &&
+			        ConstraintTable[RefreshDate] <= TODAY()
+			    )
+			RETURN
+			    CALCULATE(
+			        SUM(ConstraintTable[ViolationCount]),
+			        Last7Days
+			    )
+			
+			```
+		formatString: 0
+
+	measure 'MLV Rank Per Day' = ```
+			
+			RANKX(
+				FILTER(
+					ALL(ConstraintTable),
+					ConstraintTable[RefreshDate] = MAX(ConstraintTable[RefreshDate])
+				),
+				CALCULATE(SUM(ConstraintTable[ViolationCount])),
+				,
+				DESC,
+				DENSE
+			)
+			
+			```
+		formatString: 0
+
+	column MLVID
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: MLVID
+
+		annotation SummarizationSetBy = Automatic
+
+	column RefreshDate
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: RefreshDate
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ConstraintName
+		dataType: string
+		isNullable: false
+		sourceProviderType: nvarchar(4000)
+		summarizeBy: none
+		sourceColumn: ConstraintName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ViolationCount
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		summarizeBy: sum
+		sourceColumn: ViolationCount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Namespace
+		dataType: string
+		sourceProviderType: varchar(8000)
+		summarizeBy: none
+		sourceColumn: Namespace
+
+		annotation SummarizationSetBy = Automatic
+
+	column SchemaName
+		dataType: string
+		sourceProviderType: nvarchar(4000)
+		summarizeBy: none
+		sourceColumn: SchemaName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MLVName
+		dataType: string
+		sourceProviderType: varchar(4000)
+		summarizeBy: none
+		sourceColumn: MLVName
+
+		annotation SummarizationSetBy = Automatic
+
+	column FullMLVName
+		dataType: string
+		sourceProviderType: nvarchar(8000)
+		summarizeBy: none
+		sourceColumn: FullMLVName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ConstraintTable = m
+		mode: directQuery
+		source =
+				let
+				    Source = Sql.Database("ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com", "SalesLakehouseSilver", [Query="SELECT#(lf)    dq.MLVID,#(lf)    dq.RefreshDate,#(lf)    j.[key] AS ConstraintName,#(lf)    SUM(TRY_CAST(j.[value] AS INT)) AS ViolationCount,#(lf)    dq.Namespace,#(lf)    PARSENAME(dq.Namespace, 1) AS SchemaName,#(lf)    dq.MLVName,#(lf)    PARSENAME(dq.Namespace, 1) + '.' + dq.MLVName AS FullMLVName#(lf)FROM#(lf)    sys_dq_metrics dq#(lf)CROSS APPLY#(lf)    OPENJSON(dq.ViolationsPerConstraint) AS j#(lf)GROUP BY#(lf)    dq.MLVID,#(lf)    dq.RefreshDate,#(lf)    j.[key],#(lf)    dq.Namespace,#(lf)    dq.MLVName"])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

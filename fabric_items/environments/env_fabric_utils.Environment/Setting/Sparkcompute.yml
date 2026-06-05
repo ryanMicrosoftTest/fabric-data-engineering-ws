@@ -6,5 +6,14 @@ executor_memory: 56g
 dynamic_executor_allocation:
   enabled: true
   min_executors: 1
-  max_executors: 9
+  max_executors: 2
+spark_conf:
+  spark.fabric.pools.skipStarterPools: true
+  spark.synapse.diagnostic.emitters: spark-eh
+  spark.synapse.diagnostic.emitter.spark-eh.type: AzureEventHub
+  spark.synapse.diagnostic.emitter.spark-eh.categories: Log,EventLog,Metrics
+  spark.synapse.diagnostic.emitter.spark-eh.secret: <REPLACE_WITH_EVENT_HUB_CONNECTION_STRING>
+  spark.synapse.diagnostic.emitter.spark-eh.filter.loggerName.match: PySparkLogger,org.apache.spark.SparkContext,org.apache.spark.api.python
+  spark.synapse.diagnostic.emitter.spark-eh.filter.eventName.match: SparkListenerApplicationStart,SparkListenerApplicationEnd,SparkListenerJobStart,SparkListenerJobEnd,SparkListenerStageCompleted,SparkListene   rTaskEnd,SparkListenerExecutorAdded,SparkListenerExecutorRemoved,SparkListenerEnvironmentUpdate
+  spark.synapse.diagnostic.emitter.spark-eh.filter.metricName.match: jvm.heap.used,jvm.heap.max,executor.runTime,executor.cpuTime,executor.me   moryUsed,executor.diskUsed,executor.totalShuffleRead,executor.totalShuffleWrite,executor.totalGCTime
 runtime_version: 1.3

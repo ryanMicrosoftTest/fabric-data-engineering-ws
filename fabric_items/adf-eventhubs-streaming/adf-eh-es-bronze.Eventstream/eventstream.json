@@ -1,0 +1,3917 @@
+{
+  "sources": [
+    {
+      "id": "c499c911-b3da-40dc-867c-a09389783b6c",
+      "name": "adf-event-hub",
+      "type": "AzureEventHub",
+      "properties": {
+        "dataConnectionId": "c891faf2-230c-4902-84d5-ccb7b632c74f",
+        "consumerGroupName": "$Default",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "00613303-abaa-4b43-ad9a-3a86a2736c30",
+      "name": "loadPipelineRunstbl",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "f653e473-1650-a180-45c3-4679870611eb",
+        "databaseName": "adf-eh-new",
+        "tableName": "PipelineRuns_tbl",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "Filter_Category_PipelineRuns"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "Filter_Category_PipelineRuns",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "6b5f9ed1-d135-4353-9790-37ecba65252a",
+      "name": "loadTriggerRunsTbl",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "f653e473-1650-a180-45c3-4679870611eb",
+        "databaseName": "adf-eh-new",
+        "tableName": "TriggerRuns_tbl",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "Filter_Category_TriggerRuns"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "Filter_Category_TriggerRuns",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "9aa96cac-6501-4e67-8c50-b73b2003ba37",
+      "name": "loadSandboxActivityRunstbl",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "f653e473-1650-a180-45c3-4679870611eb",
+        "databaseName": "adf-eh-new",
+        "tableName": "SandboxActivityRuns_tbl",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "Filter_Category_SandboxActivityRuns"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "Filter_Category_SandboxActivityRuns",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "9c4669b3-2e2e-4ae2-9d64-cf4b4f513059",
+      "name": "loadSandboxPipelineRunsTbl",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "f653e473-1650-a180-45c3-4679870611eb",
+        "databaseName": "adf-eh-new",
+        "tableName": "SandboxPipelineRuns_tbl",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "Filter_Category_SandboxPipelineRuns"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "Filter_Category_SandboxPipelineRuns",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bb913ae6-b078-4cc4-aa11-0fe12bd34d50",
+      "name": "loadActivityRunstbl",
+      "type": "Eventhouse",
+      "properties": {
+        "dataIngestionMode": "ProcessedIngestion",
+        "workspaceId": "00000000-0000-0000-0000-000000000000",
+        "itemId": "f653e473-1650-a180-45c3-4679870611eb",
+        "databaseName": "adf-eh-new",
+        "tableName": "ActivityRuns_tbl",
+        "inputSerialization": {
+          "type": "Json",
+          "properties": {
+            "encoding": "UTF8"
+          }
+        }
+      },
+      "inputNodes": [
+        {
+          "name": "Filter_Category_ActivityRuns"
+        }
+      ],
+      "inputSchemas": [
+        {
+          "name": "Filter_Category_ActivityRuns",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "id": "3e3ee941-8165-4049-ba4d-68af6597ceb0",
+      "name": "adf-eh-es-stream",
+      "type": "DefaultStream",
+      "properties": {},
+      "inputNodes": [
+        {
+          "name": "adf-event-hub"
+        }
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "name": "expand_records",
+      "type": "Expand",
+      "inputNodes": [
+        {
+          "name": "adf-eh-es-stream"
+        }
+      ],
+      "properties": {
+        "column": {
+          "expressionType": "ColumnReference",
+          "node": null,
+          "columnName": "records",
+          "columnPathSegments": []
+        },
+        "ignoreMissingOrEmpty": true
+      },
+      "inputSchemas": [
+        {
+          "name": "adf-eh-es-stream",
+          "schema": {
+            "columns": [
+              {
+                "name": "records",
+                "type": "Array",
+                "fields": null,
+                "items": {
+                  "name": null,
+                  "type": "Record",
+                  "fields": [
+                    {
+                      "name": "EventName",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "body",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "category",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "correlationId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "end",
+                      "type": "DateTime",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "env_dt_spanId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "env_dt_traceId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "env_name",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "env_time",
+                      "type": "DateTime",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "env_ver",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "failureType",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "groupId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "level",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "location",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "name",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "operationName",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "pipelineName",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "properties",
+                      "type": "Record",
+                      "fields": [
+                        {
+                          "name": "Parameters",
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "symbol",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "freq",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "from",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "to",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        },
+                        {
+                          "name": "SystemParameters",
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "ExecutionStart",
+                              "type": "DateTime",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "TriggerId",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "SubscriptionId",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "PipelineRunRequestTime",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        },
+                        {
+                          "name": "Predecessors",
+                          "type": "Array",
+                          "fields": null,
+                          "items": {
+                            "name": null,
+                            "type": "Record",
+                            "fields": [
+                              {
+                                "name": "Name",
+                                "type": "Nvarchar(max)",
+                                "fields": null,
+                                "items": null
+                              },
+                              {
+                                "name": "Id",
+                                "type": "Nvarchar(max)",
+                                "fields": null,
+                                "items": null
+                              },
+                              {
+                                "name": "InvokedByType",
+                                "type": "Nvarchar(max)",
+                                "fields": null,
+                                "items": null
+                              }
+                            ],
+                            "items": null
+                          }
+                        },
+                        {
+                          "name": "UserProperties",
+                          "type": "Record",
+                          "fields": [],
+                          "items": null
+                        },
+                        {
+                          "name": "Annotations",
+                          "type": "Array",
+                          "fields": null,
+                          "items": null
+                        },
+                        {
+                          "name": "Message",
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      ],
+                      "items": null
+                    },
+                    {
+                      "name": "resourceId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "runId",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "severityNumber",
+                      "type": "BigInt",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "severityText",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "start",
+                      "type": "DateTime",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "status",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "tags",
+                      "type": "Nvarchar(max)",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "timestamp",
+                      "type": "DateTime",
+                      "fields": null,
+                      "items": null
+                    },
+                    {
+                      "name": "time",
+                      "type": "DateTime",
+                      "fields": null,
+                      "items": null
+                    }
+                  ],
+                  "items": null
+                }
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter_Category_ActivityRuns",
+      "type": "Filter",
+      "inputNodes": [
+        {
+          "name": "ManageFields"
+        }
+      ],
+      "properties": {
+        "conditions": [
+          {
+            "column": {
+              "expressionType": "ColumnReference",
+              "node": null,
+              "columnName": "category",
+              "columnPathSegments": []
+            },
+            "operatorType": "Equals",
+            "value": {
+              "expressionType": "Literal",
+              "dataType": "Nvarchar(max)",
+              "value": "ActivityRuns"
+            }
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "ManageFields",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter_Category_PipelineRuns",
+      "type": "Filter",
+      "inputNodes": [
+        {
+          "name": "ManageFields"
+        }
+      ],
+      "properties": {
+        "conditions": [
+          {
+            "column": {
+              "expressionType": "ColumnReference",
+              "node": null,
+              "columnName": "category",
+              "columnPathSegments": []
+            },
+            "operatorType": "Equals",
+            "value": {
+              "expressionType": "Literal",
+              "dataType": "Nvarchar(max)",
+              "value": "PipelineRuns"
+            }
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "ManageFields",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter_Category_SandboxActivityRuns",
+      "type": "Filter",
+      "inputNodes": [
+        {
+          "name": "ManageFields"
+        }
+      ],
+      "properties": {
+        "conditions": [
+          {
+            "column": {
+              "expressionType": "ColumnReference",
+              "node": null,
+              "columnName": "category",
+              "columnPathSegments": []
+            },
+            "operatorType": "Equals",
+            "value": {
+              "expressionType": "Literal",
+              "dataType": "Nvarchar(max)",
+              "value": "SandboxActivityRuns"
+            }
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "ManageFields",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter_Category_SandboxPipelineRuns",
+      "type": "Filter",
+      "inputNodes": [
+        {
+          "name": "ManageFields"
+        }
+      ],
+      "properties": {
+        "conditions": [
+          {
+            "column": {
+              "expressionType": "ColumnReference",
+              "node": null,
+              "columnName": "category",
+              "columnPathSegments": []
+            },
+            "operatorType": "Equals",
+            "value": {
+              "expressionType": "Literal",
+              "dataType": "Nvarchar(max)",
+              "value": "SandboxPipelineRuns"
+            }
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "ManageFields",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter_Category_TriggerRuns",
+      "type": "Filter",
+      "inputNodes": [
+        {
+          "name": "ManageFields"
+        }
+      ],
+      "properties": {
+        "conditions": [
+          {
+            "column": {
+              "expressionType": "ColumnReference",
+              "node": null,
+              "columnName": "category",
+              "columnPathSegments": []
+            },
+            "operatorType": "Equals",
+            "value": {
+              "expressionType": "Literal",
+              "dataType": "Nvarchar(max)",
+              "value": "TriggerRuns"
+            }
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "ManageFields",
+          "schema": {
+            "columns": [
+              {
+                "name": "category",
+                "type": "Nvarchar(max)",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "ManageFields",
+      "type": "ManageFields",
+      "inputNodes": [
+        {
+          "name": "expand_records"
+        }
+      ],
+      "properties": {
+        "columns": [
+          {
+            "type": "Rename",
+            "properties": {
+              "column": {
+                "expressionType": "ColumnReference",
+                "node": null,
+                "columnName": "ArrayValue_records",
+                "columnPathSegments": [
+                  {
+                    "field": "category"
+                  }
+                ]
+              }
+            },
+            "alias": "category"
+          },
+          {
+            "type": "Rename",
+            "properties": {
+              "column": {
+                "expressionType": "ColumnReference",
+                "node": null,
+                "columnName": "ArrayValue_records",
+                "columnPathSegments": []
+              }
+            },
+            "alias": "ArrayValue_records"
+          },
+          {
+            "type": "Rename",
+            "properties": {
+              "column": {
+                "expressionType": "ColumnReference",
+                "node": null,
+                "columnName": "EventProcessedUtcTime",
+                "columnPathSegments": []
+              }
+            },
+            "alias": "EventProcessedUtcTime"
+          },
+          {
+            "type": "Rename",
+            "properties": {
+              "column": {
+                "expressionType": "ColumnReference",
+                "node": null,
+                "columnName": "PartitionId",
+                "columnPathSegments": []
+              }
+            },
+            "alias": "PartitionId"
+          },
+          {
+            "type": "Rename",
+            "properties": {
+              "column": {
+                "expressionType": "ColumnReference",
+                "node": null,
+                "columnName": "EventEnqueuedUtcTime",
+                "columnPathSegments": []
+              }
+            },
+            "alias": "EventEnqueuedUtcTime"
+          }
+        ]
+      },
+      "inputSchemas": [
+        {
+          "name": "expand_records",
+          "schema": {
+            "columns": [
+              {
+                "name": "ArrayIndex_records",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "ArrayValue_records",
+                "type": "Record",
+                "fields": [
+                  {
+                    "name": "EventName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "body",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "category",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "correlationId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "end",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_spanId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_dt_traceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "env_ver",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "failureType",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "groupId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "level",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "location",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "name",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "operationName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "pipelineName",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "properties",
+                    "type": "Record",
+                    "fields": [
+                      {
+                        "name": "Parameters",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "SystemParameters",
+                        "type": "Record",
+                        "fields": [
+                          {
+                            "name": "ExecutionStart",
+                            "type": "DateTime",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "TriggerId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "SubscriptionId",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          },
+                          {
+                            "name": "PipelineRunRequestTime",
+                            "type": "Nvarchar(max)",
+                            "fields": null,
+                            "items": null
+                          }
+                        ],
+                        "items": null
+                      },
+                      {
+                        "name": "Predecessors",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Record",
+                          "fields": [
+                            {
+                              "name": "Name",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "Id",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            },
+                            {
+                              "name": "InvokedByType",
+                              "type": "Nvarchar(max)",
+                              "fields": null,
+                              "items": null
+                            }
+                          ],
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "UserProperties",
+                        "type": "Record",
+                        "fields": [],
+                        "items": null
+                      },
+                      {
+                        "name": "Annotations",
+                        "type": "Array",
+                        "fields": null,
+                        "items": {
+                          "name": null,
+                          "type": "Nvarchar(max)",
+                          "fields": null,
+                          "items": null
+                        }
+                      },
+                      {
+                        "name": "Message",
+                        "type": "Nvarchar(max)",
+                        "fields": null,
+                        "items": null
+                      }
+                    ],
+                    "items": null
+                  },
+                  {
+                    "name": "resourceId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "runId",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityNumber",
+                    "type": "BigInt",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "severityText",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "start",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "status",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "tags",
+                    "type": "Nvarchar(max)",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  },
+                  {
+                    "name": "time",
+                    "type": "DateTime",
+                    "fields": null,
+                    "items": null
+                  }
+                ],
+                "items": null
+              },
+              {
+                "name": "EventProcessedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "PartitionId",
+                "type": "BigInt",
+                "fields": null,
+                "items": null
+              },
+              {
+                "name": "EventEnqueuedUtcTime",
+                "type": "DateTime",
+                "fields": null,
+                "items": null
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "compatibilityLevel": "1.1"
+}

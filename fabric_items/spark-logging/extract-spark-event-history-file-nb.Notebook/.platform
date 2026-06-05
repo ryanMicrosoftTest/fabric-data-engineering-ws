@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "extract-spark-event-history-file-nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "91c23a82-742d-ae9d-4f16-d1639656d7b2"
+  }
+}

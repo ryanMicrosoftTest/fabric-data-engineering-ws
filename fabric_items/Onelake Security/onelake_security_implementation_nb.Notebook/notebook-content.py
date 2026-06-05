@@ -6,26 +6,26 @@
 # META   "kernel_info": {
 # META     "name": "synapse_pyspark"
 # META   },
-# META   "dependencies": {}
-# META }
-
-# CELL ********************
-
-# Welcome to your new notebook
-# Type here in the cell editor to add code!
-
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "0386880f-c134-41be-923c-00150c5fbafe",
+# META       "default_lakehouse_name": "onelake_security_lh_with_schemas",
+# META       "default_lakehouse_workspace_id": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "0386880f-c134-41be-923c-00150c5fbafe"
+# META         }
+# META       ]
+# META     }
+# META   }
 # META }
 
 # MARKDOWN ********************
 
 # ### MANUALLY enable OneLake Security on the Lakehouse and change Identity on SQL Analytics Endpoint to User
 # - This must be done by the person listed as the owner of the lakehouse
+# - The owner of the lakehouse CANNOT be a service principal
+# - This notebook also expects a lakehouse without schemas
 
 # CELL ********************
 
@@ -65,7 +65,7 @@ tenant_id_secret = 'fuam-spn-tenant-id'
 client_secret_name = 'fuam-spn-secret'
 
 workspace_id = 'a8cbda3d-903e-4154-97d9-9a91c95abb42'
-lakehouse_id = '25ae3fb0-1c96-49eb-8a0f-208c350dc4ba'
+lakehouse_id = '0386880f-c134-41be-923c-00150c5fbafe'                   # standalone lakehouse
 
 tenant_id = '35acf02c-4b87-4ae6-9221-ff5cafd430b4'
 
@@ -335,6 +335,32 @@ def list_data_access_roles(workspace_id:str, item_id:str, api_token:str):
 
     return response
 
+def upsert_data_access_role_new(workspace_id, item_id, role, api_token):
+    base = f'https://api.fabric.microsoft.com/v1/workspaces/{workspace_id}/items/{item_id}/dataAccessRoles'
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json"
+    }
+    existing = requests.get(base, headers=headers).json().get('value', [])
+    new_role = role.definition['value'][0]
+
+    match = None
+    if new_role.get('id'):
+        match = next((r for r in existing if r.get('id') == new_role['id']), None)
+    if not match:
+        match = next((r for r in existing if r.get('name', '').lower() == new_role['name'].lower()), None)
+
+    if match:
+        for k, v in new_role.items():
+            if k != 'id':
+                match[k] = v
+    else:
+        if not new_role.get('id'):
+            new_role['id'] = str(uuid.uuid4())
+        existing.append(new_role)
+
+    return requests.put(base, headers=headers, json={'value': existing})
+
 
 # METADATA ********************
 
@@ -535,12 +561,15 @@ display(doctor_table_df)
  'description': 'lakehouse to test onelake security V2',
  'workspaceId': 'a8cbda3d-903e-4154-97d9-9a91c95abb42'}
 """
-display(doctor_table_df)
+# display(doctor_table_df)
+
+# Create the schema first (if it doesn't exist)
+spark.sql("CREATE SCHEMA IF NOT EXISTS health_dbo")
 
 try:
-    doctor_table_df.write.format('delta').mode('overwrite').save(f'abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/doctor_table')
-except:
-    print('ERROR')
+    doctor_table_df.write.format('delta').mode('overwrite').saveAsTable('health_dbo.doctor_table')
+except Exception as e:
+    print(f'ERROR: {e}')
 
 
 # METADATA ********************
@@ -558,6 +587,22 @@ except:
 # MARKDOWN ********************
 
 # ### Create Roles
+
+# CELL ********************
+
+# print inputs to next cell
+print(f'workspaceId: {workspace_id}')
+print(f'lakehouseId: {lakehouse_id}')
+print(f'Object Id for Gastro Role: {object_id_for_gastro_role}')
+print(f'Object Id for Neuro Role: {object_id_user_neuro_role}')
+print(f'Object Id for Ortho Role: {object_id_for_ortho_role}')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # CELL ********************
 
@@ -602,14 +647,15 @@ constraints_working_lh = {
 dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
 
 
-fabricItemMembers = [
-          {
-            "itemAccess": [
-              "ReadAll"
-            ],
-            "sourcePath": f"{workspace_id}/{lakehouse_id}"
-          }
-        ]
+# fabricItemMembers = [
+#           {
+#             "itemAccess": [
+#               "Read"
+#             ],
+#             "sourcePath": f"{workspace_id}/{lakehouse_id}"
+#           }
+#         ]
+fabricItemMembers = []
 
 ms_entra_members = [
   {
@@ -676,14 +722,15 @@ constraints_working_lh = {
 dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
  
 
-fabricItemMembers = [
-          {
-            "itemAccess": [
-              "ReadAll"
-            ],
-            "sourcePath": f"{workspace_id}/{lakehouse_id}"
-          }
-        ]
+# fabricItemMembers = [
+#           {
+#             "itemAccess": [
+#               "Read"
+#             ],
+#             "sourcePath": f"{workspace_id}/{lakehouse_id}"
+#           }
+#         ]
+fabricItemMembers = []
  
 ms_entra_members = [
   {
@@ -749,14 +796,15 @@ constraints_working_lh = {
 dec_rule_working_lh = DecisionRules(effect='Permit', permission=permissionRule_working_lh, constraints=constraints_working_lh)
  
 
-fabricItemMembers = [
-          {
-            "itemAccess": [
-              "ReadAll"
-            ],
-            "sourcePath": f"{workspace_id}/{lakehouse_id}"
-          }
-        ]
+# fabricItemMembers = [
+#           {
+#             "itemAccess": [
+#               "Read"
+#             ],
+#             "sourcePath": f"{workspace_id}/{lakehouse_id}"
+#           }
+#         ]
+fabricItemMembers = []
  
 ms_entra_members = [
   {
