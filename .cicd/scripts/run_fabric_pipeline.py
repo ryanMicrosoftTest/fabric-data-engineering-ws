@@ -1,6 +1,6 @@
 """Run a Fabric Data Pipeline by name and poll until it reaches a terminal status.
 
-Usage (from Pipeline B):
+Usage (from fabric-items-deployment-pipeline):
     python run_fabric_pipeline.py \
         --workspace-id <GUID> \
         --pipeline-name onelake_security_role_pl \
@@ -104,18 +104,81 @@ def run_pipeline(workspace_id, item_id, token):
     return location
 
 
+# Transient HTTP statuses returned by the Fabric job-status endpoint that
+# should be retried instead of failing the entire pipeline run.
+_RETRYABLE_STATUSES = {408, 429, 500, 502, 503, 504}
+_MAX_CONSECUTIVE_TRANSIENT_ERRORS = 10
+
+
 def poll_job(location_url, token, poll_interval, timeout):
-    """Poll the job instance until a terminal status is reached."""
+    """Poll the job instance until a terminal status is reached.
+
+    The Fabric ``jobs/instances/{id}`` endpoint intermittently returns 5xx
+    responses while a job is still running. Those are treated as transient
+    and retried; only after several consecutive transient failures (or the
+    overall timeout) do we give up.
+    """
     headers = {"Authorization": f"Bearer {token}"}
     start = time.time()
+    consecutive_transient_errors = 0
+    last_transient_error = None
 
     while True:
         elapsed = time.time() - start
         if elapsed > timeout:
             raise TimeoutError(f"Pipeline job did not complete within {timeout}s")
 
-        resp = requests.get(location_url, headers=headers, timeout=60)
+        try:
+            resp = requests.get(location_url, headers=headers, timeout=60)
+        except requests.RequestException as exc:
+            consecutive_transient_errors += 1
+            last_transient_error = exc
+            logger.warning(
+                "Transient network error polling job status (%d/%d): %s",
+                consecutive_transient_errors,
+                _MAX_CONSECUTIVE_TRANSIENT_ERRORS,
+                exc,
+            )
+            if consecutive_transient_errors >= _MAX_CONSECUTIVE_TRANSIENT_ERRORS:
+                raise RuntimeError(
+                    f"Job status polling failed after {consecutive_transient_errors} "
+                    f"consecutive network errors. Last error: {exc}"
+                ) from exc
+            time.sleep(poll_interval)
+            continue
+
+        if resp.status_code in _RETRYABLE_STATUSES:
+            consecutive_transient_errors += 1
+            request_id = (
+                resp.headers.get("x-ms-request-id")
+                or resp.headers.get("RequestId")
+                or "<none>"
+            )
+            body_snippet = resp.text[:500].replace("\n", " ")
+            last_transient_error = (
+                f"HTTP {resp.status_code} (x-ms-request-id={request_id}): {body_snippet}"
+            )
+            logger.warning(
+                "Transient HTTP %s polling job status (%d/%d). x-ms-request-id=%s body=%s",
+                resp.status_code,
+                consecutive_transient_errors,
+                _MAX_CONSECUTIVE_TRANSIENT_ERRORS,
+                request_id,
+                body_snippet,
+            )
+            if consecutive_transient_errors >= _MAX_CONSECUTIVE_TRANSIENT_ERRORS:
+                raise RuntimeError(
+                    f"Job status polling failed after {consecutive_transient_errors} "
+                    f"consecutive transient HTTP errors. Last error: {last_transient_error}"
+                )
+            time.sleep(poll_interval)
+            continue
+
+        # Any other non-2xx is treated as a hard failure (e.g. 401, 403, 404).
         resp.raise_for_status()
+
+        consecutive_transient_errors = 0
+        last_transient_error = None
         body = resp.json()
 
         status = body.get("status", "Unknown")

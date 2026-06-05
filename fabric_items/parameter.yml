@@ -50,6 +50,59 @@ key_value_replace:
       item_type: "DataPipeline"
       item_name: "scheduled_pl"
 
+find_replace:
+    # 'Load Customer Data' DataPipeline - source Lakehouse 'new_wwi_lakehouse' artifactId
+    # Hardcoded ID in pipeline-content.json points at a workspace that isn't the deployment target.
+    # QA/PROD targets do not yet have new_wwi_lakehouse; placeholder GUIDs are used so publish
+    # to those envs will fail clearly until the resource is created.
+    - find_value: d443a54c-07db-9424-42c4-9b907d0dfe91
+      replace_value:
+        DEV: 6fae42ab-a6f2-4e7e-bd44-3497e4efbea9
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
+    # 'Load Customer Data' - sink DataWarehouse 'WorldWideImporters' artifactId
+    - find_value: faf57c49-8a74-49aa-8e3b-8ccb7390d403
+      replace_value:
+        DEV: dd862a4c-1795-41b3-90b8-529605120e66
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
+    # 'Load Customer Data' - sink DataWarehouse 'WorldWideImporters' workspaceId
+    - find_value: a8cbda3d-903e-4154-97d9-9a91c95abb42
+      replace_value:
+        DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
+        QA: 2ae91835-ea46-482c-8656-14362495e197
+        PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
+    # 'Load Customer Data' - source Lakehouse 'new_wwi_lakehouse' workspaceId
+    # The local file has the all-zero placeholder GUID. Fabric's updateDefinition
+    # API rejects all-zeros on linked services for an existing pipeline; it must
+    # be the actual target workspace GUID. Scoped to this DataPipeline only so
+    # other items that legitimately use the all-zero placeholder are unaffected.
+    - find_value: "00000000-0000-0000-0000-000000000000"
+      replace_value:
+        DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
+        QA: 2ae91835-ea46-482c-8656-14362495e197
+        PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
+    # 'Load Customer Data' - sink DataWarehouse SQL endpoint
+    - find_value: ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com
+      replace_value:
+        DEV: ftykynmhjpteverb75ok7vbqwq-bze7y6s7cewepiqfc7oguw7oki.datawarehouse.fabric.microsoft.com
+        QA: placeholder.datawarehouse.fabric.microsoft.com
+        PROD: placeholder.datawarehouse.fabric.microsoft.com
+      item_type: "DataPipeline"
+      item_name: "Load Customer Data"
+
 
 # spark_pool:
 #     # CapacityPool_Large

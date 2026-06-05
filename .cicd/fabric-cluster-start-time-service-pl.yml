@@ -1,0 +1,533 @@
+# Fabric Cluster Start-Time Service — CI/CD Pipeline
+# ====================================================
+# Single pipeline that builds, validates, and deploys the entire Function App
+# (all 18 functions deploy together) plus its supporting infrastructure and
+# Fabric Warehouse schema.
+#
+# Stages:
+#   1. Validate          — lint (ruff/black), type-check (mypy, warn), pytest with coverage gate (>=80%)
+#   2. InfraDeploy       — terraform apply for the Function App + dependencies
+#   3. WarehouseDeploy   — build sqlproj -> dacpac, sqlpackage publish to Fabric Warehouse
+#   4. FunctionDeploy    — func azure functionapp publish (remote build)
+#   5. Smoke             — GET /api/health on the deployed Function App
+#
+# Manual usage:
+#   - Pick `environment` (DEV/QA/PROD) when queueing.
+#   - `skipInfra=true`  -> skip Terraform stage (e.g. code-only redeploys)
+#   - `skipWarehouse=true` -> skip dacpac publish (e.g. backfill / hotfix function only)
+#   - Function deploy still runs as long as InfraDeploy succeeded or was skipped.
+#
+# Prerequisites in Azure DevOps (project: Contoso-University):
+#   - Service connections: `fabric-sc` (DEV/QA), `fabric-sc-prod` (PROD)
+#   - Variable group(s) linked to this pipeline providing:
+#       KeyVaultNameNonProd, KeyVaultNameProd
+#       TF_BACKEND_RG, TF_BACKEND_SA, TF_BACKEND_CONTAINER
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+      - copilot/*
+      - feature/*
+  paths:
+    include:
+      - fabric-cluster-start-time-service/**
+      - .cicd/fabric-cluster-start-time-service-pl.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - fabric-cluster-start-time-service/**
+
+parameters:
+  - name: environment
+    displayName: Deployment Environment
+    type: string
+    default: 'DEV'
+    values:
+      - 'DEV'
+      - 'QA'
+      - 'PROD'
+  - name: skipInfra
+    displayName: Skip Terraform stage
+    type: boolean
+    default: false
+  - name: skipWarehouse
+    displayName: Skip Warehouse (sqlpackage) stage
+    type: boolean
+    default: false
+  - name: runDeployStages
+    displayName: Force deploy stages to run on feature/* branches (manual full run)
+    type: boolean
+    default: false
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: targetEnvironment
+    value: ${{ parameters.environment }}
+  - name: pythonVersion
+    value: '3.13'
+  - name: funcRoot
+    value: '$(Build.SourcesDirectory)/fabric-cluster-start-time-service/function'
+  - name: tfRoot
+    value: '$(Build.SourcesDirectory)/fabric-cluster-start-time-service/iac/function_app'
+  - name: warehouseRoot
+    value: '$(Build.SourcesDirectory)/fabric-cluster-start-time-service/iac/warehouse'
+  - name: envLower
+    value: $[ lower(variables['targetEnvironment']) ]
+  # Conditional service connection / KV pattern — mirrors .cicd/fabric-items-cicd.yml
+  - ${{ if eq(parameters.environment, 'PROD') }}:
+    - name: azureServiceConnection
+      value: 'fabric-sc-prod'
+    - name: keyVaultName
+      value: '$(KeyVaultNameProd)'
+    - name: secretsFilter
+      value: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
+    - name: clientIdSecret
+      value: 'fabric-prod-spn-client-secret'
+    - name: clientSecretSecret
+      value: 'fabric-prod-secret'
+    - name: tenantIdSecret
+      value: 'tenantID'
+  - ${{ if ne(parameters.environment, 'PROD') }}:
+    - name: azureServiceConnection
+      value: 'fabric-sc'
+    - name: keyVaultName
+      value: '$(KeyVaultNameNonProd)'
+    - name: secretsFilter
+      value: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
+    - name: clientIdSecret
+      value: 'fabric-non-prod-spn-client-secret'
+    - name: clientSecretSecret
+      value: 'fabric-non-prod-spn-secret'
+    - name: tenantIdSecret
+      value: 'tenant-id-secret'
+
+stages:
+# ---------------------------------------------------------------------------
+- stage: Validate
+  displayName: 'Validate (lint + tests)'
+  jobs:
+    - job: LintAndTest
+      displayName: 'Lint, type-check, and unit tests'
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '$(pythonVersion)'
+            addToPath: true
+          displayName: 'Use Python $(pythonVersion)'
+
+        - bash: |
+            set -euo pipefail
+            UBUNTU_VERSION=$(lsb_release -rs)
+            sudo rm -f /etc/apt/sources.list.d/mssql-release.list
+            sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+            sudo rm -f /usr/share/keyrings/microsoft-prod.gpg
+            curl -sSL -o /tmp/packages-microsoft-prod.deb \
+              "https://packages.microsoft.com/config/ubuntu/${UBUNTU_VERSION}/packages-microsoft-prod.deb"
+            sudo dpkg -i /tmp/packages-microsoft-prod.deb
+            rm -f /tmp/packages-microsoft-prod.deb
+            sudo apt-get update
+            sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+          displayName: 'Install ODBC Driver 18 for SQL Server'
+
+        - bash: |
+            set -euo pipefail
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install ruff black mypy pytest pytest-asyncio pytest-mock pytest-cov httpx freezegun
+          workingDirectory: $(funcRoot)
+          displayName: 'Install Python dependencies'
+
+        - bash: ruff check .
+          workingDirectory: $(funcRoot)
+          displayName: 'ruff'
+
+        - bash: black --check .
+          workingDirectory: $(funcRoot)
+          displayName: 'black --check'
+
+        - bash: mypy .
+          workingDirectory: $(funcRoot)
+          displayName: 'mypy (warnings only)'
+          continueOnError: true
+
+        - bash: |
+            set -euo pipefail
+            pytest tests/unit -v \
+              --junitxml=$(Build.SourcesDirectory)/junit.xml \
+              --cov=. --cov-report=xml --cov-report=term \
+              --cov-fail-under=80
+          workingDirectory: $(funcRoot)
+          displayName: 'pytest (unit) with coverage'
+
+        - task: PublishTestResults@2
+          condition: always()
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: '$(Build.SourcesDirectory)/junit.xml'
+            testRunTitle: 'Function App unit tests'
+          displayName: 'Publish test results'
+
+        - task: PublishCodeCoverageResults@2
+          condition: always()
+          inputs:
+            summaryFileLocation: '$(funcRoot)/coverage.xml'
+          displayName: 'Publish code coverage'
+
+# ---------------------------------------------------------------------------
+- stage: InfraDeploy
+  displayName: 'Infra (Terraform)'
+  dependsOn: Validate
+  condition: |
+    and(
+      succeeded(),
+      ne('${{ parameters.skipInfra }}', 'True'),
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
+    )
+  jobs:
+    - job: terraformJob
+      displayName: 'terraform apply'
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - bash: |
+            set -euo pipefail
+            TF_VERSION="${TF_VERSION:-1.9.8}"
+            curl -fsSL -o /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+            unzip -o /tmp/terraform.zip -d /tmp/terraform-bin
+            sudo mv /tmp/terraform-bin/terraform /usr/local/bin/terraform
+            terraform version
+          displayName: 'Install Terraform'
+
+        - task: AzureCLI@2
+          name: tfApply
+          displayName: 'terraform init / plan / apply'
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            workingDirectory: $(tfRoot)
+            addSpnToEnvironment: true
+            inlineScript: |
+              set -euo pipefail
+
+              # AzureCLI@2 with addSpnToEnvironment exposes:
+              #   - servicePrincipalId, tenantId, idToken  (workload identity federation / OIDC)
+              #   - servicePrincipalId, servicePrincipalKey, tenantId  (secret-based SPN)
+              # This service connection uses WIF, so configure terraform azurerm provider for OIDC.
+              export ARM_CLIENT_ID="$servicePrincipalId"
+              export ARM_TENANT_ID="$tenantId"
+              export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+              if [ -n "${idToken:-}" ]; then
+                export ARM_USE_OIDC=true
+                export ARM_OIDC_TOKEN="$idToken"
+              else
+                export ARM_CLIENT_SECRET="${servicePrincipalKey:-}"
+              fi
+
+              terraform init \
+                -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
+                -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
+                -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
+                -backend-config="key=fabric-cluster-start-time-service/$(envLower).tfstate" \
+                -backend-config="use_azuread_auth=true"
+
+              terraform plan -var-file=envs/$(envLower).tfvars -out=tfplan
+              terraform apply -auto-approve tfplan
+
+              FUNCTION_APP_NAME=$(terraform output -raw function_app_name)
+              RESOURCE_GROUP_NAME=$(terraform output -raw resource_group_name)
+              echo "##vso[task.setvariable variable=functionAppName;isOutput=true]$FUNCTION_APP_NAME"
+              echo "##vso[task.setvariable variable=resourceGroupName;isOutput=true]$RESOURCE_GROUP_NAME"
+
+# ---------------------------------------------------------------------------
+- stage: WarehouseDeploy
+  displayName: 'Warehouse (sqlpackage)'
+  dependsOn: InfraDeploy
+  condition: |
+    and(
+      in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
+      ne('${{ parameters.skipWarehouse }}', 'True'),
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
+    )
+  jobs:
+    - job: Sqlpackage
+      displayName: 'Build & publish dacpac to Fabric Warehouse'
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '8.0.x'
+          displayName: 'Install .NET SDK 8.0'
+
+        - bash: |
+            set -euo pipefail
+            dotnet tool install -g microsoft.sqlpackage
+            echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+          displayName: 'Install sqlpackage'
+
+        - bash: |
+            set -euo pipefail
+            dotnet build "$(warehouseRoot)/FabricTelemetryWarehouse.sqlproj" -c Release
+          displayName: 'Build sqlproj -> dacpac'
+
+        - task: AzureCLI@2
+          displayName: 'Ensure Fabric capacity is active (resume if paused)'
+          name: capacityResume
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+
+              CAP_NAME='$(FabricCapacityName)'
+              CAP_RG='$(FabricCapacityResourceGroup)'
+
+              if [ -z "${CAP_NAME}" ] || [ -z "${CAP_RG}" ]; then
+                echo "ERROR: pipeline variables FabricCapacityName and FabricCapacityResourceGroup must be set."
+                exit 1
+              fi
+
+              STATE=$(az resource show \
+                --resource-type Microsoft.Fabric/capacities \
+                --name "$CAP_NAME" \
+                --resource-group "$CAP_RG" \
+                --query properties.state -o tsv)
+              echo "Fabric capacity '$CAP_NAME' current state: $STATE"
+
+              if [ "$STATE" = "Active" ]; then
+                echo "Capacity is already active; will NOT pause it after deployment."
+                echo "##vso[task.setvariable variable=wasPaused;isOutput=true]false"
+              else
+                echo "Capacity is '$STATE' — resuming…"
+                az resource invoke-action \
+                  --action resume \
+                  --resource-type Microsoft.Fabric/capacities \
+                  --name "$CAP_NAME" \
+                  --resource-group "$CAP_RG"
+
+                # Wait until Active (timeout 5 min)
+                for i in $(seq 1 30); do
+                  STATE=$(az resource show \
+                    --resource-type Microsoft.Fabric/capacities \
+                    --name "$CAP_NAME" \
+                    --resource-group "$CAP_RG" \
+                    --query properties.state -o tsv)
+                  echo "  poll $i: state=$STATE"
+                  if [ "$STATE" = "Active" ]; then break; fi
+                  sleep 10
+                done
+
+                if [ "$STATE" != "Active" ]; then
+                  echo "ERROR: capacity did not reach Active state within timeout."
+                  exit 1
+                fi
+
+                # Brief settle so the SQL endpoint is reachable
+                sleep 15
+                echo "##vso[task.setvariable variable=wasPaused;isOutput=true]true"
+              fi
+            addSpnToEnvironment: true
+
+        - task: AzureCLI@2
+          displayName: 'sqlpackage publish to Fabric Warehouse'
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+
+              DACPAC=$(find "$(warehouseRoot)/bin/Release" -maxdepth 3 -name "FabricTelemetryWarehouse.dacpac" | head -n1)
+              if [ -z "$DACPAC" ]; then
+                echo "ERROR: dacpac not found under $(warehouseRoot)/bin/Release"
+                exit 1
+              fi
+              echo "Using dacpac: $DACPAC"
+
+              # Fabric Warehouse SPN auth via AAD access token
+              TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
+
+              sqlpackage /Action:Publish \
+                /SourceFile:"$DACPAC" \
+                /TargetServerName:"ftykynmhjpteverb75ok7vbqwq-ljdabvz5x3jevlc4bifz6llgwi.datawarehouse.fabric.microsoft.com" \
+                /TargetDatabaseName:"fabric_telemetry_wh" \
+                /AccessToken:"$TOKEN" \
+                /p:IncludeCompositeObjects=True
+            addSpnToEnvironment: true
+
+        - task: AzureCLI@2
+          displayName: 'Re-pause Fabric capacity (only if we resumed it)'
+          condition: and(always(), eq(variables['capacityResume.wasPaused'], 'true'))
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+              CAP_NAME='$(FabricCapacityName)'
+              CAP_RG='$(FabricCapacityResourceGroup)'
+              echo "Suspending Fabric capacity '$CAP_NAME' (was paused before this run)…"
+              az resource invoke-action \
+                --action suspend \
+                --resource-type Microsoft.Fabric/capacities \
+                --name "$CAP_NAME" \
+                --resource-group "$CAP_RG"
+            addSpnToEnvironment: true
+
+# ---------------------------------------------------------------------------
+- stage: FunctionDeploy
+  displayName: 'Deploy Function App'
+  dependsOn:
+    - InfraDeploy
+    - WarehouseDeploy
+  condition: |
+    and(
+      in(dependencies.InfraDeploy.result, 'Succeeded', 'Skipped'),
+      in(dependencies.WarehouseDeploy.result, 'Succeeded', 'Skipped'),
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
+    )
+  jobs:
+    - job: PublishFunc
+      displayName: 'func azure functionapp publish'
+      variables:
+        functionAppName: $[ stageDependencies.InfraDeploy.terraformJob.outputs['tfApply.functionAppName'] ]
+        resourceGroupName: $[ stageDependencies.InfraDeploy.terraformJob.outputs['tfApply.resourceGroupName'] ]
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '$(pythonVersion)'
+            addToPath: true
+          displayName: 'Use Python $(pythonVersion)'
+
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '20.x'
+          displayName: 'Use Node 20'
+
+        - bash: |
+            set -euo pipefail
+            npm i -g azure-functions-core-tools@4 --unsafe-perm true
+          displayName: 'Install Azure Functions Core Tools v4'
+
+        - task: AzureCLI@2
+          displayName: 'Strip platform-injected shared-key storage settings'
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              set -euo pipefail
+              if [ -z "${FUNCTION_APP_NAME:-}" ]; then
+                echo "ERROR: functionAppName is empty — InfraDeploy output not propagated."
+                exit 1
+              fi
+              # The Flex Consumption resource provider auto-injects
+              # AzureWebJobsStorage and DEPLOYMENT_STORAGE_CONNECTION_STRING
+              # as connection strings with an EMPTY AccountKey (because the
+              # storage account has shared_access_key_enabled = false). Those
+              # take precedence over the identity-based AzureWebJobsStorage__*
+              # settings and cause the host to fail with 403 AuthenticationFailed.
+              # Remove them so identity-based auth is used.
+              echo "Removing platform-injected shared-key storage settings on $FUNCTION_APP_NAME"
+              az functionapp config appsettings delete \
+                --name "$FUNCTION_APP_NAME" \
+                --resource-group "$(resourceGroupName)" \
+                --setting-names AzureWebJobsStorage DEPLOYMENT_STORAGE_CONNECTION_STRING \
+                --output none
+          env:
+            FUNCTION_APP_NAME: $(functionAppName)
+
+        - task: AzureCLI@2
+          displayName: 'Publish Function App (remote build)'
+          inputs:
+            azureSubscription: '$(azureServiceConnection)'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            workingDirectory: $(funcRoot)
+            inlineScript: |
+              set -euo pipefail
+              if [ -z "${FUNCTION_APP_NAME:-}" ]; then
+                echo "ERROR: functionAppName is empty — InfraDeploy output not propagated."
+                exit 1
+              fi
+              echo "Publishing to Function App: $FUNCTION_APP_NAME"
+              func azure functionapp publish "$FUNCTION_APP_NAME" --python --build remote
+          env:
+            FUNCTION_APP_NAME: $(functionAppName)
+
+# ---------------------------------------------------------------------------
+- stage: Smoke
+  displayName: 'Smoke test (/api/health)'
+  dependsOn:
+    - InfraDeploy
+    - FunctionDeploy
+  condition: |
+    and(
+      succeeded('FunctionDeploy'),
+      or(
+        not(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')),
+        eq('${{ parameters.runDeployStages }}', 'True')
+      )
+    )
+  jobs:
+    - job: HealthCheck
+      displayName: 'GET /api/health'
+      variables:
+        functionAppName: $[ stageDependencies.InfraDeploy.terraformJob.outputs['tfApply.functionAppName'] ]
+      steps:
+        - bash: |
+            set -uo pipefail
+            echo "Waiting 30s for cold start..."
+            sleep 30
+
+            if [ -z "${FUNCTION_APP_NAME:-}" ]; then
+              echo "ERROR: functionAppName is empty — InfraDeploy output not propagated."
+              exit 1
+            fi
+
+            URL="https://${FUNCTION_APP_NAME}.azurewebsites.net/api/health"
+            echo "Checking $URL"
+            BODY_FILE="$(Agent.TempDirectory)/health_body.json"
+            for i in 1 2 3 4 5; do
+              STATUS=$(curl -s -o "$BODY_FILE" -w "%{http_code}" "$URL" || echo "000")
+              echo "Attempt $i: status=$STATUS"
+              if [ "$STATUS" = "200" ]; then
+                cat "$BODY_FILE"
+                exit 0
+              fi
+              sleep 15
+            done
+            echo "Health check failed after 5 attempts"
+            cat "$BODY_FILE" || true
+            exit 1
+          env:
+            FUNCTION_APP_NAME: $(functionAppName)
+          displayName: 'Health check with retries'

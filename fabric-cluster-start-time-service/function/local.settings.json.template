@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "<storage-connection-string>",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "FUNCTIONS_EXTENSION_VERSION": "~4",
+    "WEBSITE_TIME_ZONE": "America/New_York",
+    "FABRIC_TENANT_ID": "",
+    "FABRIC_API_BASE_URL": "https://api.fabric.microsoft.com",
+    "WAREHOUSE_SQL_ENDPOINT": "ftykynmhjpteverb75ok7vbqwq-ljdabvz5x3jevlc4bifz6llgwi.datawarehouse.fabric.microsoft.com",
+    "WAREHOUSE_DATABASE": "fabric_telemetry_wh",
+    "MI_CLIENT_ID": "",
+    "TARGET_WORKSPACE_IDS": "d700465a-be3d-4ad2-ac5c-0a0b9f2d66b2",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": ""
+  }
+}

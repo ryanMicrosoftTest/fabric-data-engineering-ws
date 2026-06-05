@@ -1,10 +1,30 @@
-# Fabric Deployment Pipeline (Pipeline B)
-# ==========================================
-# Triggered only by Pipeline A completion. Deploys all fabric_items to the
-# target workspace, patches the Environment with the exact package version,
-# then validates by running the onelake_security_role_pl pipeline.
+# fabric-items-deployment-pipeline
+# =================================
+# Deploys all fabric_items to the target Fabric workspace, patches the
+# Environment with the exact onelake-security package version, then validates
+# by running the onelake_security_role_pl pipeline.
+#
+# Triggers:
+#   1. Direct CI on changes under fabric_items/**
+#   2. Explicit queue from onelake-security-role-service-pipeline (via az pipelines run)
+#
+# When a single commit changes BOTH fabric_items/** AND onelake-security-role-service/**,
+# the upstream onelake-security-role-service-pipeline will queue this pipeline
+# explicitly. The PreflightCheck stage below detects that case and skips the
+# CI-triggered run so the deployment only fires once.
 
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - feature/*
+      - release/*
+      - copilot/*
+  paths:
+    include:
+      - 'fabric_items/**'
+
 pr: none
 
 resources:
@@ -15,16 +35,12 @@ resources:
     name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
     ref: main
   pipelines:
+    # Resource is required so the deploy job can `download:` artifacts from the
+    # latest onelake-security-role-service-pipeline run. NO trigger here — the
+    # upstream pipeline queues us explicitly via `az pipelines run` to pass the
+    # deployment environment parameter.
     - pipeline: onelakeSecurityPkg
-      source: ryanMicrosoftTest.fabric-data-engineering-ws.onelake-security-role-test-cicd   # Azure DevOps name of Pipeline A
-      trigger:
-        branches:
-          include:
-            - main
-            - feature/*
-            - release/*
-            - copilot/*
-            - copilot/*
+      source: onelake-security-role-service-pipeline   # ADO display name of the upstream pipeline
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -46,8 +62,45 @@ variables:
     value: '472fe7a1-c6d3-4f4f-b2b5-f8bcaf988310'
 
 stages:
+- stage: PreflightCheck
+  displayName: 'Preflight: dedupe CI run'
+  jobs:
+  - job: ShouldRun
+    displayName: 'Decide whether to run deployment'
+    steps:
+    - checkout: self
+      fetchDepth: 2
+      displayName: 'Checkout (shallow, for diff)'
+    - bash: |
+        set -euo pipefail
+        SKIP=false
+        REASON="$(Build.Reason)"
+        echo "Build.Reason: $REASON"
+
+        if [[ "$REASON" == "IndividualCI" || "$REASON" == "BatchedCI" ]]; then
+          # CI trigger fired because fabric_items/** changed. If the same commit
+          # also touched onelake-security-role-service/**, the upstream pipeline
+          # will queue this pipeline explicitly — skip this CI run to avoid a
+          # duplicate deployment.
+          CHANGED=$(git diff-tree --no-commit-id --name-only -r "$(Build.SourceVersion)" 2>/dev/null || true)
+          echo "Changed files in $(Build.SourceVersion):"
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -q "^onelake-security-role-service/"; then
+            echo "##[warning]onelake-security-role-service/** also changed in this commit."
+            echo "##[warning]onelake-security-role-service-pipeline will queue this pipeline explicitly. Skipping CI run."
+            SKIP=true
+          fi
+        fi
+
+        echo "skip=$SKIP"
+        echo "##vso[task.setvariable variable=skip;isOutput=true]$SKIP"
+      name: gate
+      displayName: 'Check for duplicate trigger'
+
 - stage: DeployFabricItems
   displayName: 'Deploy Fabric Items'
+  dependsOn: PreflightCheck
+  condition: and(succeeded(), ne(dependencies.PreflightCheck.outputs['ShouldRun.gate.skip'], 'true'))
   jobs:
   - job: PatchAndDeploy
     displayName: 'Patch Environment, Deploy & Validate'
@@ -71,10 +124,10 @@ stages:
         addToPath: true
       displayName: 'Set up Python'
 
-    # Download metadata from Pipeline A
+    # Download metadata from onelake-security-role-service-pipeline
     - download: onelakeSecurityPkg
       artifact: package_metadata
-      displayName: 'Download package metadata from Pipeline A'
+      displayName: 'Download package metadata from onelake-security-role-service-pipeline'
 
     # Install pyyaml early — needed by patch_onelake_env.py
     - script: |
