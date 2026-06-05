@@ -1,0 +1,128 @@
+trigger:
+  branches:
+    include:
+      - main  
+      - release/*
+  paths:
+    include:
+      - 'fabric_items/Data Engineering High Concurrency/**'  
+    exclude:
+      - '**'
+
+# Add resources section to define external repositories
+resources:
+  repositories:
+  - repository: fabric-cicd-demo
+    type: github
+    endpoint: RyanMicrosoftContosoUniversity  # This should be your GitHub service connection name
+    name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
+    ref: main
+
+pool:
+  vmImage: 'ubuntu-latest'  
+
+parameters:
+  - name: environment
+    displayName: Deployment Environment
+    type: string
+    default: 'DEV'
+    values:
+      - 'DEV'
+      - 'QA'
+      - 'PROD'
+
+variables:
+  - name: targetEnvironment
+    value: ${{ parameters.environment }}
+
+stages:
+- stage: DeployFabricItems
+  displayName: 'Deploy Fabric Items'
+  jobs:
+  - job: AuthenticateAndDeploy
+    displayName: 'Authenticate and Deploy'
+    steps:
+    # Checkout the current repository
+    - checkout: self  
+      fetchDepth: 1
+      path: s/current-repo  # Optional: specify a subdirectory
+      displayName: 'Checkout current repository'
+
+    # Checkout the external repository
+    - checkout: fabric-cicd-demo
+      fetchDepth: 1
+      path: s/fabric-cicd-demo  # Optional: specify a subdirectory
+      displayName: 'Checkout fabric-cicd-demo repository'
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.11' 
+        addToPath: true
+      displayName: 'Set up Python'
+
+    # ...existing code...
+    - task: AzureKeyVault@2
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      inputs:
+        azureSubscription: 'fabric-sc'  
+        KeyVaultName: '$(KeyVaultNameNonProd)'  
+        SecretsFilter: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (DEV/QA)'
+
+    - task: AzureKeyVault@2
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      inputs:
+        azureSubscription: 'fabric-sc-prod'  
+        KeyVaultName: '$(KeyVaultNameProd)'  
+        SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (PROD)'
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt
+      displayName: 'Install dependencies'
+
+    # Example of using files from the external repository
+    - script: |
+        echo "Current repo directory:"
+        ls -la $(Build.SourcesDirectory)/current-repo
+        echo "External repo directory:"
+        ls -la $(Build.SourcesDirectory)/fabric-cicd-demo
+        # You can now access files from both repositories
+      displayName: 'Show repository contents'
+
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        ls -a fabric_items
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      workingDirectory: $(Build.SourcesDirectory)/current-repo/
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
+      displayName: 'Run authentication and deployment script (DEV/QA)'
+
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        ls -a fabric_items
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      workingDirectory: $(Build.SourcesDirectory)/current-repo/
+      env:
+        AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenantID)
+        AZURE_CLIENT_SECRET: $(fabric-prod-secret)
+      displayName: 'Run authentication and deployment script (PROD)'
+    
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/current-repo/fabric_cicd.error.log'
+        ArtifactName: 'errorlog'
+        publishLocation: 'Container'
+      condition: always()
+      displayName: 'Publish error log artifact'
