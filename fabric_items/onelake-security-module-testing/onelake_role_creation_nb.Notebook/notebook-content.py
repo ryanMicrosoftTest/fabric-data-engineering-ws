@@ -30,6 +30,17 @@
 # - `yaml_directory`: Path to role-definition YAMLs in the notebook's default lakehouse (default: `Files/role-definitions`)
 # - `validate_first`: Run dry-run before applying (default: `true`)
 
+# CELL ********************
+
+import
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # PARAMETERS CELL ********************
 
 ### Parameters — these are overridden by the pipeline at runtime
