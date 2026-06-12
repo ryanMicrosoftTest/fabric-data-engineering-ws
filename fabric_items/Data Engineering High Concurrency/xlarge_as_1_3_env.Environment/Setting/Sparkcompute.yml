@@ -1,4 +1,5 @@
 enable_native_execution_engine: false
+instance_pool_id: 83dd8cff-c63d-4083-912c-28382bd0e0de
 live_pool:
   state: Disabled
   max_cluster_to_hydrate_per_activation: 2
