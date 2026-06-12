@@ -113,3 +113,47 @@ find_replace:
 #     "e7b8f1c4-4a6e-4b8b-9b2e-8f1e5d6a9c3d":
 #         type: "Workspace"
 #         name: "WorkspacePool_Medium"
+
+# Custom Spark instance pools are workspace-scoped: each workspace assigns its own
+# GUID even when the pool name/spec is identical. The *.Environment Sparkcompute.yml
+# files pin the GUIDs from the source "Ryan Development Workspace"
+# (a8cbda3d-903e-4154-97d9-9a91c95abb42). The matching named pools have been created
+# in every deployment target (devops-dev, devops-test, devops-prod), so each source
+# GUID is remapped to the equivalent pool *by name* at deploy time.
+spark_pool:
+    # medium-as-1-7 (used by xxlarge/xlarge/large/medium_as_* environments)
+    - instance_pool_id: "83dd8cff-c63d-4083-912c-28382bd0e0de"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "medium-as-1-7"
+        QA:
+          type: "Workspace"
+          name: "medium-as-1-7"
+        PROD:
+          type: "Workspace"
+          name: "medium-as-1-7"
+    # small-as-1-10 (used by small_as_1_10_env and onelake_security_utils)
+    - instance_pool_id: "87c1e4fc-1d30-4eb3-8017-faff1bea1578"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "small-as-1-10"
+        QA:
+          type: "Workspace"
+          name: "small-as-1-10"
+        PROD:
+          type: "Workspace"
+          name: "small-as-1-10"
+    # 10_md_pool (used by presidio-env)
+    - instance_pool_id: "8b573cc2-e81c-415b-9cdb-b55d68426bd9"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "10_md_pool"
+        QA:
+          type: "Workspace"
+          name: "10_md_pool"
+        PROD:
+          type: "Workspace"
+          name: "10_md_pool"
