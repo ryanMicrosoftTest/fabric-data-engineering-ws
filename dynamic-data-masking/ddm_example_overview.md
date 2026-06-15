@@ -202,7 +202,7 @@ unmasked SSN. The `DENY` statements close that bypass.
 ## 5. Native Masking (Unconditional)
 
 ### Overview
-![Native Masking Overview](/Dynamic-Data-Masking/images/native-masking-overview.png)
+![Native Masking Overview](images/native-masking-overview.png)
 
 
 Files: `tsql_native_ddm_ssn_nb.Notebook` (T-SQL) and `ddm-native-example.excalidraw` (diagram).
