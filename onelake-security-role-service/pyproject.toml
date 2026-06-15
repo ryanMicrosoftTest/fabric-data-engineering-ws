@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "onelake-security"
-version = "0.2.0"
+version = "0.2.1"
 description = "YAML-driven OneLake data access role management for Microsoft Fabric"
 readme = "README.md"
 requires-python = ">=3.10"
