@@ -1,0 +1,5 @@
+C:\Users\rharrington\repos\fabric-data-engineering-ws\fabric-cluster-start-time-service\iac\warehouse\bin\Debug\FabricTelemetryWarehouse.dacpac
+C:\Users\rharrington\repos\fabric-data-engineering-ws\fabric-cluster-start-time-service\iac\warehouse\obj\Debug\Model.xml
+C:\Users\rharrington\repos\fabric-data-engineering-ws\fabric-cluster-start-time-service\iac\warehouse\obj\Debug\refactor.xml
+C:\Users\rharrington\repos\fabric-data-engineering-ws\fabric-cluster-start-time-service\iac\warehouse\obj\Debug\postdeploy.sql
+C:\Users\rharrington\repos\fabric-data-engineering-ws\fabric-cluster-start-time-service\iac\warehouse\obj\Debug\predeploy.sql

@@ -1,11 +1,11 @@
 """Patch the onelake_security_utils Environment with the exact package version and feed connection.
 
-Reads the package metadata produced by Pipeline A and updates the checked-in
-``environment.yml`` so that the Fabric Environment installs the correct
-onelake-security wheel from the target feed.
+Reads the package metadata produced by onelake-security-role-service-pipeline
+and updates the checked-in ``environment.yml`` so that the Fabric Environment
+installs the correct onelake-security wheel from the target feed.
 
 Environment variables required:
-    PACKAGE_METADATA_FILE  - path to package-metadata.json from Pipeline A
+    PACKAGE_METADATA_FILE  - path to package-metadata.json from onelake-security-role-service-pipeline
     FEED_CONNECTION_ID     - Fabric Azure Artifact Feed connection ID for the target environment
 """
 

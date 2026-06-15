@@ -1,9 +1,11 @@
-# OneLake Security Role Service — CI/CD Pipeline
-# ================================================
-# Pipeline A: tests, builds, and publishes the onelake-security package.
-# Publishes the wheel to Azure Artifacts and emits metadata for Pipeline B.
+# onelake-security-role-service-pipeline
+# =========================================
+# Tests, builds, and publishes the onelake-security package to Azure Artifacts,
+# emits metadata, and (optionally) queues fabric-items-deployment-pipeline to
+# deploy the new package to the target Fabric workspace.
 
 trigger:
+  batch: true
   branches:
     include:
       - main
@@ -13,9 +15,6 @@ trigger:
   paths:
     include:
       - 'onelake-security-role-service/**'
-      - 'fabric_items/**'
-      - 'attached_config/**'
-      - '.cicd/**'
 
 pr:
   branches:
@@ -24,13 +23,10 @@ pr:
   paths:
     include:
       - 'onelake-security-role-service/**'
-      - 'fabric_items/**'
-      - 'attached_config/**'
-      - '.cicd/**'
 
 parameters:
   - name: triggerDeployment
-    displayName: 'Trigger Fabric deployment (Pipeline B) after publish'
+    displayName: 'Trigger fabric-items-deployment-pipeline after publish'
     type: boolean
     default: true
   - name: deploymentEnvironment
@@ -213,36 +209,36 @@ stages:
             workingDirectory: $(workingDirectory)
 
   - stage: TriggerDeployment
-    displayName: 'Trigger Fabric Deployment (Pipeline B)'
+    displayName: 'Trigger fabric-items-deployment-pipeline'
     dependsOn: Publish
     condition: and(succeeded(), eq('${{ parameters.triggerDeployment }}', 'true'))
     jobs:
-      - job: TriggerPipelineB
-        displayName: 'Queue Pipeline B'
+      - job: TriggerFabricItemsDeployment
+        displayName: 'Queue fabric-items-deployment-pipeline'
         steps:
           - bash: |
               set -euo pipefail
 
-              # Pipeline B definition ID — update if the pipeline is recreated
-              PIPELINE_B_ID=$(az pipelines show \
-                --name "ryanMicrosoftTest.fabric-data-engineering-ws.fabric_items_cicd" \
+              # ADO display name of fabric-items-deployment-pipeline — update if the pipeline is recreated/renamed
+              DEPLOY_PIPELINE_ID=$(az pipelines show \
+                --name "fabric-items-deployment-pipeline" \
                 --org "$(System.CollectionUri)" \
                 --project "$(System.TeamProject)" \
                 --query "id" -o tsv 2>/dev/null || echo "")
 
-              if [ -z "$PIPELINE_B_ID" ]; then
-                echo "##[error]Could not find Pipeline B. Verify the pipeline name."
+              if [ -z "$DEPLOY_PIPELINE_ID" ]; then
+                echo "##[error]Could not find fabric-items-deployment-pipeline. Verify the ADO pipeline display name."
                 exit 1
               fi
 
-              echo "Triggering Pipeline B (ID: $PIPELINE_B_ID) for environment: ${{ parameters.deploymentEnvironment }}"
+              echo "Triggering fabric-items-deployment-pipeline (ID: $DEPLOY_PIPELINE_ID) for environment: ${{ parameters.deploymentEnvironment }}"
 
               az pipelines run \
-                --id "$PIPELINE_B_ID" \
+                --id "$DEPLOY_PIPELINE_ID" \
                 --org "$(System.CollectionUri)" \
                 --project "$(System.TeamProject)" \
                 --branch "$(Build.SourceBranch)" \
                 --parameters "environment=${{ parameters.deploymentEnvironment }}"
-            displayName: 'Trigger Pipeline B via Azure CLI'
+            displayName: 'Trigger fabric-items-deployment-pipeline via Azure CLI'
             env:
               AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)

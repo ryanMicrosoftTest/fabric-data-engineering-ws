@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "tsql_native_ddm_ssn_nb",
+    "description": "Native Fabric Dynamic Data Masking (DDM) example for SSN"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "829f378a-2fa5-486d-9723-10f82b11b400"
+  }
+}
