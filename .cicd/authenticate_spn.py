@@ -20,6 +20,7 @@ Environment variables required:
 
 import os
 import sys
+import time
 
 import yaml
 from azure.identity import ClientSecretCredential
@@ -84,11 +85,28 @@ def main():
         token_credential=credential,
     )
 
-    try:
-        publish_all_items(workspace)
-    except Exception as e:
-        print(f"ERROR: Deployment failed for environment '{environment}': {e}")
-        sys.exit(1)
+    max_attempts = 4
+    for attempt in range(1, max_attempts + 1):
+        try:
+            publish_all_items(workspace)
+            break
+        except Exception as e:
+            msg = str(e)
+            transient = (
+                "previous operation is completed" in msg
+                or "TooManyRequests" in msg
+                or "operation is in progress" in msg
+            )
+            if transient and attempt < max_attempts:
+                wait = 15 * attempt
+                print(
+                    f"Transient publish error (attempt {attempt}/{max_attempts}); "
+                    f"retrying in {wait}s: {msg}"
+                )
+                time.sleep(wait)
+                continue
+            print(f"ERROR: Deployment failed for environment '{environment}': {e}")
+            sys.exit(1)
 
     print(f"Deployment completed successfully for environment: {environment}")
 
