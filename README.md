@@ -482,6 +482,14 @@ See the full design, module breakdown, and operational guidance: [onelake-securi
 
 
 
+### Pull Databricks Data into Fabric
+
+Zero-copy access to Databricks Unity Catalog data from Microsoft Fabric — no ETL, no duplication. A catalog in Databricks is surfaced in Fabric as a **Mirrored Azure Databricks Catalog** artifact, which creates OneLake shortcuts to the selected tables rather than copying the underlying data. From there the mirrored tables behave like native Fabric items: OneLake security (RLS / CLS) can be layered on, sensitivity labels applied, and the data queried through the SQL analytics endpoint or from notebooks — all while the source of truth stays in Databricks. The same pattern works in reverse, letting Databricks clients read from Fabric servers.
+
+See the step-by-step walkthrough with screenshots: [fabric-databricks-together/overview.md](fabric-databricks-together/overview.md)
+
+
+
 
 
 
