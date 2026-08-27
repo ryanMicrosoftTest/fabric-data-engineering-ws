@@ -106,8 +106,9 @@ onelake-security-role-service/
 │       ├── api_client.py            # REST client with ETag concurrency + 429 retry
 │       ├── workflow_service.py      # Orchestration: 412 retry loop, dry-run, coordination
 │       ├── file_tracker.py          # Content hash watermarking for change detection
-│       └── audit.py                 # Operation logging with pluggable backend
-├── tests/                           # 137 tests, 96% coverage
+│       ├── audit.py                 # Operation logging with pluggable backend
+│       └── lakehouse_audit.py       # Read-only role snapshot of a lakehouse, saveable to disk
+├── tests/                           # 153 tests
 │   ├── conftest.py                  # Shared fixtures (sample YAMLs, mock API responses)
 │   ├── test_models.py
 │   ├── test_yaml_parser.py
@@ -116,7 +117,8 @@ onelake-security-role-service/
 │   ├── test_api_client.py
 │   ├── test_workflow_service.py
 │   ├── test_file_tracker.py
-│   └── test_audit.py
+│   ├── test_audit.py
+│   └── test_lakehouse_audit.py
 ├── notebooks/                       # Thin Fabric notebook wrappers
 │   ├── onelake_role_creation_nb.py
 │   └── onelake_role_mapping_nb.py
@@ -325,8 +327,25 @@ This is the automated path — the CI pipeline publishes to Azure Artifacts, and
 | `workflow_service.py` | `process_role_definitions()` and `process_user_mappings()` — orchestration with 412 retry loop | 16 |
 | `file_tracker.py` | `FileTracker` and `compute_content_hash()` — SHA-256 watermarking for change detection | 12 |
 | `audit.py` | `AuditLogger` and `AuditRecord` — operation logging with pluggable writer backend | 12 |
+| `lakehouse_audit.py` | `audit_lakehouse()` and `save_report()` — read-only snapshot of every role on a lakehouse, exportable as JSON/CSV/Markdown | 16 |
 
-**Total: 137 tests, 96% coverage**
+**Total: 153 tests**
+
+### Auditing a lakehouse
+
+```python
+from onelake_security.api_client import OneLakeSecurityClient
+from onelake_security.lakehouse_audit import audit_lakehouse, save_report
+
+client = OneLakeSecurityClient(api_token=token)
+report = audit_lakehouse(client, workspace_id, lakehouse_id, lakehouse_name="clinical_lh")
+
+print(report.role_count, report.total_members, [r.name for r in report.orphaned_roles])
+
+save_report(report, "audits/clinical_lh.json")                      # full structured snapshot
+save_report(report, "audits/clinical_lh.csv", format="csv")         # one row per role/path/member
+save_report(report, "audits/clinical_lh.md", format="markdown")     # review-friendly summary
+```
 
 ---
 
