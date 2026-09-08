@@ -39,6 +39,8 @@ from fabric.dataagent.evaluation import evaluate_data_agent
 from fabric.dataagent.evaluation import get_evaluation_summary
 from fabric.dataagent.evaluation import get_evaluation_details
 
+import time
+
 # METADATA ********************
 
 # META {
@@ -54,6 +56,8 @@ from fabric.dataagent.evaluation import get_evaluation_details
 
 # Define a sample evaluation set with user questions and their expected answers.
 # You can modify the question/answer paits to match your scenario
+
+
 df = pd.DataFrame(
     columns=['question', 'expected_answer'],
     data=[
@@ -91,6 +95,9 @@ table_name = f"{data_agent_name}_evaluation_output"
 # Specify the Data Agent stage: "production" (default) or "sandbox"
 data_agent_stage = "production"
 
+# get time start for perf eval
+start = time.perf_counter()
+
 # Run the evaluation and get the evaluation ID
 evaluation_id = evaluate_data_agent(
     df,
@@ -101,6 +108,11 @@ evaluation_id = evaluate_data_agent(
 )
 
 print(f"Unique ID for the current evaluation run: {evaluation_id}")
+
+duration = time.perf_counter() - start
+
+print(f'Total time for eval: {duration}')
+
 
 # METADATA ********************
 
@@ -146,6 +158,33 @@ eval_details = get_evaluation_details(
     get_all_rows=get_all_rows,
     verbose=verbose
 )
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "jupyter_python"
+# META }
+
+# MARKDOWN ********************
+
+# # Copilot Studio
+# 
+# Agent --> App Insights --> Log Conversation History
+# 
+# Question --> Logged App Insights
+# {
+#     user_id:
+#     question: "Here is the question"
+#     trace -> copilot orchestrator (20s)-> data agent respond (230s)
+# 
+#     X,Y,Z 
+# }
+# 
+# copilot studio orchestrator --> chooses which data agent --> agent A --> Slow; Wrong Answer 
+
+# CELL ********************
+
 
 # METADATA ********************
 
