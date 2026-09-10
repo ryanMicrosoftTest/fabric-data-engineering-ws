@@ -1,0 +1,50 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/graphqlApi/definition/1.0.0/schema.json",
+  "datasources": [
+    {
+      "objects": [
+        {
+          "actions": {
+            "Query": "Enabled",
+            "Query_by_pk": "Enabled",
+            "Create": "Enabled",
+            "Update": "Enabled",
+            "Delete": "Enabled"
+          },
+          "fieldMappings": {
+            "memo_content": "memo_content",
+            "note_date": "note_date",
+            "note_id": "note_id",
+            "note_type": "note_type",
+            "patient_id": "patient_id"
+          },
+          "graphqlType": "clinical_notes",
+          "relationships": [],
+          "sourceObject": "health_dbo.clinical_notes",
+          "sourceObjectType": "Table"
+        },
+        {
+          "actions": {
+            "Query": "Enabled",
+            "Query_by_pk": "Enabled",
+            "Create": "Enabled",
+            "Update": "Enabled",
+            "Delete": "Enabled"
+          },
+          "fieldMappings": {
+            "department": "department",
+            "doctor": "doctor",
+            "memo_content": "memo_content"
+          },
+          "graphqlType": "doctor_table",
+          "relationships": [],
+          "sourceObject": "health_dbo.doctor_table",
+          "sourceObjectType": "Table"
+        }
+      ],
+      "sourceItemId": "6186a7b6-1000-4075-afc5-8c64b12b9fad",
+      "sourceType": "SqlAnalyticsEndpoint",
+      "sourceWorkspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42"
+    }
+  ]
+}
