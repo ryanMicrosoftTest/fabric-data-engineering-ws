@@ -278,6 +278,7 @@ stages:
         AZURE_TENANT_ID: $(tenant-id-secret)
         AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
         FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
+        FABRIC_CICD_FILE_LOGGING_ENABLED: 'true'
       displayName: 'Run authentication and deployment script (DEV/QA)'
 
     - script: |
@@ -293,6 +294,7 @@ stages:
         AZURE_TENANT_ID: $(tenantID)
         AZURE_CLIENT_SECRET: $(fabric-prod-secret)
         FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
+        FABRIC_CICD_FILE_LOGGING_ENABLED: 'true'
       displayName: 'Run authentication and deployment script (PROD)'
 
     - bash: |
