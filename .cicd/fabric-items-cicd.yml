@@ -1,11 +1,17 @@
 # fabric-items-deployment-pipeline
 # =================================
-# Patches the onelake_security_utils Environment, deploys fabric_items,
-# then validates DEV/QA by running onelake_security_role_pl.
+# Deploys all fabric_items to the target Fabric workspace, patches the
+# Environment with the exact onelake-security package version, then validates
+# by running the onelake_security_role_pl pipeline.
 #
-# When the same commit changes both fabric_items/** and
-# onelake-security-role-service/**, skip this pipeline's CI-triggered run.
-# The upstream service pipeline queues deployment explicitly.
+# Triggers:
+#   1. Direct CI on changes under fabric_items/**
+#   2. Explicit queue from onelake-security-role-service-pipeline (via az pipelines run)
+#
+# When a single commit changes BOTH fabric_items/** AND onelake-security-role-service/**,
+# the upstream onelake-security-role-service-pipeline will queue this pipeline
+# explicitly. The PreflightCheck stage below detects that case and skips the
+# CI-triggered run so the deployment only fires once.
 
 trigger:
   batch: true
@@ -23,17 +29,18 @@ pr: none
 
 resources:
   repositories:
-    - repository: fabric-cicd-demo
-      type: github
-      endpoint: RyanMicrosoftContosoUniversity
-      name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
-      ref: main
-
+  - repository: fabric-cicd-demo
+    type: github
+    endpoint: RyanMicrosoftContosoUniversity
+    name: RyanMicrosoftContosoUniversity/fabric-cicd-demo
+    ref: main
   pipelines:
-    # Used to download package metadata. The upstream pipeline queues
-    # deployment explicitly; there is no completion trigger here.
+    # Resource is required so the deploy job can `download:` artifacts from the
+    # latest onelake-security-role-service-pipeline run. NO trigger here — the
+    # upstream pipeline queues us explicitly via `az pipelines run` to pass the
+    # deployment environment parameter.
     - pipeline: onelakeSecurityPkg
-      source: onelake-security-role-service-pipeline
+      source: onelake-security-role-service-pipeline   # ADO display name of the upstream pipeline
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -51,200 +58,226 @@ parameters:
 variables:
   - name: targetEnvironment
     value: ${{ parameters.environment }}
-
   - name: FEED_CONNECTION_ID
     value: '472fe7a1-c6d3-4f4f-b2b5-f8bcaf988310'
 
 stages:
-  - stage: PreflightCheck
-    displayName: 'Preflight: dedupe CI run'
-    jobs:
-      - job: ShouldRun
-        displayName: 'Decide whether to run deployment'
-        steps:
-          - checkout: self
-            fetchDepth: 2
-            displayName: 'Checkout (shallow, for diff)'
+- stage: PreflightCheck
+  displayName: 'Preflight: dedupe CI run'
+  jobs:
+  - job: ShouldRun
+    displayName: 'Decide whether to run deployment'
+    steps:
+    - checkout: self
+      fetchDepth: 2
+      displayName: 'Checkout (shallow, for diff)'
+    - bash: |
+        set -euo pipefail
+        SKIP=false
+        REASON="$(Build.Reason)"
+        echo "Build.Reason: $REASON"
 
-          - bash: |
-              set -euo pipefail
-              SKIP=false
-              REASON="$(Build.Reason)"
-              echo "Build.Reason: $REASON"
+        if [[ "$REASON" == "IndividualCI" || "$REASON" == "BatchedCI" ]]; then
+          # CI trigger fired because fabric_items/** changed. If the same commit
+          # also touched onelake-security-role-service/**, the upstream pipeline
+          # will queue this pipeline explicitly — skip this CI run to avoid a
+          # duplicate deployment.
+          CHANGED=$(git diff-tree --no-commit-id --name-only -r "$(Build.SourceVersion)" 2>/dev/null || true)
+          echo "Changed files in $(Build.SourceVersion):"
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -q "^onelake-security-role-service/"; then
+            echo "##[warning]onelake-security-role-service/** also changed in this commit."
+            echo "##[warning]onelake-security-role-service-pipeline will queue this pipeline explicitly. Skipping CI run."
+            SKIP=true
+          fi
+        fi
 
-              if [[ "$REASON" == "IndividualCI" || "$REASON" == "BatchedCI" ]]; then
-                CHANGED=$(git diff-tree --no-commit-id --name-only -r "$(Build.SourceVersion)" 2>/dev/null || true)
-                echo "Changed files in $(Build.SourceVersion):"
-                echo "$CHANGED"
+        echo "skip=$SKIP"
+        echo "##vso[task.setvariable variable=skip;isOutput=true]$SKIP"
+      name: gate
+      displayName: 'Check for duplicate trigger'
 
-                if echo "$CHANGED" | grep -q "^onelake-security-role-service/"; then
-                  echo "##[warning]onelake-security-role-service/** also changed in this commit."
-                  echo "##[warning]The upstream service pipeline will queue deployment explicitly. Skipping this CI run."
-                  SKIP=true
-                fi
-              fi
+- stage: DeployFabricItems
+  displayName: 'Deploy Fabric Items'
+  dependsOn: PreflightCheck
+  condition: and(succeeded(), ne(dependencies.PreflightCheck.outputs['ShouldRun.gate.skip'], 'true'))
+  jobs:
+  - job: PatchAndDeploy
+    displayName: 'Patch Environment, Deploy & Validate'
+    timeoutInMinutes: 360
+    steps:
+    # Checkout the current repository
+    - checkout: self
+      fetchDepth: 1
+      path: s/current-repo
+      displayName: 'Checkout current repository'
 
-              echo "skip=$SKIP"
-              echo "##vso[task.setvariable variable=skip;isOutput=true]$SKIP"
-            name: gate
-            displayName: 'Check for duplicate trigger'
+    # Checkout the external repository
+    - checkout: fabric-cicd-demo
+      fetchDepth: 1
+      path: s/fabric-cicd-demo
+      displayName: 'Checkout fabric-cicd-demo repository'
 
-  - stage: DeployFabricItems
-    displayName: 'Deploy Fabric Items'
-    dependsOn: PreflightCheck
-    condition: and(succeeded(), ne(dependencies.PreflightCheck.outputs['ShouldRun.gate.skip'], 'true'))
-    jobs:
-      - job: PatchAndDeploy
-        displayName: 'Patch Environment, Deploy & Validate'
-        timeoutInMinutes: 360
-        steps:
-          - checkout: self
-            fetchDepth: 1
-            path: s/current-repo
-            displayName: 'Checkout current repository'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.11'
+        addToPath: true
+      displayName: 'Set up Python'
 
-          - checkout: fabric-cicd-demo
-            fetchDepth: 1
-            path: s/fabric-cicd-demo
-            displayName: 'Checkout fabric-cicd-demo repository'
+    # Download metadata from onelake-security-role-service-pipeline
+    - download: onelakeSecurityPkg
+      artifact: package_metadata
+      displayName: 'Download package metadata from onelake-security-role-service-pipeline'
 
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.11'
-              addToPath: true
-            displayName: 'Set up Python'
+    # Install pyyaml early — needed by patch_onelake_env.py
+    - script: |
+        python -m pip install pyyaml
+      displayName: 'Install pyyaml for environment patch'
 
-          # Install once, before any Python patching or deployment scripts.
-          - bash: |
-              set -euo pipefail
-              python -m pip install --upgrade pip
-              python -m pip install -r "$(Pipeline.Workspace)/s/fabric-cicd-demo/.cicd/requirements.txt"
-              python -m pip install pyyaml requests msal
-              python -c "from azure.identity import ClientSecretCredential; import fabric_cicd; import yaml; import requests; import msal"
-            displayName: 'Install dependencies'
+    # Patch inline so a missing package entry does not require script changes.
+    - bash: |
+        set -euo pipefail
+        python - <<'PY'
+        import json
+        import os
+        import re
+        from pathlib import Path
+        import yaml
 
-          - download: onelakeSecurityPkg
-            artifact: package_metadata
-            displayName: 'Download package metadata from onelake-security-role-service-pipeline'
+        metadata = json.loads(Path(os.environ["PACKAGE_METADATA_FILE"]).read_text(encoding="utf-8"))
+        version = metadata["packageVersion"]
+        feed = os.environ["FEED_CONNECTION_ID"]
+        if not isinstance(version, str) or not version.strip():
+            raise ValueError("Package metadata must contain a nonempty packageVersion")
+        if not feed.strip() or feed.startswith("$("):
+            raise ValueError("FEED_CONNECTION_ID is empty or unresolved")
 
-          - bash: |
-              set -euo pipefail
+        env_file = Path("fabric_items/onelake_security_utils.Environment/Libraries/PublicLibraries/environment.yml")
+        doc = yaml.safe_load(env_file.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict) or not isinstance(doc.get("dependencies"), list):
+            raise ValueError("environment.yml must contain a dependencies list")
 
-              if [[ -z "${FEED_CONNECTION_ID:-}" || "$FEED_CONNECTION_ID" == '$('* ]]; then
-                echo "##[error]FEED_CONNECTION_ID is empty or unresolved."
-                exit 1
-              fi
+        package_found = False
+        index_found = False
+        pip_groups = []
+        for dep in doc["dependencies"]:
+            if not isinstance(dep, dict) or "pip" not in dep:
+                continue
+            entries = dep["pip"]
+            if not isinstance(entries, list):
+                raise ValueError("environment.yml pip dependencies must be a list")
+            pip_groups.append(entries)
+            for i, entry in enumerate(entries):
+                if not isinstance(entry, str):
+                    raise ValueError("Each pip dependency must be a string")
+                if re.match(r"^onelake[-_.]+security(?=\s|[<>=!~;\[@]|$)", entry.lstrip(), re.IGNORECASE):
+                    entries[i] = f"onelake-security=={version}"
+                    package_found = True
+                elif re.match(r"^--index-url(?:\s|=|$)", entry.lstrip()):
+                    entries[i] = f"--index-url {feed}"
+                    index_found = True
 
-              echo "Source branch: $(Build.SourceBranch)"
-              echo "Source commit: $(Build.SourceVersion)"
-              echo "Checked-out commit: $(git rev-parse HEAD)"
-              echo "Patching fabric_items/onelake_security_utils.Environment/Libraries/PublicLibraries/environment.yml"
+        if not index_found:
+            raise ValueError("environment.yml must contain a pip --index-url entry")
+        if not package_found:
+            pip_groups[0].append(f"onelake-security=={version}")
+            print("Added missing onelake-security pip entry")
 
-              python .cicd/scripts/patch_onelake_env.py
-            displayName: 'Patch onelake_security_utils environment.yml'
-            workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
-            env:
-              FEED_CONNECTION_ID: $(FEED_CONNECTION_ID)
-              PACKAGE_METADATA_FILE: '$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json'
+        env_file.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+        print(f"Updated environment.yml to onelake-security=={version}")
+        PY
+      displayName: 'Patch onelake_security_utils environment.yml'
+      workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
+      env:
+        FEED_CONNECTION_ID: $(FEED_CONNECTION_ID)
+        PACKAGE_METADATA_FILE: '$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json'
 
-          - task: AzureKeyVault@2
-            condition: and(succeeded(), in(variables['targetEnvironment'], 'DEV', 'QA'))
-            inputs:
-              azureSubscription: 'fabric-sc'
-              KeyVaultName: '$(KeyVaultNameNonProd)'
-              SecretsFilter: 'tenant-id-secret,fabric-non-prod-spn-secret,fabric-non-prod-spn-client-secret'
-            displayName: 'Get Key Vault Secrets (DEV/QA)'
+    # ...existing code...
+    - task: AzureKeyVault@2
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      inputs:
+        azureSubscription: 'fabric-sc'
+        KeyVaultName: '$(KeyVaultNameNonProd)'
+        SecretsFilter: 'tenant-id-secret, fabric-non-prod-spn-secret, fabric-non-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (DEV/QA)'
 
-          - task: AzureKeyVault@2
-            condition: and(succeeded(), eq(variables['targetEnvironment'], 'PROD'))
-            inputs:
-              azureSubscription: 'fabric-sc-prod'
-              KeyVaultName: '$(KeyVaultNameProd)'
-              SecretsFilter: 'tenantID,fabric-prod-secret,fabric-prod-spn-client-secret'
-            displayName: 'Get Key Vault Secrets (PROD)'
+    - task: AzureKeyVault@2
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      inputs:
+        azureSubscription: 'fabric-sc-prod'
+        KeyVaultName: '$(KeyVaultNameProd)'
+        SecretsFilter: 'tenantID, fabric-prod-secret, fabric-prod-spn-client-secret'
+      displayName: 'Get Key Vault Secrets (PROD)'
 
-          - bash: |
-              set -euo pipefail
-              echo "Target Environment: $(targetEnvironment)"
-              echo "Working Directory: $PWD"
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt
+        pip install pyyaml requests msal
+      displayName: 'Install dependencies'
 
-              python "$(Pipeline.Workspace)/s/fabric-cicd-demo/.cicd/authenticate_spn.py" \
-                "$(targetEnvironment)" \
-                "$(Pipeline.Workspace)/s/current-repo/attached_config/target_deployment.yml"
-            condition: and(succeeded(), in(variables['targetEnvironment'], 'DEV', 'QA'))
-            workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
-            env:
-              AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
-              AZURE_TENANT_ID: $(tenant-id-secret)
-              AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
-              FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: '900'
-            displayName: 'Run authentication and deployment script (DEV/QA)'
+    # Show repository contents
+    - script: |
+        echo "Current repo directory:"
+        ls -la $(Build.SourcesDirectory)/current-repo
+        echo "External repo directory:"
+        ls -la $(Build.SourcesDirectory)/fabric-cicd-demo
+      displayName: 'Show repository contents'
 
-          - bash: |
-              set -euo pipefail
-              echo "Target Environment: $(targetEnvironment)"
-              echo "Working Directory: $PWD"
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        ls -a fabric_items
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
+      condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
+      workingDirectory: $(Build.SourcesDirectory)/current-repo/
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
+        FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
+      displayName: 'Run authentication and deployment script (DEV/QA)'
 
-              python "$(Pipeline.Workspace)/s/fabric-cicd-demo/.cicd/authenticate_spn.py" \
-                "$(targetEnvironment)" \
-                "$(Pipeline.Workspace)/s/current-repo/attached_config/target_deployment.yml"
-            condition: and(succeeded(), eq(variables['targetEnvironment'], 'PROD'))
-            workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
-            env:
-              AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
-              AZURE_TENANT_ID: $(tenantID)
-              AZURE_CLIENT_SECRET: $(fabric-prod-secret)
-              FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: '900'
-            displayName: 'Run authentication and deployment script (PROD)'
+    - script: |
+        echo "Target Environment: $(targetEnvironment)"
+        echo "Working Directory: $(Build.SourcesDirectory)"
+        ls -a
+        ls -a fabric_items
+        python $(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/authenticate_spn.py $(targetEnvironment) $(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml
+      condition: eq(variables['targetEnvironment'], 'PROD')
+      workingDirectory: $(Build.SourcesDirectory)/current-repo/
+      env:
+        AZURE_CLIENT_ID: $(fabric-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenantID)
+        AZURE_CLIENT_SECRET: $(fabric-prod-secret)
+        FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
+      displayName: 'Run authentication and deployment script (PROD)'
 
-          - bash: |
-              set -euo pipefail
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/current-repo/fabric_cicd.error.log'
+        ArtifactName: 'errorlog'
+        publishLocation: 'Container'
+      condition: always()
+      displayName: 'Publish error log artifact'
 
-              WORKSPACE_ID=$(python -c "
-              import os
-              import yaml
-              with open('attached_config/target_deployment.yml', encoding='utf-8') as f:
-                  cfg = yaml.safe_load(f)
-              workspace_id = cfg[os.environ['TARGET_ENVIRONMENT']]['target_workspace_id']
-              if not isinstance(workspace_id, str) or not workspace_id.strip():
-                  raise ValueError('target_workspace_id must be a nonempty string')
-              print(workspace_id)
-              ")
-
-              echo "Resolved workspace ID for $(targetEnvironment): $WORKSPACE_ID"
-
-              python .cicd/scripts/run_fabric_pipeline.py \
-                --workspace-id "$WORKSPACE_ID" \
-                --pipeline-name "onelake_security_role_pl" \
-                --poll-interval 30 \
-                --timeout 3600
-            condition: and(succeeded(), in(variables['targetEnvironment'], 'DEV', 'QA'))
-            displayName: 'Run and validate onelake_security_role_pl ($(targetEnvironment))'
-            workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
-            env:
-              TARGET_ENVIRONMENT: $(targetEnvironment)
-              AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
-              AZURE_TENANT_ID: $(tenant-id-secret)
-              AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
-
-          # Early failures may occur before fabric-cicd creates an error log.
-          - bash: |
-              set -euo pipefail
-
-              if [[ -f "$(Pipeline.Workspace)/s/current-repo/fabric_cicd.error.log" ]]; then
-                echo "##vso[task.setvariable variable=hasErrorLog;isOutput=true]true"
-              else
-                echo "No fabric_cicd.error.log was generated."
-                echo "##vso[task.setvariable variable=hasErrorLog;isOutput=true]false"
-              fi
-            name: detectErrorLog
-            condition: always()
-            displayName: 'Locate deployment error log'
-
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Pipeline.Workspace)/s/current-repo/fabric_cicd.error.log'
-              ArtifactName: 'errorlog'
-              publishLocation: 'Container'
-            condition: and(always(), eq(variables['detectErrorLog.hasErrorLog'], 'true'))
-            displayName: 'Publish error log artifact'
+    # Run the validation Fabric pipeline and poll for success
+    - script: |
+        WORKSPACE_ID=$(python -c "
+        import yaml
+        with open('$(Build.SourcesDirectory)/current-repo/attached_config/target_deployment.yml') as f:
+            cfg = yaml.safe_load(f)
+        print(cfg['$(targetEnvironment)']['target_workspace_id'])
+        ")
+        echo "Resolved workspace ID for $(targetEnvironment): $WORKSPACE_ID"
+        python $(Build.SourcesDirectory)/current-repo/.cicd/scripts/run_fabric_pipeline.py \
+          --workspace-id "$WORKSPACE_ID" \
+          --pipeline-name "onelake_security_role_pl" \
+          --poll-interval 30 \
+          --timeout 3600
+      condition: in(variables['targetEnvironment'], 'DEV', 'QA')
+      displayName: 'Run and validate onelake_security_role_pl ($(targetEnvironment))'
+      env:
+        AZURE_CLIENT_ID: $(fabric-non-prod-spn-client-secret)
+        AZURE_TENANT_ID: $(tenant-id-secret)
+        AZURE_CLIENT_SECRET: $(fabric-non-prod-spn-secret)
