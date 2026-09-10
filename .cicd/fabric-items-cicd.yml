@@ -192,7 +192,49 @@ stages:
         FEED_CONNECTION_ID: $(FEED_CONNECTION_ID)
         PACKAGE_METADATA_FILE: '$(Pipeline.Workspace)/onelakeSecurityPkg/package_metadata/package-metadata.json'
 
-    # ...existing code...
+    # Add the pool mapping to the agent checkout before fabric-cicd loads it.
+    - bash: |
+        set -euo pipefail
+        python - <<'PY'
+        import os
+        from pathlib import Path
+        import yaml
+
+        target = os.environ["TARGET_ENVIRONMENT"]
+        if target not in {"DEV", "QA", "PROD"}:
+            raise ValueError(f"Unsupported target environment: {target}")
+        parameter_file = Path("fabric_items/parameter.yml")
+        doc = yaml.safe_load(parameter_file.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            raise ValueError("parameter.yml must contain a mapping")
+        rules = doc.setdefault("spark_pool", [])
+        if not isinstance(rules, list) or any(not isinstance(rule, dict) for rule in rules):
+            raise ValueError("spark_pool must be a list of mappings")
+
+        source_id = "83dd8cff-c63d-4083-912c-28382bd0e0de"
+        matches = [rule for rule in rules if rule.get("instance_pool_id") == source_id]
+        if len(matches) > 1:
+            raise ValueError(f"Multiple Spark pool rules exist for {source_id}")
+        if matches:
+            rule = matches[0]
+            if "item_name" in rule:
+                raise ValueError("The medium pool rule must apply to all Environments; remove its item_name filter")
+        else:
+            rule = {"instance_pool_id": source_id, "replace_value": {}}
+            rules.append(rule)
+        replacements = rule.setdefault("replace_value", {})
+        if not isinstance(replacements, dict):
+            raise ValueError("Spark pool replace_value must be a mapping")
+        replacements[target] = {"type": "Capacity", "name": "medium-as-1-7"}
+
+        parameter_file.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+        print(f"Configured {target}: {source_id} -> Capacity / medium-as-1-7")
+        PY
+      displayName: 'Configure capacity Spark pool mapping'
+      workingDirectory: '$(Pipeline.Workspace)/s/current-repo'
+      env:
+        TARGET_ENVIRONMENT: $(targetEnvironment)
+
     - task: AzureKeyVault@2
       condition: or(eq(variables['targetEnvironment'], 'DEV'), eq(variables['targetEnvironment'], 'QA'))
       inputs:
@@ -253,12 +295,26 @@ stages:
         FABRIC_CICD_RETRY_MAX_DURATION_SECONDS: 900
       displayName: 'Run authentication and deployment script (PROD)'
 
+    - bash: |
+        set -euo pipefail
+        if [[ -f "$ERROR_LOG_PATH" ]]; then
+          echo "##vso[task.setvariable variable=hasErrorLog;isOutput=true]true"
+        else
+          echo "##vso[task.setvariable variable=hasErrorLog;isOutput=true]false"
+          echo "##vso[task.logissue type=warning]No deployment error log at $ERROR_LOG_PATH. See the deployment task output."
+        fi
+      name: detectErrorLog
+      condition: always()
+      displayName: 'Check for deployment error log'
+      env:
+        ERROR_LOG_PATH: '$(Pipeline.Workspace)/s/current-repo/fabric_cicd.error.log'
+
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/current-repo/fabric_cicd.error.log'
+        PathtoPublish: '$(Pipeline.Workspace)/s/current-repo/fabric_cicd.error.log'
         ArtifactName: 'errorlog'
         publishLocation: 'Container'
-      condition: always()
+      condition: and(always(), eq(variables['detectErrorLog.hasErrorLog'], 'true'))
       displayName: 'Publish error log artifact'
 
     # Run the validation Fabric pipeline and poll for success
