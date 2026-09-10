@@ -171,11 +171,12 @@ stages:
 
     # Show repository contents
     - script: |
-        echo "Current repo directory:"
-        ls -la $(Build.SourcesDirectory)/current-repo
-        echo "External repo directory:"
-        ls -la $(Build.SourcesDirectory)/fabric-cicd-demo
-      displayName: 'Show repository contents'
+        set -euo pipefail
+        python -m pip install --upgrade pip
+        python -m pip install -r "$(Build.SourcesDirectory)/fabric-cicd-demo/.cicd/requirements.txt"
+        python -m pip install pyyaml requests msal
+        python -c "from azure.identity import ClientSecretCredential; import fabric_cicd"
+      displayName: 'Install dependencies'
 
     - script: |
         echo "Target Environment: $(targetEnvironment)"
