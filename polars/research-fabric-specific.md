@@ -88,3 +88,11 @@ Silver is the Spark-first layer under F64. Joins, dedupes, CDC, merges, and skew
 Bronze and Gold are where Polars still earns a place. Bronze simple batch ingestion and Gold small-to-medium aggregations can avoid Spark overhead, but streaming Bronze and governed/optimized Gold serving should generally stay Spark.
 
 Treat all boundaries as benchmark gates, not laws. At every gray-zone boundary, run the same job in Polars and Spark with representative data, record wall-clock duration, CU consumption, memory peak/OOM behavior, and output table quality. The public Fabric benchmark evidence is strong directionally, but your file sizes, cardinality, skew, Delta features, and SLA shape will determine the exact cutoff.
+
+
+
+Questions:
+- Why are the references to capacity units in terms of Spark vCores instead of just vCores?
+Example:
+"A Fabric F64 has 64 Capacity Units, and for Spark, Microsoft documents 1 capacity unit = 2 Spark vCores. That gives 128 Spark vCores base. Fabric Spark bursting can allow up to 3x the purchased Spark vCores, so an F64 can reach 384 Spark vCores, and Microsoft’s current documentation says a single Spark job can consume all 384 vCores if the pool is configured large enough and the capacity is otherwise free."
+

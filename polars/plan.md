@@ -22,4 +22,6 @@ be stored in a workspace named: polars-benchmark-engineering-ws)
 - The environments created should be configurable and adjusted/tuned to allow the resource it's supporting to achieve maximum results
 - The environments will be separated by technology and layer.  What I mean by this for example is: [polars-bronze, polars-silver,polars-gold, pyspark-bronze, pyspark-silver, pyspark-gold]
 - There should also be an evalution if the additional separation of layer (medallion layer) is worth the effort or if just separation by technology is sufficient
+- The Fabric Capacity used for all of this will be an F64 (existing) named: uswest3capacity
+
 
