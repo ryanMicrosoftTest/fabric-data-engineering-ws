@@ -108,7 +108,7 @@ onelake-security-role-service/
 │       ├── file_tracker.py          # Content hash watermarking for change detection
 │       ├── audit.py                 # Operation logging with pluggable backend
 │       └── lakehouse_audit.py       # Read-only role snapshot of a lakehouse, saveable to disk
-├── tests/                           # 153 tests
+├── tests/                           # 159 tests
 │   ├── conftest.py                  # Shared fixtures (sample YAMLs, mock API responses)
 │   ├── test_models.py
 │   ├── test_yaml_parser.py
@@ -121,7 +121,8 @@ onelake-security-role-service/
 │   └── test_lakehouse_audit.py
 ├── notebooks/                       # Thin Fabric notebook wrappers
 │   ├── onelake_role_creation_nb.py
-│   └── onelake_role_mapping_nb.py
+│   ├── onelake_role_mapping_nb.py
+│   └── onelake_lakehouse_audit_nb.ipynb  # Read-only full role audit + disk export
 ├── examples/                        # Working YAML examples
 │   ├── role-definitions/
 │   │   ├── neurology-read.yml       # Simple RLS
@@ -309,7 +310,7 @@ This is the automated path — the CI pipeline publishes to Azure Artifacts, and
 ### Option 2: Manual Upload
 
 1. Build locally: `python -m build --wheel`
-2. Fabric Environment → Custom Libraries → upload `dist/onelake_security-0.1.0-py3-none-any.whl`
+2. Fabric Environment → Custom Libraries → upload `dist/onelake_security-0.4.0-py3-none-any.whl`
 3. Publish the Environment
 
 ---
@@ -323,22 +324,34 @@ This is the automated path — the CI pipeline publishes to Azure Artifacts, and
 | `translators.py` | `role_definition_to_api_role()` and `user_mapping_to_api_members()` — domain ↔ API payload | 12 |
 | `role_definition_reconciler.py` | `reconcile_role_definitions()` — merge role intent into existing API state (upsert/delete) | 9 |
 | `role_membership_reconciler.py` | `reconcile_role_membership()` — replace members for a role, preserve other roles | 8 |
-| `api_client.py` | `OneLakeSecurityClient` — GET/PUT roles with ETag concurrency and 429 retry | 15 |
+| `api_client.py` | `OneLakeSecurityClient` — GET/PUT roles, workspace role assignments, ETag concurrency and 429 retry | 20 |
 | `workflow_service.py` | `process_role_definitions()` and `process_user_mappings()` — orchestration with 412 retry loop | 16 |
 | `file_tracker.py` | `FileTracker` and `compute_content_hash()` — SHA-256 watermarking for change detection | 12 |
 | `audit.py` | `AuditLogger` and `AuditRecord` — operation logging with pluggable writer backend | 12 |
-| `lakehouse_audit.py` | `audit_lakehouse()` and `save_report()` — read-only snapshot of every role on a lakehouse, exportable as JSON/CSV/Markdown | 16 |
+| `lakehouse_audit.py` | `audit_lakehouse()` and `save_report()` — read-only snapshot of every role on a lakehouse, exportable as JSON/CSV/Markdown | 35 |
+| `entra_directory.py` | `EntraDirectoryClient` — resolves member object IDs to Entra display names and types, expands groups to their members, reverse name lookup | 31 |
+| `workspace_audit.py` | `audit_workspace_roles()` — read-only snapshot of workspace Admin/Member/Contributor/Viewer grants, with groups expanded to people | 34 |
 
-**Total: 153 tests**
+**Total: 242 tests**
 
 ### Auditing a lakehouse
 
 ```python
 from onelake_security.api_client import OneLakeSecurityClient
+from onelake_security.entra_directory import EntraDirectoryClient
 from onelake_security.lakehouse_audit import audit_lakehouse, save_report
 
 client = OneLakeSecurityClient(api_token=token)
-report = audit_lakehouse(client, workspace_id, lakehouse_id, lakehouse_name="clinical_lh")
+directory = EntraDirectoryClient(graph_token=graph_token)
+
+report = audit_lakehouse(
+    client,
+    workspace_id,
+    lakehouse_item_id,
+    lakehouse_name="clinical_lh",
+    directory=directory,     # object IDs -> friendly Entra names
+    expand_groups=True,      # groups -> the users inside them
+)
 
 print(report.role_count, report.total_members, [r.name for r in report.orphaned_roles])
 
@@ -347,11 +360,106 @@ save_report(report, "audits/clinical_lh.csv", format="csv")         # one row pe
 save_report(report, "audits/clinical_lh.md", format="markdown")     # review-friendly summary
 ```
 
+### Friendly names instead of object IDs
+
+The Fabric roles API returns member **object IDs only**, so an unenriched audit reads
+`ab6dc298-6ad2-449f-944b-e6c1c759e586 | n/a`. `entra_directory` maps those GUIDs back to the
+security group or user behind them.
+
+```python
+from onelake_security.entra_directory import EntraDirectoryClient
+from onelake_security.lakehouse_audit import resolve_member_names, expand_group_members
+
+directory = EntraDirectoryClient(graph_token=graph_token)
+
+# Object ID -> display name, object type, UPN. Returns the IDs that failed, with reasons.
+unresolved = resolve_member_names(report, directory)
+for item in unresolved:
+    print(item.object_id, item.reason)   # deleted / cross-tenant / not visible
+
+# Group -> the principals inside it, so the audit shows who actually holds access.
+expand_group_members(report, directory)          # transitive by default
+
+# Ad hoc lookups
+directory.resolve_object("ab6dc298-6ad2-449f-944b-e6c1c759e586")   # -> DirectoryObject
+directory.get_group_members(group_id)                              # -> [DirectoryObject]
+directory.find_by_name("AAD-NEUROLOGY-READERS")                    # name -> object IDs
+```
+
+| Capability | Method | Notes |
+|---|---|---|
+| Bulk resolve | `resolve_objects()` / `resolve()` | Batched 1000/call; `resolve()` also returns *why* an ID failed |
+| Single resolve | `resolve_object()` | Returns `None` when the object is not visible |
+| Group expansion | `get_group_members()` | `transitive=True` flattens nested groups to end principals |
+| Reverse lookup | `find_by_name()` | Searches users, groups, and service principals |
+| Caching | on by default | Repeated group hits across roles collapse to one Graph call |
+
+After enrichment the report exposes `member.friendly_name`, `member.object_type`,
+`member.user_principal_name`, `member.group_members`, and `member.resolution_note`;
+`report.to_effective_user_rows()` gives one row per role × path × **person** with groups expanded.
+
+**Graph permissions:** the SPN needs `Directory.Read.All` (or `User.Read.All` + `Group.Read.All`),
+plus `GroupMember.Read.All` for group expansion. Without them the audit still succeeds — members
+simply keep their object IDs and carry a `resolution_note` explaining why.
+
+### Auditing workspace roles
+
+OneLake data access roles govern tables, columns, and rows *inside* a lakehouse. Workspace roles
+are the plane above: a workspace **Admin** outranks every OneLake role, so a review that only
+reads `dataAccessRoles` misses the broadest access in the tenant.
+
+```python
+from onelake_security.workspace_audit import audit_workspace_roles, save_workspace_report
+
+report = audit_workspace_roles(
+    client,
+    workspace_id,
+    directory=directory,   # expands security groups to the people inside them
+)
+
+print(report.assignment_count, report.role_counts)
+print([a.friendly_name for a in report.elevated_assignments])   # Admin + Member
+print([a.friendly_name for a in report.empty_groups])           # grants that reach nobody
+
+for row in report.effective_principals():
+    print(row["effective_role"], row["principal_name"], row["granted_via"])
+
+save_workspace_report(report, "audits/ws.json")
+save_workspace_report(report, "audits/ws.csv", format="csv")
+save_workspace_report(report, "audits/ws_effective.csv", format="effective_csv")
+save_workspace_report(report, "audits/ws.md", format="markdown")
+```
+
+`effective_principals()` collapses every grant to **one row per person at their highest role**.
+A user who is a direct Viewer but also sits in an Admin group is reported once, as Admin, with
+`granted_via` listing both paths.
+
+| Property | Meaning |
+|---|---|
+| `role_counts` | `{"Admin": 6, "Member": 1, "Contributor": 2, "Viewer": 4}` |
+| `elevated_assignments` | Admin + Member grants — the ones worth challenging |
+| `group_assignments` | Grants made to a security group rather than a person |
+| `empty_groups` | Groups that were expanded and contain nobody — the grant is inert |
+| `unexpanded_groups` | Groups whose membership was never looked up (unknown, not empty) |
+
+**Permissions:** reading `GET /workspaces/{id}/roleAssignments` requires the SPN to hold
+**Contributor or higher** on that workspace, in addition to the Graph permissions above.
+
+**Deployed notebook:** `onelake_lakehouse_audit_nb` in workspace `a8cbda3d-903e-4154-97d9-9a91c95abb42`, folder *OneLake Security Audit*. It audits lakehouse `0386880f-c134-41be-923c-00150c5fbafe`, resolves every member object ID to its Entra display name and expands groups to the users inside them, displays a role summary, a role × path × member detail grid, an effective-access grid (one row per person), **a workspace role audit for the workspace the notebook is running in** (section 6, with a per-user effective-access grid), governance findings (orphaned roles, wildcard grants, unresolved members, empty group grants, RLS/CLS coverage), and writes timestamped plus `_latest` JSON/CSV/Markdown files — including `effective_access.csv` and `workspace_roles.*` — to `Files/onelake-security-audits`.
+
+In Spark, `save_report()` targets a local filesystem path — write to OneLake with `notebookutils.fs.put` instead:
+
+```python
+notebookutils.fs.put(f"{abfss_dir}/audit.json", report.to_json(), True)
+notebookutils.fs.put(f"{abfss_dir}/audit.md", report.to_markdown(), True)
+```
+
 ---
 
 ## Prerequisites
 
-- **SPN with `OneLake.ReadWrite.All`** scope and **Contributor** role on the target workspace
+- **SPN with `OneLake.ReadWrite.All`** scope and **Contributor** role on the target workspace (Contributor or higher is also what lets the workspace role audit read `GET /workspaces/{id}/roleAssignments`)
+- **Microsoft Graph application permissions** for friendly-name resolution in audits: `Directory.Read.All` (or `User.Read.All` + `Group.Read.All`), plus `GroupMember.Read.All` to expand groups — admin consent required
 - **OneLake Security must be enabled** on the target lakehouse (manual, one-time, by the lakehouse owner)
 - **Azure Key Vault** with SPN credentials stored as secrets
 - **Fabric Environment** with `onelake-security` package installed
