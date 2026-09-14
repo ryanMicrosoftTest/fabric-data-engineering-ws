@@ -7,7 +7,7 @@
           "source": {
             "type": "ParquetSource",
             "storeSettings": {
-              "type": "LakehouseReadSettings",
+              "type": "AzureBlobStorageReadSettings",
               "recursive": true,
               "enablePartitionDiscovery": false
             },
@@ -45,11 +45,18 @@
             "tableOption": "autoCreate",
             "allowCopyCommand": true,
             "copyCommandSettings": {},
+            "writeBehavior": "Upsert",
+            "upsertSettings": {
+              "keys": [
+                "CustomerKey",
+                "WWICustomerID"
+              ]
+            },
             "datasetSettings": {
               "type": "DataWarehouseTable",
               "typeProperties": {
                 "schema": "dbo",
-                "table": "dimension_customer"
+                "table": "DimCustomer"
               },
               "schema": [],
               "linkedService": {
@@ -57,9 +64,9 @@
                 "properties": {
                   "type": "DataWarehouse",
                   "typeProperties": {
-                    "artifactId": "faf57c49-8a74-49aa-8e3b-8ccb7390d403",
+                    "artifactId": "7390d403-8ccb-8e3b-49aa-8a74faf57c49",
                     "endpoint": "ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com",
-                    "workspaceId": "a8cbda3d-903e-4154-97d9-9a91c95abb42"
+                    "workspaceId": "00000000-0000-0000-0000-000000000000"
                   },
                   "annotations": []
                 }
