@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "capturedAtUtc": "2026-08-04T17:11:15.2629683Z",
+  "status": "done",
+  "workspace": {
+    "id": "896bca78-0d4a-4dc9-8716-05539ecf4ea5",
+    "displayName": "airflow-example-ws"
+  },
+  "originalItem": {
+    "id": "3add6022-0759-47a1-ab32-2f038e8308f8",
+    "preserved": true,
+    "writesIssued": 0
+  },
+  "replacementItem": {
+    "id": "f10cb3e8-8dd6-4f47-82d0-77141f600e49",
+    "displayName": "medallion_orchestrator_recovery",
+    "type": "ApacheAirflowJob"
+  },
+  "credential": {
+    "keyId": "71a9c2c5-435a-443a-aed8-c5ab5560d0db",
+    "expiresAtUtc": "2026-11-02T16:27:06Z"
+  },
+  "tests": {
+    "command": "python -m pytest medallion_orchestrator/tests -q",
+    "passed": 76,
+    "failed": 0,
+    "fallbackRequestParity": true
+  },
+  "deployedFiles": [
+    {
+      "path": "dags/fabric_notebook_fallback.py",
+      "sizeBytes": 24971,
+      "sha256": "fb320fc329d7a1aac2b5ec7bcd15a702ebfd4fcd94f946a208230d13451c942b"
+    },
+    {
+      "path": "dags/medallion_pipeline.py",
+      "sizeBytes": 1769,
+      "sha256": "253e1cfa39b48ee9a5083b473d11a6c5f232b91245852bdff68c024c88e81798"
+    },
+    {
+      "path": "dags/validate_compute_configuration.py",
+      "sizeBytes": 1100,
+      "sha256": "55d61ea8a2f686b76567bc511211836f980ef6245da4151d446ca83161e0482a"
+    }
+  ],
+  "requirements": {
+    "airflowRequirements": [],
+    "privateWheelFileRemoved": true,
+    "installedLibraries": [],
+    "deploymentOperationId": "bace39bb-e616-4f09-9c94-9a6cd9b7accc",
+    "operationStatusAtFinalRead": "Running",
+    "effectiveStateVerifiedBy": [
+      "getDefinition airflowRequirements is empty",
+      "environment libraries list is empty",
+      "private wheel file is absent"
+    ]
+  },
+  "environment": {
+    "status": "Started",
+    "restartCount": 1,
+    "airflowWebUrl": "https://af635400331785.westus3.airflow.svc.datafactory.azure.com/login/"
+  },
+  "connections": {
+    "tokenValidation": {
+      "fabric": true,
+      "sql": true,
+      "secretPrinted": false,
+      "secretWrittenToDisk": false
+    },
+    "fabric_conn": {
+      "exists": true,
+      "type": "generic",
+      "host": "https://api.fabric.microsoft.com",
+      "loginConfigured": true,
+      "tenantConfigured": true,
+      "scope": "https://api.fabric.microsoft.com/.default"
+    },
+    "airflow_config_sql": {
+      "exists": true,
+      "type": "generic",
+      "host": "ftykynmhjpteverb75ok7vbqwq-pdfgxckkbxeu3bywavjz5t2ouu.database.fabric.microsoft.com",
+      "schema": "airflow_config-8c3d270b-c9d6-468a-b1bc-0c99059616de",
+      "loginConfigured": true,
+      "tenantConfigured": true,
+      "driver": "ODBC Driver 18 for SQL Server",
+      "tokenScope": "https://database.windows.net/.default"
+    }
+  },
+  "dagVerification": {
+    "medallion_nyc_taxi": {
+      "imported": true,
+      "registered": true,
+      "paused": true,
+      "schedule": "0 10 * * *",
+      "taskIds": [
+        "bronze_ingest",
+        "silver_transform",
+        "gold_aggregate"
+      ],
+      "order": "bronze_ingest >> silver_transform >> gold_aggregate",
+      "dagRunsTriggered": 0
+    },
+    "validate_compute_configuration": {
+      "imported": true,
+      "registered": true,
+      "paused": true,
+      "schedule": null,
+      "taskIds": [
+        "probe_effective_compute_configuration"
+      ],
+      "dagRunsTriggered": 0
+    },
+    "targetImportErrorCount": 0
+  },
+  "temporarySetup": {
+    "method": "Airflow stable REST API",
+    "temporaryDagCreated": false,
+    "exactTemporarySetupDagPresent": false,
+    "recoveryProbeFilesPresent": false
+  },
+  "blockers": []
+}
