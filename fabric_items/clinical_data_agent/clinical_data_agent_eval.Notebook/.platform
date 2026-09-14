@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "DataPipeline",
-    "displayName": "internal_lookup_pl"
+    "type": "Notebook",
+    "displayName": "clinical_data_agent_eval"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "b482b13d-5a90-a0fd-435d-12bdbafea2d8"
+    "logicalId": "30825b9c-480f-af89-446b-007bf77ff382"
   }
 }

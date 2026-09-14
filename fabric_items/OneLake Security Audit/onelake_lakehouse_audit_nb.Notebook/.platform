@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "onelake_lakehouse_audit_nb",
+    "description": "Full read-only OneLake security role audit for a lakehouse"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b8a2dd86-ee66-988b-4bb5-7cce12a97951"
+  }
+}
