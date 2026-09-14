@@ -15,10 +15,30 @@
 # Objectives
 # -   All data in Student table must have social security number masked <br>
 # -   All data in employee table that is of a student must have social security number masked
+#
+# > **Security scope:** this notebook masks the **data itself** during
+# > transformation. Anything downstream of the write sees only masked values, but
+# > any principal with OneLake/Delta access to the *source* tables still sees raw
+# > values. See `ddm_security_posture.md`.
+#
+# ## Configuration
+# Set the three IDs below for your own environment before running. They are the
+# only environment-specific values in this notebook.
 
 # CELL ********************
 
 from pyspark.sql import functions as F
+
+# Environment configuration — replace with your own IDs.
+# Workspace ID: Fabric portal URL -> /groups/<WORKSPACE_ID>/
+# Lakehouse ID: open the lakehouse -> URL segment after /lakehouses/
+WORKSPACE_ID = "<workspace-id>"
+SILVER_LAKEHOUSE_ID = "<silver-lakehouse-id>"
+BRONZE_LAKEHOUSE_ID = "<bronze-lakehouse-id>"
+
+ONELAKE = "onelake.dfs.fabric.microsoft.com"
+silver_lh_abfss_path = f"abfss://{WORKSPACE_ID}@{ONELAKE}/{SILVER_LAKEHOUSE_ID}/Tables"
+bronze_lh_abfss_path = f"abfss://{WORKSPACE_ID}@{ONELAKE}/{BRONZE_LAKEHOUSE_ID}/Tables"
 
 # METADATA ********************
 
@@ -30,8 +50,6 @@ from pyspark.sql import functions as F
 # CELL ********************
 
 # read from silver lakehouse
-silver_lh_abfss_path = 'abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/70e18f53-f14f-41bd-b3d0-8060d42c4909/Tables'
-
 employee_df = spark.read.format('delta').load(f'{silver_lh_abfss_path}/employee')
 student_df = spark.read.format('delta').load(f'{silver_lh_abfss_path}/student')
 
@@ -70,9 +88,7 @@ display(student_df)
 
 # CELL ********************
 
-# read from bronze lakehouse
-bronze_lh_abfss_path = 'abfss://a8cbda3d-903e-4154-97d9-9a91c95abb42@onelake.dfs.fabric.microsoft.com/d550d915-f3a8-418b-b3f4-c2cb369838c3/Tables'
-
+# read from bronze lakehouse (path built from BRONZE_LAKEHOUSE_ID in the config cell)
 employee_df = spark.read.format('delta').load(f'{bronze_lh_abfss_path}/employee')
 student_df = spark.read.format('delta').load(f'{bronze_lh_abfss_path}/student')
 

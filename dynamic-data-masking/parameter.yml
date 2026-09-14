@@ -1,0 +1,57 @@
+# fabric-cicd parameterization for the Dynamic Data Masking notebooks
+#
+# The notebooks in this folder pin a default lakehouse and warehouse by item ID in their
+# `# META` / `-- META` blocks. Those IDs are environment-specific. Fill in the per-environment
+# GUIDs below and pass this file to fabric-cicd so the notebooks rebind on deploy.
+#
+# Leave a value as the all-zero placeholder to make deployment to that environment fail
+# clearly until the target item exists.
+#
+# Find the IDs in the Fabric portal URL:
+#   https://app.fabric.microsoft.com/groups/<workspace-id>/lakehouses/<lakehouse-id>
+
+find_replace:
+    # Workspace ID referenced by the Spark notebook's abfss paths and by notebook metadata.
+    - find_value: "<workspace-id>"
+      replace_value:
+        DEV: 00000000-0000-0000-0000-000000000000
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "Notebook"
+
+    # Silver lakehouse — source of dbo.employee / dbo.student and host of the SQL analytics
+    # endpoint the masking notebooks target.
+    - find_value: "<silver-lakehouse-id>"
+      replace_value:
+        DEV: 00000000-0000-0000-0000-000000000000
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "Notebook"
+
+    # Bronze lakehouse — raw source read by the Spark masking notebook.
+    - find_value: "<bronze-lakehouse-id>"
+      replace_value:
+        DEV: 00000000-0000-0000-0000-000000000000
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "Notebook"
+      item_name: "data_masking_spark_files_nb"
+
+    # Entra security group granted UNMASK on the masked column (native DDM notebook).
+    # Group display names typically differ per environment.
+    - find_value: "<unmask-group>"
+      replace_value:
+        DEV: "sg-fabric-ddm-unmask-dev"
+        QA: "sg-fabric-ddm-unmask-qa"
+        PROD: "sg-fabric-ddm-unmask-prod"
+      item_type: "Notebook"
+      item_name: "tsql_native_ddm_ssn_nb"
+
+    # Entra security group added to the maskedReaders role (conditional masking notebook).
+    - find_value: "<masked-readers-group>"
+      replace_value:
+        DEV: "sg-fabric-ddm-masked-readers-dev"
+        QA: "sg-fabric-ddm-masked-readers-qa"
+        PROD: "sg-fabric-ddm-masked-readers-prod"
+      item_type: "Notebook"
+      item_name: "tsql_data_mask_ssn_nb"

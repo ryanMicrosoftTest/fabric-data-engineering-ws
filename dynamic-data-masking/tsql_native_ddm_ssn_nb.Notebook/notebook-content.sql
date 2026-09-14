@@ -43,6 +43,17 @@
 -- students" rule. If that conditional requirement is mandatory, use the
 -- view/role pattern instead. This notebook is the lighter-weight choice when the
 -- requirement is simply "mask SSN for all non-privileged users."
+-- 
+-- > **Security scope:** the mask applies to the **SQL analytics endpoint /
+-- > Warehouse query path only**. Spark, OneLake shortcuts, and Direct Lake
+-- > semantic models read the underlying Delta files and are **not** masked. See
+-- > `ddm_security_posture.md` before treating this as a protection boundary.
+-- 
+-- **Placeholders** — replace before running:
+-- 
+-- | Placeholder | Meaning |
+-- |---|---|
+-- | `<unmask-group>` | Entra security group allowed to see unmasked values |
 
 -- CELL ********************
 
@@ -108,20 +119,36 @@ WHERE t.name = 'employee';
 
 -- MARKDOWN ********************
 
--- ## 3. Grant UNMASK to privileged principals
+-- ## 3. Grant UNMASK to a privileged Entra group
 -- 
 -- Unlike the view/role pattern (which used `DENY SELECT` to block base-table
 -- access), native DDM masks by default and you instead **grant `UNMASK`** to the
--- principals who are allowed to see the real values — e.g. data engineers.
+-- principals who are allowed to see the real values.
+-- 
+-- Grant to an **Entra security group**, not to individual users, so membership is
+-- managed in Entra ID and no T-SQL change is required as people join or leave.
 -- 
 -- Every other principal querying `dbo.employee` automatically receives the
 -- masked value with no view, role membership, or DENY required.
+-- 
+-- Replace `<unmask-group>` with the Entra group display name.
 
 -- CELL ********************
 
--- Allow a privileged principal (e.g. data engineer) to see unmasked SSNs.
--- In Fabric, UNMASK is granted at the database scope.
-GRANT UNMASK TO [adf_user_2@MngEnvMCAP372892.onmicrosoft.com];
+-- The group must exist as a database principal before it can be granted UNMASK.
+CREATE USER [<unmask-group>] FROM EXTERNAL PROVIDER;
+
+-- UNMASK only changes how masked columns render. It does not grant read access
+-- and does not override a DENY, so the principal still needs SELECT.
+GRANT SELECT ON OBJECT::dbo.employee TO [<unmask-group>];
+
+-- Least privilege: grant UNMASK on the specific column that needs to be readable.
+GRANT UNMASK ON dbo.employee(social_security_number) TO [<unmask-group>];
+
+-- Broader alternatives, in increasing order of exposure:
+--   GRANT UNMASK ON OBJECT::dbo.employee TO [<unmask-group>];  -- every masked column on the table
+--   GRANT UNMASK TO [<unmask-group>];                          -- every masked column in the database
+-- Prefer the column-scoped grant above unless a wider scope is explicitly required.
 
 -- METADATA ********************
 
@@ -135,11 +162,43 @@ GRANT UNMASK TO [adf_user_2@MngEnvMCAP372892.onmicrosoft.com];
 -- ## 4. Verify masking behavior
 -- 
 -- A principal **without** `UNMASK` sees `XXX-XX-####`; a principal **with**
--- `UNMASK` sees the real SSN. To test as another user, connect to the SQL
--- analytics endpoint as that principal and run the SELECT below.
+-- `UNMASK` sees the real value.
+-- 
+-- **Masking cannot be verified from an admin/owner session.** Workspace admins,
+-- the warehouse owner, and `db_owner` members hold implicit `UNMASK` and always
+-- see real values. Connect to the SQL analytics endpoint as a non-privileged
+-- principal to confirm the mask.
+-- 
+-- The query below lists who currently holds `UNMASK` so the privileged set can be
+-- reviewed without impersonation.
 
 -- CELL ********************
 
+-- Who currently holds UNMASK, at any scope?
+SELECT pr.name       AS principal_name,
+       pr.type_desc  AS principal_type,
+       pe.state_desc AS permission_state,
+       pe.permission_name,
+       pe.class_desc AS permission_scope
+FROM sys.database_permissions AS pe
+JOIN sys.database_principals AS pr
+    ON pe.grantee_principal_id = pr.principal_id
+WHERE pe.permission_name = 'UNMASK';
+
+-- Note: this does NOT list workspace Admin/Member/Contributor members or any
+-- principal with CONTROL on the database. They hold UNMASK implicitly and always
+-- see real values. Review workspace role membership separately.
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sql",
+-- META   "language_group": "sqldatawarehouse"
+-- META }
+
+-- CELL ********************
+
+-- Run this AS a non-privileged principal (not as an admin/owner) to see the mask.
 SELECT TOP 20 id, first_name, last_name, social_security_number
 FROM dbo.employee
 
@@ -158,12 +217,14 @@ FROM dbo.employee
 
 -- CELL ********************
 
--- Revoke UNMASK from the principal (they will then see masked values)
--- REVOKE UNMASK FROM [adf_user_2@MngEnvMCAP372892.onmicrosoft.com];
+-- Revoke UNMASK from the group (its members will then see masked values)
+-- REVOKE UNMASK ON dbo.employee(social_security_number) FROM [<unmask-group>];
 
 -- Drop the mask from the column entirely (all principals see real values again)
 -- ALTER TABLE dbo.employee
 --     ALTER COLUMN social_security_number DROP MASKED;
+
+-- DROP USER [<unmask-group>];
 
 -- METADATA ********************
 
