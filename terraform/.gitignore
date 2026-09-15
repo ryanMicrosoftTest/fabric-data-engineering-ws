@@ -1,0 +1,20 @@
+# Rendered SQL — regenerated on every apply, never edited by hand.
+.rendered/
+
+# Ad-hoc / local variable overrides. Committed values live in envs/*.tfvars,
+# matching fabric-cluster-start-time-service/iac/function_app.
+terraform.tfvars
+*.auto.tfvars
+
+# Backend config may carry storage account details.
+backend.hcl
+*.tfbackend
+
+# State never belongs in the repo: it stores resource attributes in the clear.
+# The repo root already ignores .terraform/, *.tfstate and *.tfstate.backup;
+# these keep the module self-contained and cover timestamped backups and the
+# local lock file, which those patterns miss.
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log

@@ -1,0 +1,39 @@
+/* =====================================================================
+   CONSUMER PROBE — run this signed in AS the consuming principal.
+
+   Terraform's own verification runs as the deploying identity and therefore
+   cannot distinguish "ownership chaining resolved under the delegated owner"
+   (design working) from "resolved under the caller, who happens to be
+   privileged" (design leaking). Only this script, run as
+   ${consumer_upn}, settles it.
+
+   Expected results are stated inline. A deviation is a real finding.
+   ===================================================================== */
+
+-- 1. Confirm effective identity. Must be the consuming principal, not you.
+SELECT SUSER_NAME() AS login_name, USER_NAME() AS user_name;
+
+-- 2. What is visible?
+--    EXPECT: only dbo views. The '${shortcut_schema}' schema must NOT appear —
+--    DENY SELECT removes metadata visibility as well as read.
+SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE
+FROM   INFORMATION_SCHEMA.TABLES
+WHERE  TABLE_SCHEMA NOT IN ('queryinsights', 'sys')
+ORDER  BY 1, 2;
+
+-- 3. THE DECISIVE QUERY.
+--    EXPECT: the filtered slice only.
+--    If this errors with an external policy action denial, ownership chaining
+--    did NOT traverse the shortcut and the design does not decouple — escalate.
+--    If it returns unfiltered rows, the view predicate is not being applied.
+%{ for v in views ~}
+SELECT * FROM [dbo].[${v.name}];
+%{ endfor ~}
+
+-- 4. The DENY must hold.
+--    EXPECT: permission denied (Msg 373 / external policy action), NOT a row count.
+--    If this succeeds, the SQL permission model is not containing the user and
+--    the pattern is unsafe as drawn.
+%{ for v in views ~}
+SELECT COUNT(*) FROM [${shortcut_schema}].[${v.source_table}];
+%{ endfor ~}
