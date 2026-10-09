@@ -289,16 +289,16 @@ Create a OneLake shortcut to the landing container, then:
 )
 ```
 
-### Lakehouse — option B: Spark Structured Streaming with Auto Loader semantics
+### Lakehouse — option B: Spark Structured Streaming file source
 
-For continuously arriving files, use a streaming read with a checkpoint so each file is
-processed exactly once:
+For files arriving over time, use Fabric's built-in file source with a checkpoint. The
+checkpoint tracks source progress across runs; with a replayable source and Delta sink,
+Spark can recover without duplicating committed writes:
 
 ```python
 (
     spark.readStream
-         .format("cloudFiles")
-         .option("cloudFiles.format", "parquet")
+         .format("parquet")
          .load("Files/landing/orders/")
          .writeStream
          .option("checkpointLocation", "Files/_checkpoints/raw_order")
