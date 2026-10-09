@@ -37,6 +37,8 @@ DRIVER_CORES = 4
 DRIVER_MEM = "28g"
 EXEC_CORES = 8
 EXEC_MEM = "56g"
+PUBLISH_TIMEOUT_SECONDS = 600
+PUBLISH_POLL_INTERVAL_SECONDS = 5
 
 STARTER = {"name": "Starter Pool", "type": "Workspace",
            "id": "00000000-0000-0000-0000-000000000000"}
@@ -98,14 +100,14 @@ def token():
     return out.stdout.strip()
 
 
-def req(method, url, tok, body=None):
+def req(method, url, tok, body=None, timeout=None):
     data = json.dumps(body).encode() if body is not None else None
     r = urllib.request.Request(url, data=data, method=method)
     r.add_header("Authorization", f"Bearer {tok}")
     if data:
         r.add_header("Content-Type", "application/json")
     try:
-        resp = urllib.request.urlopen(r)
+        resp = urllib.request.urlopen(r, timeout=timeout)
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"{method} {url} -> {e.code}: {e.read().decode()[:600]}")
     txt = resp.read().decode()
@@ -121,12 +123,40 @@ def deploy():
         # 2) publish staging
         req("POST", f"{base}/staging/publish", tok)
         # 3) poll publish state
+        deadline = time.monotonic() + PUBLISH_TIMEOUT_SECONDS
+        last_response = None
         while True:
-            time.sleep(5)
-            _, e = req("GET", base, tok)
-            st = e.get("properties", {}).get("publishDetails", {}).get("state")
-            if st not in ("Running", "Waiting", None):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError(
+                    f"{env_id}: publish timed out; last response: {last_response!r}")
+            time.sleep(min(PUBLISH_POLL_INTERVAL_SECONDS, remaining))
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError(
+                    f"{env_id}: publish timed out; last response: {last_response!r}")
+            try:
+                _, e = req("GET", base, tok, timeout=remaining)
+            except TimeoutError as exc:
+                raise TimeoutError(
+                    f"{env_id}: publish timed out; last response: {last_response!r}") from exc
+            last_response = e
+            properties = e.get("properties") if isinstance(e, dict) else None
+            details = (properties.get("publishDetails")
+                       if isinstance(properties, dict) else None)
+            st = details.get("state") if isinstance(details, dict) else None
+            if not isinstance(st, str) or not st:
+                raise RuntimeError(
+                    f"{env_id}: invalid publish response: {e!r}")
+            if st == "Succeeded":
                 break
+            if st in ("Running", "Waiting"):
+                continue
+            if st in ("Failed", "Cancelled", "Canceled"):
+                raise RuntimeError(
+                    f"{env_id}: publish {st}: {e!r}")
+            raise RuntimeError(
+                f"{env_id}: invalid publish state {st!r}: {e!r}")
         print(f"{env_id}: executors={cfg['executors']} "
               f"(x{EXEC_CORES}c = {cfg['executors']*EXEC_CORES} worker vCores) "
               f"driver={DRIVER_CORES}c -> publish {st}")
