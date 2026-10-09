@@ -82,7 +82,7 @@ and Password are the preferred mappings.
 | --- | --- |
 | Connection ID | `airflow_config_sql` |
 | Connection type | `Fabric SQL notebook compute configuration` (`fabric_sql_config`) |
-| Host | Fabric Warehouse or SQL analytics endpoint server name (without `https://`) |
+| Host | Fabric Warehouse server name (without `https://`); a Lakehouse SQL analytics endpoint cannot host this configuration table |
 | Schema | Database/Warehouse name |
 | Login | Microsoft Entra application (client) ID |
 | Password | Client secret |
