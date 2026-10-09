@@ -113,8 +113,8 @@ variable "consumer_workspace_role" {
   default     = "Viewer"
 
   validation {
-    condition     = contains(["Viewer", "Contributor", "Member", "Admin"], var.consumer_workspace_role)
-    error_message = "consumer_workspace_role must be one of: Viewer, Contributor, Member, Admin."
+    condition     = var.consumer_workspace_role == "Viewer"
+    error_message = "consumer_workspace_role must be Viewer because elevated workspace roles can bypass the SQL permission model."
   }
 }
 
