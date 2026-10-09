@@ -28,6 +28,14 @@ find_replace:
         PROD: 00000000-0000-0000-0000-000000000000
       item_type: "Notebook"
 
+    # Warehouse attached to the SQL masking notebooks.
+    - find_value: "<warehouse-id>"
+      replace_value:
+        DEV: 00000000-0000-0000-0000-000000000000
+        QA: 00000000-0000-0000-0000-000000000000
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "Notebook"
+
     # Bronze lakehouse — raw source read by the Spark masking notebook.
     - find_value: "<bronze-lakehouse-id>"
       replace_value:
