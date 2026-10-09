@@ -31,3 +31,6 @@ fabric-cluster-start-time-service/func.excalidraw
 *.tfstate
 *.tfstate.backup
 .local/
+
+# Scratch/throwaway scripts
+.tmp_*

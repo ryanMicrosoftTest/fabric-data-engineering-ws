@@ -1,0 +1,66 @@
+/* =====================================================================
+   Post-deployment assertions.
+   Runs as the DEPLOYING identity, so it cannot prove the consumer's
+   experience — see README "What this cannot verify".
+   Raises on any structural failure.
+   ===================================================================== */
+
+SET NOCOUNT ON;
+
+/* --- 1. The shortcut schema enumerated at all -------------------------
+   A delegated (SPN) shortcut is silently never surfaced by a delegated-mode
+   endpoint. Absence here means the shortcut is the wrong type, not lag. */
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = N'${shortcut_schema}'
+)
+    THROW 50001, N'Shortcut schema not enumerated. Expected a passthrough OneLake shortcut; a delegated/SPN shortcut never surfaces in delegated endpoint mode. Metadata sync can also lag ~2 min after create.', 1;
+
+/* --- 2. Views exist --------------------------------------------------- */
+%{ for v in views ~}
+IF OBJECT_ID(N'[dbo].[${v.name}]', N'V') IS NULL
+    THROW 50002, N'Missing view dbo.${v.name}.', 1;
+%{ endfor ~}
+
+/* --- 3. Consuming principal exists ------------------------------------ */
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'${consumer_upn}')
+    THROW 50003, N'Consuming principal not present as a database user.', 1;
+
+/* --- 4. Exactly the intended permission shape -------------------------
+   Expected: CONNECT at database, SELECT on each view, DENY on the shortcut
+   schema. Anything else means something granted access out of band. */
+DECLARE @unexpected int;
+
+SELECT @unexpected = COUNT(*)
+FROM   sys.database_permissions dp
+JOIN   sys.database_principals  pr ON pr.principal_id = dp.grantee_principal_id
+LEFT   JOIN sys.objects o ON dp.class = 1 AND o.object_id = dp.major_id
+WHERE  pr.name = N'${consumer_upn}'
+  AND  NOT (dp.class = 0 AND dp.permission_name = 'CONNECT' AND dp.state_desc = 'GRANT')
+  AND  NOT (dp.class = 3 AND SCHEMA_NAME(dp.major_id) = N'${shortcut_schema}' AND dp.state_desc = 'DENY')
+  AND  NOT (dp.class = 1 AND dp.state_desc = 'GRANT' AND o.name IN (${view_name_list}));
+
+IF @unexpected > 0
+    THROW 50004, N'Consuming principal holds permissions beyond the intended set. Inspect sys.database_permissions before releasing this environment.', 1;
+
+/* --- 5. Ownership chain intact ----------------------------------------
+   If the view and its base tables resolve to different owners, chaining
+   breaks, the DENY in step 4 starts being evaluated, and the view fails
+   for the consumer while still looking correct to an admin. */
+DECLARE @broken int;
+
+SELECT @broken = COUNT(*)
+FROM   sys.views v
+JOIN   sys.schemas vs ON vs.schema_id = v.schema_id
+CROSS  APPLY (
+    SELECT TOP 1 s.principal_id
+    FROM   sys.schemas s
+    WHERE  s.name = N'${shortcut_schema}'
+) src
+WHERE  vs.name = N'dbo'
+  AND  v.name IN (${view_name_list})
+  AND  ISNULL(v.principal_id, vs.principal_id) <> ISNULL(src.principal_id, vs.principal_id);
+
+IF @broken > 0
+    THROW 50005, N'Ownership chain broken between dbo views and the shortcut schema. The consumer will get permission errors even though the grants look correct.', 1;
+
+SELECT N'OK - structure, permissions and ownership chain verified.' AS result;

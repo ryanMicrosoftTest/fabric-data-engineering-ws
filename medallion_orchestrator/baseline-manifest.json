@@ -1,0 +1,35 @@
+{
+  "workspace": {
+    "id": "896bca78-0d4a-4dc9-8716-05539ecf4ea5",
+    "displayName": "airflow-example-ws",
+    "capacityId": "ad343e36-f335-4ba3-b261-b739f7e950b0",
+    "capacityAssignmentProgress": "Completed",
+    "capacityRegion": "West US 3"
+  },
+  "item": {
+    "id": "3add6022-0759-47a1-ab32-2f038e8308f8",
+    "displayName": "medallion_orchestrator",
+    "type": "ApacheAirflowJob",
+    "description": "Airflow DAG orchestrating Bronze->Silver->Gold NYC taxi medallion notebooks"
+  },
+  "definitionParts": [
+    {
+      "path": ".platform",
+      "sha256": "8b6cb39d7841d0843a93d26e2abe134d3a9e54ba64c6e671aa82302695c93800"
+    },
+    {
+      "path": "apacheairflowjob-content.json",
+      "sha256": "3b8b57f04b94117e16b5ea38418842f86bea3116ccee76a60dfe86e3ceba3604"
+    },
+    {
+      "path": "dags/medallion_pipeline.py",
+      "sha256": "fbf854e65468db88ed5f90ec695a435dd5cb70ed0106c4828cd077ece517ab2f"
+    }
+  ],
+  "requirementsProjection": {
+    "source": "apacheairflowjob-content.json properties.typeProperties.airflowProperties.airflowRequirements",
+    "path": "requirements/requirements.txt",
+    "count": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
