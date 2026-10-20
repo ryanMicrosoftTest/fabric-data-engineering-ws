@@ -8,20 +8,20 @@
 -- META   },
 -- META   "dependencies": {
 -- META     "lakehouse": {
--- META       "default_lakehouse": "70e18f53-f14f-41bd-b3d0-8060d42c4909",
+-- META       "default_lakehouse": "<silver-lakehouse-id>",
 -- META       "default_lakehouse_name": "health_silver_lh",
--- META       "default_lakehouse_workspace_id": "a8cbda3d-903e-4154-97d9-9a91c95abb42",
+-- META       "default_lakehouse_workspace_id": "<workspace-id>",
 -- META       "known_lakehouses": [
 -- META         {
--- META           "id": "70e18f53-f14f-41bd-b3d0-8060d42c4909"
+-- META           "id": "<silver-lakehouse-id>"
 -- META         }
 -- META       ]
 -- META     },
 -- META     "warehouse": {
--- META       "default_warehouse": "bea89836-d75a-4946-b79b-b0e8a10d9c0b",
+-- META       "default_warehouse": "<warehouse-id>",
 -- META       "known_warehouses": [
 -- META         {
--- META           "id": "bea89836-d75a-4946-b79b-b0e8a10d9c0b",
+-- META           "id": "<warehouse-id>",
 -- META           "type": "Lakewarehouse"
 -- META         }
 -- META       ]
