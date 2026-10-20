@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "load_adls_to_fabric_shortcut_nb"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8e7969fd-927b-9544-487a-09047600ac73"
+  }
+}
