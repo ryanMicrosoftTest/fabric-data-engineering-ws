@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#
+# Shared pre-commit hook: block secrets and foreign-customer identifiers.
+#
+# Enable (per clone, one-time):   git config core.hooksPath .githooks
+# Bypass a single commit:         git commit --no-verify
+# Allowlist a specific line:      append   # pragma: allowlist secret
+#
+# Performance: scans the STAGED content of only the added/modified files in
+# this commit using a SINGLE `git grep --cached` pass (a handful of processes
+# total, not one-per-file), so runtime stays flat as the commit grows.
+#
+# Scope: (a) high-confidence secrets and (b) references to tenants/domains that
+# are NOT this environment's own MngEnvMCAP372892 demo tenant. Generic
+# synthetic PII (the de-identification sample data) is intentionally NOT blocked.
+
+set -u
+
+RED=$'\033[31m'; YEL=$'\033[33m'; RST=$'\033[0m'
+fail=0
+
+# --- Files that should never be committed (by name) ---------------------------
+FILENAME_BLOCK='(^|/)(do_not_commit|local\.settings\.json$|id_rsa$|.*\.(pfx|p12|pkcs12|pem|key)$)|(^|/)\.env(\.|$)'
+
+# --- High-confidence secret content patterns (PCRE) ---------------------------
+SECRET_PATTERNS=(
+  '-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----'
+  'AccountKey=[A-Za-z0-9+/]{40,}={0,2}'
+  'SharedAccessKey=[A-Za-z0-9+/]{20,}={0,2}'
+  '[?&]sig=[A-Za-z0-9%]{20,}'
+  'eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{10,}'
+  'AKIA[0-9A-Z]{16}'
+  'gh[pousr]_[A-Za-z0-9]{30,}'
+  'xox[baprs]-[A-Za-z0-9-]{10,}'
+  'sk-[A-Za-z0-9]{20,}'
+  '(?i)(client_secret|api[_-]?key|password|passwd|pwd)\s*[:=]\s*["'"'"'][^"'"'"'$<{][^"'"'"']{10,}["'"'"']'
+)
+
+# --- Foreign tenant / customer signals ----------------------------------------
+FOREIGN_TENANT='[A-Za-z0-9-]+\.onmicrosoft\.com'
+OWN_TENANT='mngenvmcap372892'
+
+# Only the files added/modified in THIS commit.
+mapfile -t files < <(git diff --cached --name-only --diff-filter=ACM)
+[ "${#files[@]}" -eq 0 ] && exit 0
+
+# 1) Filename blocklist — single grep over the file list.
+badnames=$(printf '%s\n' "${files[@]}" | grep -Pi -e "$FILENAME_BLOCK" || true)
+if [ -n "$badnames" ]; then
+  printf '%s BLOCKED (do-not-commit filename):%s\n' "$RED" "$RST"
+  printf '%s\n' "$badnames" | sed 's/^/    /'
+  fail=1
+fi
+
+# Build -e args for the secret patterns.
+secret_args=()
+for pat in "${SECRET_PATTERNS[@]}"; do secret_args+=(-e "$pat"); done
+
+# 2) Secrets — ONE git grep pass over staged content of the changed files.
+#    git grep skips binary files automatically (-I); strip allowlisted lines.
+secret_hits=$(git grep --cached -nP -I "${secret_args[@]}" -- "${files[@]}" 2>/dev/null \
+              | grep -v 'pragma: allowlist secret' || true)
+if [ -n "$secret_hits" ]; then
+  printf '%s BLOCKED (possible secret):%s\n' "$RED" "$RST"
+  printf '%s\n' "$secret_hits" | sed 's/^/    /'
+  fail=1
+fi
+
+# 3) Foreign tenant — ONE git grep pass, then drop our own tenant + allowlisted.
+foreign_hits=$(git grep --cached -nPiI -e "$FOREIGN_TENANT" -- "${files[@]}" 2>/dev/null \
+               | grep -vi "$OWN_TENANT" \
+               | grep -v 'pragma: allowlist secret' || true)
+if [ -n "$foreign_hits" ]; then
+  printf '%s BLOCKED (foreign tenant/customer domain):%s\n' "$YEL" "$RST"
+  printf '%s\n' "$foreign_hits" | sed 's/^/    /'
+  fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo ""
+  printf '%sCommit blocked by .githooks/pre-commit.%s\n' "$RED" "$RST"
+  echo "Remove the flagged secret/customer reference, or if it is a false positive:"
+  echo "  - append  # pragma: allowlist secret  to the specific line, or"
+  echo "  - re-run with  git commit --no-verify  to bypass this check."
+  exit 1
+fi
+
+exit 0

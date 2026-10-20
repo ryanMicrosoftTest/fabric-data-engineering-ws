@@ -39,7 +39,7 @@ def workspace_sub_orchestrator(context: df.DurableOrchestrationContext):
     level0_results = yield context.task_all(level0_tasks)
 
     notebook_items_result = level0_results[1] if len(level0_results) > 1 else {}
-    notebook_ids = []
+    notebook_ids: list[str] = []
     if isinstance(notebook_items_result, dict):
         notebook_ids = notebook_items_result.get("notebook_ids") or []
 
@@ -51,7 +51,7 @@ def workspace_sub_orchestrator(context: df.DurableOrchestrationContext):
     level1_results = yield context.task_all(level1_tasks)
 
     job_instances_result = level1_results[1] if len(level1_results) > 1 else {}
-    livy_ids = []
+    livy_ids: list[str] = []
     if isinstance(job_instances_result, dict):
         livy_ids = job_instances_result.get("livy_session_ids") or []
 

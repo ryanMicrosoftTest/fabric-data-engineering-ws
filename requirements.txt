@@ -1,4 +1,4 @@
 azure-identity>=1.13.0
 azure-keyvault-secrets>=4.7.0
 pyyaml>=6.0
-fabric-cicd
+fabric-cicd>=0.3.1,<2

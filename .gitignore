@@ -30,3 +30,4 @@ fabric-cluster-start-time-service/func.excalidraw
 **/.terraform/
 *.tfstate
 *.tfstate.backup
+.local/

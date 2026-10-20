@@ -9,6 +9,38 @@ The framework leverages this project here: https://github.com/microsoft/fabric-c
 - Keep team-specific assets (notebooks, lakehouses, etc.) separated from pipeline/framework code.
 - Enforce consistent structure and configuration across environments (DEV/QA/PROD).
 
+## Table of Contents
+
+Documentation and guides across this repository:
+
+### Guides & Reference
+- [Spark Best Practices](docs/spark-best-practices/spark-best-practices.md)
+- [OneLake Security](fabric_onelake_security.md)
+- [Fabric VNet Setup](fabric-vnet-setup.md)
+- [Lakehouse Migration](fabric-lakehouse-migration/lakehouse-migration.md)
+- [Dynamic Data Masking — Example Overview](dynamic-data-masking/ddm_example_overview.md)
+- [Optimize Fabric Data Agent](fabric_data_agent/optimize_fabric_data_agent.md)
+
+### Services & Components
+- [Cluster Start-Time Service — README](fabric-cluster-start-time-service/README.md)
+- [Cluster Start-Time Service — Overview](fabric-cluster-start-time-service/overview.md)
+- [Cluster Start-Time Service — Function App IaC](fabric-cluster-start-time-service/iac/function_app/README.md)
+- [Private Link Service — Scaling](fabric-privatelink-service/fabric-privatelink-scaling.md)
+- [Private Link Service — Manual Build](fabric-privatelink-service/fabric-privatelink-service-build-manual/README.md)
+- [Private Link Service — Pipeline Build](fabric-privatelink-service/fabric-privatelink-service-build-pipeline-complete/README.md)
+- [OneLake Security Role Service — README](onelake-security-role-service/docs/onelake-security-role-service-README.md)
+- [OneLake Security Role Service — Pipeline Setup](onelake-security-role-service/pipeline/pipeline-setup-guide.md)
+- [IaC Scripts](scripts/iac/README.md)
+- [Fabric Items](fabric_items/Readme.md)
+
+### Project & Governance
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Copilot Policy](copilot-policy.md)
+- [Disclaimer](DISCLAIMER.md)
+- [License](LICENSE.md)
+- [Security](SECURITY.md)
+- [Support](SUPPORT.md)
+
 ## Repository Structure
 ```
 .
@@ -447,6 +479,14 @@ create alerts and perform analytics.
 YAML-driven management of OneLake data access roles for Microsoft Fabric lakehouses. Role definitions and user-to-role mappings are authored as declarative YAML files, checked into Git, and applied to lakehouses on a schedule by two thin Fabric notebooks that wrap a shared Python library (`onelake_security`). The library handles parsing, validation, translation to the Fabric REST API shape, ETag-based concurrency, idempotent reconciliation, and audit logging — so role structure (RLS / CLS / table scope) and role membership are managed independently, are version-controlled, and are safe to re-run daily without side effects.
 
 See the full design, module breakdown, and operational guidance: [onelake-security-role-service/docs/onelake-security-role-service-README.md](onelake-security-role-service/docs/onelake-security-role-service-README.md)
+
+
+
+### Pull Databricks Data into Fabric
+
+Zero-copy access to Databricks Unity Catalog data from Microsoft Fabric — no ETL, no duplication. A catalog in Databricks is surfaced in Fabric as a **Mirrored Azure Databricks Catalog** artifact, which creates OneLake shortcuts to the selected tables rather than copying the underlying data. From there the mirrored tables behave like native Fabric items: OneLake security (RLS / CLS) can be layered on, sensitivity labels applied, and the data queried through the SQL analytics endpoint or from notebooks — all while the source of truth stays in Databricks. The same pattern works in reverse, letting Databricks clients read from Fabric servers.
+
+See the step-by-step walkthrough with screenshots: [fabric-databricks-together/overview.md](fabric-databricks-together/overview.md)
 
 
 

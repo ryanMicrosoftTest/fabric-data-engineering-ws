@@ -53,12 +53,13 @@ key_value_replace:
 find_replace:
     # 'Load Customer Data' DataPipeline - source Lakehouse 'new_wwi_lakehouse' artifactId
     # Hardcoded ID in pipeline-content.json points at a workspace that isn't the deployment target.
-    # QA/PROD targets do not yet have new_wwi_lakehouse; placeholder GUIDs are used so publish
-    # to those envs will fail clearly until the resource is created.
+    # DEV and QA now have new_wwi_lakehouse, so they map to the real per-env GUID. PROD does
+    # not yet have the resource; the placeholder GUID is kept so publish to PROD fails clearly
+    # until the resource is created.
     - find_value: d443a54c-07db-9424-42c4-9b907d0dfe91
       replace_value:
         DEV: 6fae42ab-a6f2-4e7e-bd44-3497e4efbea9
-        QA: 00000000-0000-0000-0000-000000000000
+        QA: 3afd6a1b-260c-4697-9dd6-2a25d0db6754
         PROD: 00000000-0000-0000-0000-000000000000
       item_type: "DataPipeline"
       item_name: "Load Customer Data"
@@ -67,7 +68,7 @@ find_replace:
     - find_value: faf57c49-8a74-49aa-8e3b-8ccb7390d403
       replace_value:
         DEV: dd862a4c-1795-41b3-90b8-529605120e66
-        QA: 00000000-0000-0000-0000-000000000000
+        QA: e54ca12b-5948-4f86-8197-7ff1e0fa6eac
         PROD: 00000000-0000-0000-0000-000000000000
       item_type: "DataPipeline"
       item_name: "Load Customer Data"
@@ -98,10 +99,42 @@ find_replace:
     - find_value: ftykynmhjpteverb75ok7vbqwq-hxnmxkb6sbkedf6ztki4swv3ii.datawarehouse.fabric.microsoft.com
       replace_value:
         DEV: ftykynmhjpteverb75ok7vbqwq-bze7y6s7cewepiqfc7oguw7oki.datawarehouse.fabric.microsoft.com
-        QA: placeholder.datawarehouse.fabric.microsoft.com
+        QA: ftykynmhjpteverb75ok7vbqwq-gumosksg5iwerbswcq3cjfpbs4.datawarehouse.fabric.microsoft.com
         PROD: placeholder.datawarehouse.fabric.microsoft.com
       item_type: "DataPipeline"
       item_name: "Load Customer Data"
+
+    # 'internal_lookup_pl' DataPipeline - Lookup activities reference same-workspace lakehouses
+    # by a Ryan-Dev artifactId (stored byte-swapped) plus an all-zero workspaceId. Neither the
+    # artifactId nor the all-zero workspace exists in the deploy targets, so Fabric falls back to
+    # resolving the lakehouse by NAME and matches both the Lakehouse and its auto-created
+    # SQLEndpoint -> "Sequence contains more than one element". Pin the real per-env GUIDs.
+    # DEV/QA have the lakehouses; PROD does not yet, so its artifactIds stay all-zero to fail
+    # clearly until the resources are created. The cross-workspace Lookup (workspace
+    # 3f5b5f79...) is intentional and left untouched.
+    - find_value: e49e6b1e-93d8-8e8e-4705-9600510faf59
+      replace_value:
+        DEV: 148ceeea-77bf-4db0-af5b-3fef82c303ca
+        QA: 81cef6dd-d27f-4b31-afad-bfadfcf03f67
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "DataPipeline"
+      item_name: "internal_lookup_pl"
+
+    - find_value: 092aa482-e6d2-9a33-44c7-ada294229b35
+      replace_value:
+        DEV: 0d3ad783-510f-4bca-81ad-0f488b8cfc00
+        QA: 67da07a1-0af1-4dce-a3e7-cdcd85877392
+        PROD: 00000000-0000-0000-0000-000000000000
+      item_type: "DataPipeline"
+      item_name: "internal_lookup_pl"
+
+    - find_value: "00000000-0000-0000-0000-000000000000"
+      replace_value:
+        DEV: 7afc490e-115f-472c-a205-17dc6a5bee52
+        QA: 2ae91835-ea46-482c-8656-14362495e197
+        PROD: a6b1cec3-e135-4f9d-9c5c-5d69ade74dd1
+      item_type: "DataPipeline"
+      item_name: "internal_lookup_pl"
 
 
 # spark_pool:
@@ -113,3 +146,47 @@ find_replace:
 #     "e7b8f1c4-4a6e-4b8b-9b2e-8f1e5d6a9c3d":
 #         type: "Workspace"
 #         name: "WorkspacePool_Medium"
+
+# Custom Spark instance pools are workspace-scoped: each workspace assigns its own
+# GUID even when the pool name/spec is identical. The *.Environment Sparkcompute.yml
+# files pin the GUIDs from the source "Ryan Development Workspace"
+# (a8cbda3d-903e-4154-97d9-9a91c95abb42). The matching named pools have been created
+# in every deployment target (devops-dev, devops-test, devops-prod), so each source
+# GUID is remapped to the equivalent pool *by name* at deploy time.
+spark_pool:
+    # medium-as-1-7 (used by xxlarge/xlarge/large/medium_as_* environments)
+    - instance_pool_id: "83dd8cff-c63d-4083-912c-28382bd0e0de"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "medium-as-1-7"
+        QA:
+          type: "Workspace"
+          name: "medium-as-1-7"
+        PROD:
+          type: "Workspace"
+          name: "medium-as-1-7"
+    # small-as-1-10 (used by small_as_1_10_env and onelake_security_utils)
+    - instance_pool_id: "87c1e4fc-1d30-4eb3-8017-faff1bea1578"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "small-as-1-10"
+        QA:
+          type: "Workspace"
+          name: "small-as-1-10"
+        PROD:
+          type: "Workspace"
+          name: "small-as-1-10"
+    # 10_md_pool (used by presidio-env)
+    - instance_pool_id: "8b573cc2-e81c-415b-9cdb-b55d68426bd9"
+      replace_value:
+        DEV:
+          type: "Workspace"
+          name: "10_md_pool"
+        QA:
+          type: "Workspace"
+          name: "10_md_pool"
+        PROD:
+          type: "Workspace"
+          name: "10_md_pool"
