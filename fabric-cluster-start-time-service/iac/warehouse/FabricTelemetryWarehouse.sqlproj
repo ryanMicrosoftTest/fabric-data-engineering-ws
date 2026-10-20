@@ -6,6 +6,7 @@
     <DefaultCollation>Latin1_General_100_BIN2_UTF8</DefaultCollation>
     <ModelCollation>1033, CI</ModelCollation>
     <ValidateCasingOnIdentifiers>False</ValidateCasingOnIdentifiers>
+    <ProjectGuid>{00000000-0000-0000-0000-000000000000}</ProjectGuid>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
