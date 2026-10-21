@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -43,10 +43,10 @@ def test_backfill_request_with_workspaces():
 def test_collector_run_context():
     ctx = CollectorRunContext(
         collector_run_id="cr-1",
-        run_started_at=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        run_started_at=datetime(2024, 1, 1, tzinfo=UTC),
         target_workspace_ids=["ws-1"],
         from_watermark=None,
-        to_watermark=datetime(2024, 1, 2, tzinfo=timezone.utc),
+        to_watermark=datetime(2024, 1, 2, tzinfo=UTC),
     )
     assert ctx.collector_run_id == "cr-1"
 
@@ -55,7 +55,7 @@ def test_workspace_collect_input():
     inp = WorkspaceCollectInput(
         collector_run_id="cr-1",
         workspace_id="ws-1",
-        to_watermark=datetime(2024, 1, 2, tzinfo=timezone.utc),
+        to_watermark=datetime(2024, 1, 2, tzinfo=UTC),
     )
     assert inp.from_watermark is None
 

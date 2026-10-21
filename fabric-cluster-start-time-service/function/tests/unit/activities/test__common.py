@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,7 +16,7 @@ def test_build_row_shape_and_timestamp():
     assert row["notebook_id"] == "n1"
     assert row["collector_run_id"] == "run-x"
     assert isinstance(row["ingested_at"], datetime)
-    assert row["ingested_at"].tzinfo is timezone.utc
+    assert row["ingested_at"].tzinfo is UTC
     assert '"id": "n1"' in row["raw_payload"]
     assert '"name": "Notebook"' in row["raw_payload"]
 
@@ -24,7 +24,7 @@ def test_build_row_shape_and_timestamp():
 def test_build_row_serializes_non_json_types():
     from activities import _common as mod
 
-    payload = {"when": datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone.utc)}
+    payload = {"when": datetime(2024, 1, 2, 3, 4, 5, tzinfo=UTC)}
     row = mod.build_row(payload, {"workspace_id": "w"}, "r")
     assert "2024-01-02" in row["raw_payload"]
 

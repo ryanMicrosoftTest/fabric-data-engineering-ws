@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
 from shared.watermarks import read_watermark, update_watermark
@@ -22,7 +22,7 @@ def test_read_watermark_returns_none_when_missing():
 
 def test_read_watermark_returns_value():
     writer, cursor = _writer_with_cursor()
-    dt = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    dt = datetime(2024, 1, 1, tzinfo=UTC)
     cursor.fetchone.return_value = (dt,)
     result = read_watermark(writer, "spark_apps", "ws-1")
     assert result == dt
@@ -39,7 +39,7 @@ def test_read_watermark_workspace_none_uses_is_null():
 def test_update_watermark_updates_when_existing():
     writer, cursor = _writer_with_cursor()
     cursor.rowcount = 1
-    update_watermark(writer, "spark_apps", "ws-1", datetime(2024, 1, 2, tzinfo=timezone.utc), "cr-1")
+    update_watermark(writer, "spark_apps", "ws-1", datetime(2024, 1, 2, tzinfo=UTC), "cr-1")
     # Only one execute call (UPDATE succeeded)
     assert cursor.execute.call_count == 1
     sql = cursor.execute.call_args_list[0].args[0]
@@ -49,7 +49,7 @@ def test_update_watermark_updates_when_existing():
 def test_update_watermark_inserts_when_missing():
     writer, cursor = _writer_with_cursor()
     cursor.rowcount = 0
-    update_watermark(writer, "spark_apps", "ws-1", datetime(2024, 1, 2, tzinfo=timezone.utc), "cr-1")
+    update_watermark(writer, "spark_apps", "ws-1", datetime(2024, 1, 2, tzinfo=UTC), "cr-1")
     assert cursor.execute.call_count == 2
     update_sql = cursor.execute.call_args_list[0].args[0]
     insert_sql = cursor.execute.call_args_list[1].args[0]
@@ -60,7 +60,7 @@ def test_update_watermark_inserts_when_missing():
 def test_update_watermark_workspace_none():
     writer, cursor = _writer_with_cursor()
     cursor.rowcount = 0
-    update_watermark(writer, "global", None, datetime(2024, 1, 2, tzinfo=timezone.utc), "cr-1")
+    update_watermark(writer, "global", None, datetime(2024, 1, 2, tzinfo=UTC), "cr-1")
     update_sql = cursor.execute.call_args_list[0].args[0]
     assert "workspace_id IS NULL" in update_sql
     insert_sql = cursor.execute.call_args_list[1].args[0]

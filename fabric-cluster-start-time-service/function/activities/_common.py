@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
@@ -49,9 +49,9 @@ def build_row(payload: dict, key_values: dict, collector_run_id: str) -> dict:
         **key_values,
         "raw_payload": json.dumps(payload, default=str),
         "collector_run_id": collector_run_id,
-        "ingested_at": datetime.now(timezone.utc),
+        "ingested_at": datetime.now(UTC),
     }
 
 
 def now_ms() -> int:
-    return int(datetime.now(timezone.utc).timestamp() * 1000)
+    return int(datetime.now(UTC).timestamp() * 1000)
