@@ -25,6 +25,9 @@ The pipeline runs as a single multi-stage build:
 4. **FunctionDeploy** — `func azure functionapp publish ... --python --build remote`
 5. **Smoke** — `GET /api/health` on the deployed Function App with retries
 
+Ruff is pinned to `0.17.0` in the pipeline and explicitly targets Python 3.13
+in `function/pyproject.toml`. Update the pin deliberately when upgrading Ruff.
+
 `FunctionDeploy` runs whenever `InfraDeploy` and `WarehouseDeploy` either
 succeeded or were skipped, so code-only redeploys are supported by setting
 both `skipInfra=true` and `skipWarehouse=true` when queueing.

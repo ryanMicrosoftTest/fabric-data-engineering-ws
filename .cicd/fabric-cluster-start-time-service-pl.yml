@@ -144,7 +144,7 @@ stages:
             set -euo pipefail
             python -m pip install --upgrade pip
             pip install -r requirements.txt
-            pip install ruff black mypy pytest pytest-asyncio pytest-mock pytest-cov httpx freezegun
+            pip install ruff==0.17.0 black mypy pytest pytest-asyncio pytest-mock pytest-cov httpx freezegun
           workingDirectory: $(funcRoot)
           displayName: 'Install Python dependencies'
 
