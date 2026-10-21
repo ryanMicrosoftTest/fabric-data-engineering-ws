@@ -12,3 +12,7 @@ mapping:
       - object_id: "662b14b6-a936-46b0-bde0-9f4d759dc46e"
         display_name: "Dr. Antionette Klerkx"
         object_type: User
+
+      - object_id: "ab6dc298-6ad2-449f-944b-e6c1c759e586"
+        display_name: "fabric_cohort_identity_spn"
+        object_type: ServicePrincipal

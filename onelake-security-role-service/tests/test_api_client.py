@@ -175,8 +175,63 @@ class TestRetryOn429:
             client.list_roles("ws", "item")
 
 
+class TestWorkspaceRoleAssignments:
+    """Workspace-level Admin/Member/Contributor/Viewer grants."""
+
+    @patch("onelake_security.api_client.requests.get")
+    def test_returns_assignments(self, mock_get):
+        mock_get.return_value = _mock_response(200, {"value": [{"role": "Admin"}]})
+
+        client = OneLakeSecurityClient(api_token="token")
+        assignments = client.list_workspace_role_assignments("ws-1")
+
+        assert assignments == [{"role": "Admin"}]
+        assert mock_get.call_args.args[0].endswith("/workspaces/ws-1/roleAssignments")
+
+    @patch("onelake_security.api_client.requests.get")
+    def test_follows_continuation_token(self, mock_get):
+        mock_get.side_effect = [
+            _mock_response(200, {
+                "value": [{"role": "Admin"}], "continuationToken": "tok-1"
+            }),
+            _mock_response(200, {"value": [{"role": "Viewer"}]}),
+        ]
+
+        client = OneLakeSecurityClient(api_token="token")
+        assignments = client.list_workspace_role_assignments("ws-1")
+
+        assert len(assignments) == 2
+        assert mock_get.call_args.kwargs["params"] == {"continuationToken": "tok-1"}
+
+    @patch("onelake_security.api_client.requests.get")
+    def test_raises_on_error(self, mock_get):
+        error = _mock_response(403)
+        error.raise_for_status.side_effect = Exception("forbidden")
+        mock_get.return_value = error
+
+        client = OneLakeSecurityClient(api_token="token")
+        with pytest.raises(Exception, match="forbidden"):
+            client.list_workspace_role_assignments("ws-1")
+
+    @patch("onelake_security.api_client.requests.get")
+    def test_get_workspace_returns_payload(self, mock_get):
+        mock_get.return_value = _mock_response(200, {"displayName": "healthcare_ws"})
+
+        client = OneLakeSecurityClient(api_token="token")
+
+        assert client.get_workspace("ws-1")["displayName"] == "healthcare_ws"
+
+    @patch("onelake_security.api_client.requests.get")
+    def test_get_workspace_is_non_fatal(self, mock_get):
+        """A missing name must not sink an otherwise valid audit."""
+        mock_get.return_value = _mock_response(403)
+
+        client = OneLakeSecurityClient(api_token="token")
+
+        assert client.get_workspace("ws-1") == {}
+
+
 class TestClientConstruction:
-    """Client initialization and configuration."""
 
     def test_requires_api_token(self):
         with pytest.raises(ValueError, match="api_token"):

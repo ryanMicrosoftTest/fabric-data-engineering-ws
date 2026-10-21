@@ -59,6 +59,47 @@ class OneLakeSecurityClient:
         roles = resp.json().get("value", [])
         return roles, etag
 
+    def get_workspace(self, workspace_id: str) -> dict:
+        """GET workspace metadata (name, capacity, description).
+
+        Returns:
+            The workspace payload, or an empty dict if it cannot be read.
+        """
+        resp = self._get_with_retry(f"{self.base_url}/workspaces/{workspace_id}")
+        if resp.status_code >= 400:
+            return {}
+        return resp.json()
+
+    def list_workspace_role_assignments(self, workspace_id: str) -> list[dict]:
+        """GET every workspace-level role assignment, following pagination.
+
+        These are the Admin / Member / Contributor / Viewer grants on the
+        workspace itself — a separate access plane from the OneLake data
+        access roles returned by `list_roles`.
+
+        Returns:
+            List of role assignment payloads.
+
+        Raises:
+            requests.HTTPError: If the API rejects the request.
+        """
+        url = f"{self.base_url}/workspaces/{workspace_id}/roleAssignments"
+        assignments: list[dict] = []
+        params: dict = {}
+
+        while True:
+            resp = self._get_with_retry(url, params=params)
+            if resp.status_code >= 400:
+                resp.raise_for_status()
+
+            payload = resp.json()
+            assignments.extend(payload.get("value") or [])
+
+            token = payload.get("continuationToken")
+            if not token:
+                return assignments
+            params = {"continuationToken": token}
+
     def put_roles(
         self,
         workspace_id: str,
@@ -128,11 +169,11 @@ class OneLakeSecurityClient:
             "Content-Type": "application/json",
         }
 
-    def _get_with_retry(self, url: str) -> requests.Response:
+    def _get_with_retry(self, url: str, params: Optional[dict] = None) -> requests.Response:
         """GET with 429 retry logic."""
         headers = self._auth_headers()
         for attempt in range(self.max_retries + 1):
-            resp = requests.get(url, headers=headers)
+            resp = requests.get(url, headers=headers, params=params)
             if resp.status_code != 429:
                 return resp
             if attempt < self.max_retries:

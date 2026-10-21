@@ -1,0 +1,1 @@
+# The recovery DAG is self-contained and uses only packages provided by the runtime.

@@ -63,12 +63,15 @@ The medallion flow shown in the diagram and referenced in the notebooks:
 | Silver | `health_silver_lh`  | 1:1 cleansed copies (`healthDB_silver_pl` pipeline)        |
 | Serve  | Warehouse           | SQL endpoint where views + roles enforce masking            |
 
-**Warehouse / lakehouse identifiers** (from notebook metadata):
+**Warehouse / lakehouse identifiers**
 
-- Default warehouse (Lakewarehouse): `bea89836-d75a-4946-b79b-b0e8a10d9c0b`
-- Silver lakehouse `health_silver_lh`: `70e18f53-f14f-41bd-b3d0-8060d42c4909`
-- Bronze lakehouse: `d550d915-f3a8-418b-b3f4-c2cb369838c3`
-- Workspace: `a8cbda3d-903e-4154-97d9-9a91c95abb42`
+Item IDs are environment-specific and are held as placeholders in the notebooks
+(`<workspace-id>`, `<silver-lakehouse-id>`, `<bronze-lakehouse-id>`). See
+[`README.md`](README.md) for how to find and set them for your own environment.
+
+> **Note:** the serve layer in the delivered examples is the **SQL analytics endpoint** of
+> `health_silver_lh`, not a separate Warehouse item. Native DDM applies to both — see
+> [`ms_learn_reconciliation.md`](ms_learn_reconciliation.md) §1.
 
 **Table schemas** (from the diagram):
 
@@ -160,8 +163,8 @@ Steps in the notebook:
 
 2. **Create a masking function** `sec.fn_mask_ssn(@ssn)` that returns
    `XXX-XX-<last 4 digits>`.
-   *Note: in the current notebook this function is defined but the view inlines the same
-   logic rather than calling it — so the function is currently unused.*
+   *The view calls this function, so the mask format is defined in exactly one place and the
+   view supplies only the row-level condition.*
 
 3. **Create the masked view** `sec.vw_employee_masked` that conditionally masks the SSN:
 
@@ -169,10 +172,11 @@ Steps in the notebook:
    CREATE OR ALTER VIEW sec.vw_employee_masked AS
    SELECT employee.id,
           employee.first_name,
+          employee.last_name,
           CASE
             WHEN EXISTS (SELECT 1 FROM student
                          WHERE student.social_security_number = employee.social_security_number)
-              THEN CONCAT('XXX-XX-', RIGHT(employee.social_security_number, 4))
+              THEN sec.fn_mask_ssn(employee.social_security_number)
             ELSE employee.social_security_number
           END AS social_security_number
    FROM employee;
@@ -187,10 +191,12 @@ Steps in the notebook:
    DENY  SELECT ON OBJECT::dbo.student            TO maskedReaders;
    ```
 
-5. **Add members** to the role:
+5. **Add the Entra security group** to the role, so membership is managed in Entra ID rather
+   than in T-SQL:
 
    ```sql
-   ALTER ROLE maskedReaders ADD MEMBER [adf_user_2@MngEnvMCAP372892.onmicrosoft.com];
+   CREATE USER [<masked-readers-group>] FROM EXTERNAL PROVIDER;
+   ALTER ROLE maskedReaders ADD MEMBER [<masked-readers-group>];
    ```
 
 **Why the DENY grants matter:** the mask lives only in the view. If a `maskedReaders`
@@ -228,16 +234,19 @@ permissions — no duplicate tables, no views:
 
 | Persona               | Sees                                   | Why                                          |
 |-----------------------|----------------------------------------|----------------------------------------------|
-| System Administrator  | Full `social_security_number`          | Admins/owners have **implicit `UNMASK`**     |
-| `adf_user_2`          | Full `social_security_number`          | Explicitly granted **`UNMASK`**              |
-| Dr. Klerx             | Last 4 digits only (`XXX-XX-####`)     | No `UNMASK` → sees the `partial()` mask       |
+| Workspace admin/owner | Full `social_security_number`          | Admins/owners have **implicit `UNMASK`**     |
+| Unmasked Reader       | Full `social_security_number`          | Explicitly granted **`UNMASK`**              |
+| Masked Reader         | Last 4 digits only (`XXX-XX-####`)     | No `UNMASK` → sees the `partial()` mask       |
 
 ### Key mechanics
 
-- **`GRANT UNMASK`** (not `DENY SELECT`) controls who sees real values:
+- **`GRANT UNMASK`** (not `DENY SELECT`) controls who sees real values. Grant to an **Entra
+  security group** at the narrowest useful scope:
 
   ```sql
-  GRANT UNMASK TO [adf_user_2@MngEnvMCAP372892.onmicrosoft.com];
+  CREATE USER [<unmask-group>] FROM EXTERNAL PROVIDER;
+  GRANT SELECT ON OBJECT::dbo.employee TO [<unmask-group>];
+  GRANT UNMASK ON dbo.employee(social_security_number) TO [<unmask-group>];
   ```
 
 - **`UNMASK` is layered on top of `SELECT`** — it only affects *how* masked columns
@@ -291,11 +300,35 @@ this folder, the view-and-role pattern is necessary.
 
 | File                                            | Purpose                                              |
 |-------------------------------------------------|------------------------------------------------------|
+| `README.md`                                     | Start here — prerequisites, configuration, run and verify steps |
+| `ddm_security_posture.md`                       | Security posture one-pager: limitations, access-path coverage, layering with RLS/CLS/OneLake |
+| `ms_learn_reconciliation.md`                    | Documented product behaviour vs. this code; feature vs. custom code |
+| `conditional_masking_walkthrough.md`            | Approach 1 walkthrough, performance and maintainability analysis |
+| `native_masking_walkthrough.md`                 | Approach 2 walkthrough and Entra group model         |
 | `data-masking-fabric.excalidraw`                | Conditional-masking scenario whiteboard (Approach 1) |
 | `data_masking_spark_files_nb.Notebook`          | Spark-based conditional masking on the data itself   |
 | `tsql_data_mask_ssn_nb.Notebook`                | SQL-endpoint conditional masking via view + role + DENY |
 | `ddm-native-example.excalidraw`                 | Native DDM scenario whiteboard (Approach 2)          |
 | `tsql_native_ddm_ssn_nb.Notebook`               | Native DDM (`ADD MASKED WITH` + `GRANT UNMASK`)      |
+| `parameter.yml`                                 | Optional fabric-cicd environment rebinding           |
 | `images/image-of-employee-table-from-masked-user.png`   | Masked user's view of `dbo.employee`         |
 | `images/image-of-employee-table-from-unmasked-user.png` | Unmasked user's view of `dbo.employee`       |
 | `ddm_example_overview.md`                       | This overview document                               |
+
+---
+
+## 8. Security Scope — Read Before Adopting
+
+Neither approach in this folder is a security boundary on its own:
+
+- **Native DDM and the masked view apply to the T-SQL surface only.** Spark, OneLake
+  shortcuts, and Direct Lake semantic models read the underlying Delta files **unmasked**.
+- **Masked values are inferable** through range predicates, joins, ordering, and aggregation
+  by any principal holding `SELECT`.
+- **Workspace Admin, Member, and Contributor always see real values** — masking cannot be
+  verified from an administrative session.
+- Only the **Spark method (4.1)** covers every access path, because it changes the persisted
+  data — at the cost of maintaining masked and unmasked copies.
+
+For regulated data, layer DDM with column-level security, row-level security, and OneLake
+data access roles. Full analysis: [`ddm_security_posture.md`](ddm_security_posture.md).
