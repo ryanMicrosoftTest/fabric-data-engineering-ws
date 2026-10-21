@@ -1,0 +1,14 @@
+[
+  {
+    "name": "patient_data",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "0ba27eeb-e130-4d6c-8207-aeb71efddd21",
+        "location": "https://healthsaadlsrheus.dfs.core.windows.net",
+        "subpath": "/healthdata/input/vcu-excel-poc-202/patient_data"
+      }
+    }
+  }
+]

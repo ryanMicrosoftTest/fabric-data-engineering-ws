@@ -7,7 +7,7 @@ unit tests can run on machines without ODBC drivers installed.
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -112,13 +112,13 @@ def mock_durable_context():
     ctx.call_activity = MagicMock()
     ctx.call_sub_orchestrator = MagicMock()
     ctx.task_all = MagicMock(side_effect=lambda tasks: list(tasks))
-    ctx.current_utc_datetime = datetime(2024, 1, 15, 10, 0, 0, tzinfo=timezone.utc)
+    ctx.current_utc_datetime = datetime(2024, 1, 15, 10, 0, 0, tzinfo=UTC)
     return ctx
 
 
 @pytest.fixture
 def frozen_now(monkeypatch):
-    fixed = datetime(2024, 1, 15, 10, 0, 0, tzinfo=timezone.utc)
+    fixed = datetime(2024, 1, 15, 10, 0, 0, tzinfo=UTC)
 
     class _FixedDT(datetime):
         @classmethod

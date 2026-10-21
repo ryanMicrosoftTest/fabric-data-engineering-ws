@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 
@@ -33,7 +33,7 @@ def update_watermarks(payload: dict) -> dict:
     cri = payload["collector_run_id"]
     workspace_id = payload.get("workspace_id")
     logger = configure_logging(collector_run_id=cri)
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     now = started
     settings = get_settings()
     credential = _get_credential(settings)
@@ -45,14 +45,14 @@ def update_watermarks(payload: dict) -> dict:
                 current_source = src
                 update_watermark(wh, src, workspace_id, now, cri)
                 updated += 1
-        duration_ms = int((datetime.now(timezone.utc) - started).total_seconds() * 1000)
+        duration_ms = int((datetime.now(UTC) - started).total_seconds() * 1000)
         logger.info(
             "update_watermarks complete",
             extra={"rows_written": updated, "duration_ms": duration_ms},
         )
         return {"success": True, "rows_written": updated, "duration_ms": duration_ms}
     except Exception as e:  # noqa: BLE001
-        duration_ms = int((datetime.now(timezone.utc) - started).total_seconds() * 1000)
+        duration_ms = int((datetime.now(UTC) - started).total_seconds() * 1000)
         logger.exception("update_watermarks failed")
         err = f"{type(e).__name__}: {e}"
         if current_source:

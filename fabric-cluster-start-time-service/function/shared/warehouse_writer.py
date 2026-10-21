@@ -1,7 +1,7 @@
 import json
 import re
 import struct
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pyodbc  # type: ignore
@@ -89,7 +89,7 @@ class WarehouseWriter:
         if self._conn is None:
             raise RuntimeError("WarehouseWriter must be used as a context manager")
 
-        ingested_at = datetime.now(timezone.utc)
+        ingested_at = datetime.now(UTC)
         all_cols = list(key_columns) + ["raw_payload", "collector_run_id", "ingested_at"]
         col_list = ", ".join(all_cols)
         placeholders = ", ".join(["?"] * len(all_cols))

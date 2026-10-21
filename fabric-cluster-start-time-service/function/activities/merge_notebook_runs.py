@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 
@@ -19,20 +19,20 @@ def _get_credential(settings):
 def merge_notebook_runs(payload: dict) -> dict:
     cri = payload["collector_run_id"]
     logger = configure_logging(collector_run_id=cri)
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     settings = get_settings()
     credential = _get_credential(settings)
     try:
         with WarehouseWriter(settings, credential) as wh:
             rowcount = wh.execute_proc("dbo.usp_merge_notebook_runs", {"collector_run_id": cri})
-        duration_ms = int((datetime.now(timezone.utc) - started).total_seconds() * 1000)
+        duration_ms = int((datetime.now(UTC) - started).total_seconds() * 1000)
         logger.info(
             "merge_notebook_runs complete",
             extra={"rows_written": rowcount, "duration_ms": duration_ms},
         )
         return {"success": True, "rows_written": rowcount, "duration_ms": duration_ms}
     except Exception as e:  # noqa: BLE001
-        duration_ms = int((datetime.now(timezone.utc) - started).total_seconds() * 1000)
+        duration_ms = int((datetime.now(UTC) - started).total_seconds() * 1000)
         logger.exception("merge_notebook_runs failed")
         return {
             "success": False,
